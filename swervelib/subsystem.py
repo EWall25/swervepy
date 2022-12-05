@@ -27,7 +27,9 @@ class Swerve(commands2.SubsystemBase):
     ):
         commands2.SubsystemBase.__init__(self)
 
-        self.gyro = ctre.WPI_PigeonIMU(*swerve_params.gyro_id)
+        self.swerve_params = swerve_params
+
+        self.gyro = ctre.WPI_PigeonIMU(swerve_params.gyro_id)
         self.gyro.configFactoryDefault()
         self.zero_heading()
 
@@ -43,8 +45,6 @@ class Swerve(commands2.SubsystemBase):
         self.kinematics = SwerveDrive4Kinematics(*[module_param.relative_position for module_param in module_params])
 
         self.odometry = SwerveDrive4Odometry(self.kinematics, self.heading)
-
-        self.swerve_params = swerve_params
 
     def periodic(self):
         # Unpack a tuple of swerve module states into four arguments using the * symbol

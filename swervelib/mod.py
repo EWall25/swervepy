@@ -25,14 +25,14 @@ class SwerveModule:
 
         ctre_configs = CTREConfigs(swerve_params)
 
+        self.angle_encoder = ctre.WPI_CANCoder(*module_params.angle_encoder_id)
+        self._config_angle_encoder(ctre_configs.swerve_cancoder_config)
+
         self.drive_motor = ctre.WPI_TalonFX(*module_params.drive_motor_id)
         self._config_drive_motor(ctre_configs.swerve_drive_config)
 
         self.angle_motor = ctre.WPI_TalonFX(*module_params.angle_motor_id)
         self._config_angle_motor(ctre_configs.swerve_angle_config)
-
-        self.angle_encoder = ctre.WPI_CANCoder(*module_params.angle_encoder_id)
-        self._config_angle_encoder(ctre_configs.swerve_cancoder_config)
 
     def desire_state(self, desired_state: SwerveModuleState, open_loop: bool):
         # Optimize the desired state so that the module rotates to it as quick as possible
@@ -78,7 +78,10 @@ class SwerveModule:
         self.drive_motor.setSelectedSensorPosition(0)
 
     def _reset_to_absolute(self):
-        absolute_position = self.absolute_encoder_rotation.degrees() - self.angle_offset
+        # Convert from WPILib Rotation2d units to astropy rotation units
+        absolute_position = self.absolute_encoder_rotation.degrees() * u.deg
+
+        absolute_position -= self.angle_offset
         absolute_position = conversions.degrees_to_falcon(absolute_position, self.swerve_params.angle_gear_ratio)
         self.angle_motor.setSelectedSensorPosition(absolute_position)
 

@@ -76,7 +76,7 @@ class SwerveParameters:
 
     # Gyro
     invert_gyro: bool  # Gyro should be CCW+
-    gyro_id: CANDeviceID
+    gyro_id: int
 
 
 @dataclass
@@ -84,7 +84,7 @@ class SwerveModuleParameters:
     corner: ModuleCorner
     relative_position: wpimath.geometry.Translation2d
 
-    angle_offset: float
+    angle_offset: Quantity["angle"]
 
     drive_motor_id: CANDeviceID
     angle_motor_id: CANDeviceID

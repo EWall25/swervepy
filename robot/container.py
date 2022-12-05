@@ -3,7 +3,6 @@ import math
 import astropy.units as u
 import ctre
 import wpilib
-from astropy.units import Quantity
 from wpimath.geometry import Translation2d
 
 from swervelib import Swerve, SwerveParameters, SwerveModuleParameters
@@ -15,8 +14,8 @@ class RobotContainer:
         field_relative = True
         open_loop = True
 
-        track_width: Quantity = 21.73 * u.imperial.inch
-        wheel_base: Quantity = 21.73 * u.imperial.inch
+        track_width = (21.73 * u.imperial.inch).to_value(u.m)
+        wheel_base = (21.73 * u.imperial.inch).to_value(u.m)
         # fmt: off
         swerve_params = SwerveParameters(
             wheel_circumference=4 * math.pi * u.imperial.inch,  # SDS Wheel Circumference
@@ -63,7 +62,7 @@ class RobotContainer:
             invert_angle_encoder=False,
 
             invert_gyro=True,
-            gyro_id=CANDeviceID(0),
+            gyro_id=0,
         )
         # When defining module positions for kinematics, +x values represent moving toward the front of the robot, and
         # +y values represent moving toward the left of the robot
@@ -71,7 +70,7 @@ class RobotContainer:
             SwerveModuleParameters(
                 corner=ModuleCorner.FRONT_LEFT,
                 relative_position=Translation2d(wheel_base / 2, track_width / 2),
-                angle_offset=0,
+                angle_offset=0 * u.deg,
                 drive_motor_id=CANDeviceID(0),
                 angle_motor_id=CANDeviceID(4),
                 angle_encoder_id=CANDeviceID(0),
@@ -79,7 +78,7 @@ class RobotContainer:
             SwerveModuleParameters(
                 corner=ModuleCorner.FRONT_RIGHT,
                 relative_position=Translation2d(wheel_base / 2, -track_width / 2),
-                angle_offset=0,
+                angle_offset=0 * u.deg,
                 drive_motor_id=CANDeviceID(1),
                 angle_motor_id=CANDeviceID(5),
                 angle_encoder_id=CANDeviceID(1),
@@ -87,7 +86,7 @@ class RobotContainer:
             SwerveModuleParameters(
                 corner=ModuleCorner.BACK_LEFT,
                 relative_position=Translation2d(-wheel_base / 2, track_width / 2),
-                angle_offset=0,
+                angle_offset=0 * u.deg,
                 drive_motor_id=CANDeviceID(2),
                 angle_motor_id=CANDeviceID(6),
                 angle_encoder_id=CANDeviceID(2),
@@ -95,7 +94,7 @@ class RobotContainer:
             SwerveModuleParameters(
                 corner=ModuleCorner.BACK_RIGHT,
                 relative_position=Translation2d(-wheel_base / 2, -track_width / 2),
-                angle_offset=0,
+                angle_offset=0 * u.deg,
                 drive_motor_id=CANDeviceID(3),
                 angle_motor_id=CANDeviceID(7),
                 angle_encoder_id=CANDeviceID(3),
