@@ -10,20 +10,12 @@ from .configs import SwerveParameters, SwerveModuleParameters, CTREConfigs
 
 
 class SwerveModule:
-    __slots__ = (
-        "drive_motor",
-        "angle_motor",
-        "angle_encoder",
-        "swerve_params",
-        "angle_offset",
-        "feedforward",
-        "relative_position",
-    )
+    __slots__ = "drive_motor", "angle_motor", "angle_encoder", "swerve_params", "angle_offset", "feedforward", "corner"
 
     def __init__(self, module_params: SwerveModuleParameters, swerve_params: SwerveParameters):
         self.swerve_params = swerve_params
         self.angle_offset = module_params.angle_offset
-        self.relative_position = module_params.position
+        self.corner = module_params.corner
 
         self.feedforward = wpimath.controller.SimpleMotorFeedforwardMeters(
             swerve_params.drive_kS,

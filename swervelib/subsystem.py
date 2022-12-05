@@ -16,7 +16,7 @@ from .mod import SwerveModule
 
 
 class Swerve(commands2.SubsystemBase):
-    __slots__ = "odometry", "swerve_modules", "gyro", "swerve_params"
+    __slots__ = "odometry", "swerve_modules", "gyro", "swerve_params", "kinematics"
 
     def __init__(
         self,
@@ -31,10 +31,18 @@ class Swerve(commands2.SubsystemBase):
         self.gyro.configFactoryDefault()
         self.zero_heading()
 
-        self.odometry = SwerveDrive4Odometry(swerve_params.kinematics, self.heading)
+        # Sort the module parameters list into front-left, front-right, back-left, back-right order
+        # The RelativeModulePosition enum has maps 0 to front-left and 3 to back-right, so the items are
+        # sorted in ascending order according to the enum value.
+        module_params = sorted(module_params, key=lambda param: param.corner)
 
         # Create four swerve modules and pass each a unique set of parameters
-        self.swerve_modules = tuple(SwerveModule(module_params[i], swerve_params) for i in range(4))
+        self.swerve_modules = tuple(SwerveModule(module_param, swerve_params) for module_param in module_params)
+
+        # Create kinematics in the same order as the swerve modules tuple
+        self.kinematics = SwerveDrive4Kinematics(*[module_param.relative_position for module_param in module_params])
+
+        self.odometry = SwerveDrive4Odometry(self.kinematics, self.heading)
 
         self.swerve_params = swerve_params
 
@@ -50,7 +58,7 @@ class Swerve(commands2.SubsystemBase):
             if field_relative
             else ChassisSpeeds(translation.x, translation.y, rotation.to_value(u.rad / u.s))
         )
-        swerve_module_states = self.swerve_params.kinematics.toSwerveModuleStates(speeds)
+        swerve_module_states = self.kinematics.toSwerveModuleStates(speeds)
         swerve_module_states = SwerveDrive4Kinematics.desaturateWheelSpeeds(
             swerve_module_states, self.swerve_params.max_speed.to_value(u.m / u.s)
         )
@@ -131,7 +139,7 @@ class Swerve(commands2.SubsystemBase):
         command = commands2.Swerve4ControllerCommand(
             trajectory,
             lambda: self.pose,
-            self.swerve_params.kinematics,
+            self.kinematics,
             wpimath.controller.PIDController(1, 0, 0),
             wpimath.controller.PIDController(1, 0, 0),
             theta_controller,
@@ -155,12 +163,9 @@ class Swerve(commands2.SubsystemBase):
         )
         # fmt: on
 
-        # Can't assume the 0th index of the swerve_modules tuple will be the front-left module,
-        # so access the appropriate angle by each module's position on the robot (e.g. front-left)
-        # The RelativeModulePosition enum is ordered in the same way as the angles tuple
-        states = tuple(
-            SwerveModuleState(0, Rotation2d.fromDegrees(angles[mod.relative_position])) for mod in self.swerve_modules
-        )
+        # The swerve_modules tuple is already ordered in front-left, front-right, back-left, back-right order
+        # Create a state with the proper angle for each module's position
+        states = tuple(SwerveModuleState(0, Rotation2d.fromDegrees(angle)) for angle in angles)
 
         # noinspection PyTypeChecker
         return commands2.InstantCommand(lambda: self.set_module_states(states))

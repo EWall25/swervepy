@@ -4,7 +4,7 @@ from typing import NamedTuple
 
 import ctre
 import wpimath.trajectory
-import wpimath.kinematics
+import wpimath.geometry
 from astropy.units import Quantity
 
 
@@ -13,7 +13,7 @@ class CANDeviceID(NamedTuple):
     canbus: str = ""
 
 
-class RelativeModulePosition(enum.IntEnum):
+class ModuleCorner(enum.IntEnum):
     FRONT_LEFT = 0
     FRONT_RIGHT = 1
     BACK_LEFT = 2
@@ -30,8 +30,6 @@ class SwerveParameters:
 
     drive_gear_ratio: float
     angle_gear_ratio: float
-
-    kinematics: wpimath.kinematics.SwerveDrive4Kinematics
 
     # Swerve Profiling
     max_speed: Quantity["velocity"]
@@ -83,7 +81,9 @@ class SwerveParameters:
 
 @dataclass
 class SwerveModuleParameters:
-    position: RelativeModulePosition
+    corner: ModuleCorner
+    relative_position: wpimath.geometry.Translation2d
+
     angle_offset: float
 
     drive_motor_id: CANDeviceID
