@@ -70,7 +70,9 @@ class Swerve(commands2.SubsystemBase):
     def set_module_states(
         self, desired_states: tuple[SwerveModuleState, SwerveModuleState, SwerveModuleState, SwerveModuleState]
     ):
-        desired_states = SwerveDrive4Kinematics.desaturateWheelSpeeds(desired_states, self.swerve_params.max_speed)
+        desired_states = SwerveDrive4Kinematics.desaturateWheelSpeeds(
+            desired_states, self.swerve_params.max_speed.to_value(u.m / u.s)
+        )
 
         for i in range(4):
             mod: SwerveModule = self.swerve_modules[i]
@@ -110,16 +112,30 @@ class Swerve(commands2.SubsystemBase):
         field_relative: bool,
         open_loop: bool,
     ):
-        # TODO: Add deadbanding
-        # TODO: Add 45deg stopping feature
-        return commands2.RunCommand(
-            lambda: self.drive(
-                Translation2d(translation(), strafe()) * self.swerve_params.max_speed.to_value(u.m / u.s),
-                rotation() * self.swerve_params.max_angular_velocity,
-                field_relative,
-                open_loop,
-            ),
-            self,
+        def received_input():
+            return translation() != 0 or strafe() != 0 or rotation() != 0
+
+        return commands2.SequentialCommandGroup(
+            commands2.RunCommand(
+                lambda: self.drive(
+                    Translation2d(translation(), strafe()) * self.swerve_params.max_speed.to_value(u.m / u.s),
+                    rotation() * self.swerve_params.max_angular_velocity,
+                    field_relative,
+                    open_loop,
+                ),
+                self,
+            )
+            # When the driver stops moving joysticks, perform a ski stop (45 degree wheels)
+            .until(lambda: not received_input()),
+            commands2.SequentialCommandGroup(
+                # Wait for a moment so that the wheels don't change angles if the driver stops and starts quickly
+                commands2.WaitCommand(0.3),
+                # If the command isn't run perpetually, the driver will regain control before he moves a joystick
+                # and ski stop will essentially never run
+                self.ski_stop_command().perpetually(),
+            )
+            # Give back control to the driver whenever he moves a joystick
+            .until(received_input),
         )
 
     def follow_trajectory_command(
@@ -168,4 +184,4 @@ class Swerve(commands2.SubsystemBase):
         states = tuple(SwerveModuleState(0, Rotation2d.fromDegrees(angle)) for angle in angles)
 
         # noinspection PyTypeChecker
-        return commands2.InstantCommand(lambda: self.set_module_states(states))
+        return commands2.InstantCommand(lambda: self.set_module_states(states), self)

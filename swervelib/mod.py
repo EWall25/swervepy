@@ -1,6 +1,7 @@
 import astropy.units as u
 import ctre
 import numpy as np
+import wpilib
 import wpimath.controller
 from wpimath.geometry import Rotation2d
 from wpimath.kinematics import SwerveModuleState
@@ -58,6 +59,9 @@ class SwerveModule:
             desired_state.angle.degrees() * u.deg, self.swerve_params.angle_gear_ratio
         )
         self.angle_motor.set(ctre.ControlMode.Position, angle)
+
+        wpilib.SmartDashboard.putNumber(f"{self.corner.name} Desired Angle (deg)", desired_state.angle.degrees())
+        wpilib.SmartDashboard.putNumber(f"{self.corner.name} Desired Velocity (mps)", desired_state.speed)
 
     def _config_angle_encoder(self, config: ctre.CANCoderConfiguration):
         self.angle_encoder.configFactoryDefault()
