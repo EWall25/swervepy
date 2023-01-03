@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "swervelib"
+version = "0.1.0"
+description = "Swerve drive library for FRC"
+authors = ["Ethan Wall <ewall25@jesuittampa.org>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+robotpy = {version = ">=2022.4,<2023", extras = ["ctre", "commands2", "pathplannerlib"]}
+astropy = "^5.2"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
