@@ -4,7 +4,6 @@ from typing import Callable
 import commands2
 import ctre
 
-# import pathplannerlib as pp
 import wpimath.controller
 from astropy import units as u
 from astropy.units import Quantity
@@ -159,17 +158,7 @@ class Swerve(commands2.SubsystemBase):
             .until(received_input),
         )
 
-    def follow_trajectory_command(
-        self, trajectory: pp.PathPlannerTrajectory | Trajectory | str, first_path: bool, params: AutoParameters
-    ):
-        # If a string is passed in, load a PathPlanner path from storage
-        if isinstance(trajectory, str):
-            trajectory = pp.PathPlanner.loadPath(trajectory, params.max_speed, params.max_acceleration)
-
-        # Change from the PathPlanner trajectory format to the WPILib format for the built-in controller
-        if isinstance(trajectory, pp.PathPlannerTrajectory):
-            trajectory = trajectory.asWPILibTrajectory()
-
+    def follow_trajectory_command(self, trajectory: Trajectory, first_path: bool, params: AutoParameters):
         theta_controller = wpimath.controller.ProfiledPIDControllerRadians(1, 0, 0, params.theta_controller_constraints)
         theta_controller.enableContinuousInput(-math.pi, math.pi)
 
