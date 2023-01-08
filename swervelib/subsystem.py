@@ -3,12 +3,19 @@ from typing import Callable
 
 import commands2
 import ctre
-import pathplannerlib as pp
+
+# import pathplannerlib as pp
 import wpimath.controller
 from astropy import units as u
 from astropy.units import Quantity
 from wpimath.geometry import Translation2d, Pose2d, Rotation2d
-from wpimath.kinematics import SwerveDrive4Odometry, ChassisSpeeds, SwerveDrive4Kinematics, SwerveModuleState
+from wpimath.kinematics import (
+    SwerveDrive4Odometry,
+    ChassisSpeeds,
+    SwerveDrive4Kinematics,
+    SwerveModuleState,
+    SwerveModulePosition,
+)
 from wpimath.trajectory import Trajectory
 
 from .configs import SwerveModuleParameters, SwerveParameters, AutoParameters
@@ -44,11 +51,14 @@ class Swerve(commands2.SubsystemBase):
         # Create kinematics in the same order as the swerve modules tuple
         self.kinematics = SwerveDrive4Kinematics(*[module_param.relative_position for module_param in module_params])
 
-        self.odometry = SwerveDrive4Odometry(self.kinematics, self.heading)
+        # Reset the driven distance of each module before constructing odometry
+        self._zero_module_positions()
+
+        self.odometry = SwerveDrive4Odometry(self.kinematics, self.heading, self.module_positions)
 
     def periodic(self):
-        # Unpack a tuple of swerve module states into four arguments using the * symbol
-        self.odometry.update(self.heading, *self.module_states)
+        # Unpack a tuple of swerve module positions into four arguments using the * symbol
+        self.odometry.update(self.heading, *self.module_positions)
 
     def drive(self, translation: Translation2d, rotation: Quantity[u.rad / u.s], field_relative: bool, open_loop: bool):
         speeds = (
@@ -82,7 +92,11 @@ class Swerve(commands2.SubsystemBase):
         self.gyro.setYaw(0)
 
     def reset_odometry(self, pose: Pose2d):
-        self.odometry.resetPosition(pose, self.heading)
+        self.odometry.resetPosition(pose, self.heading, *self.module_positions)
+
+    def _zero_module_positions(self):
+        for mod in self.swerve_modules:
+            mod.zero_distance()
 
     @property
     def pose(self) -> Pose2d:
@@ -92,6 +106,13 @@ class Swerve(commands2.SubsystemBase):
     def module_states(self) -> tuple[SwerveModuleState, SwerveModuleState, SwerveModuleState, SwerveModuleState]:
         # noinspection PyTypeChecker
         return tuple(mod.state for mod in self.swerve_modules)
+
+    @property
+    def module_positions(
+        self,
+    ) -> tuple[SwerveModulePosition, SwerveModulePosition, SwerveModulePosition, SwerveModulePosition]:
+        # noinspection PyTypeChecker
+        return tuple(mod.position for mod in self.swerve_modules)
 
     @property
     def heading(self) -> Rotation2d:

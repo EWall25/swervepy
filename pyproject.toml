@@ -6,9 +6,9 @@ authors = ["Ethan Wall <ewall25@jesuittampa.org>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = "^3.10"
-robotpy = {version = ">=2022.4,<2023", extras = ["ctre", "commands2", "pathplannerlib"]}
+python = "~3.10"
 astropy = "^5.2"
+robotpy = {version = "^2023.1.1", extras = ["ctre", "commands2"]}
 
 [tool.poetry.dev-dependencies]
 

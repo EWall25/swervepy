@@ -41,3 +41,15 @@ def mps_to_falcon(velocity: Quantity[u.m / u.s], circumference: Quantity["length
     wheel_rpm = (velocity.to_value(u.m / u.s) * 60) / circumference.to_value(u.m)
     wheel_velocity = rpm_to_falcon(wheel_rpm, gear_ratio)
     return wheel_velocity
+
+
+def falcon_to_metres(counts: float, circumference: Quantity["length"], gear_ratio: float) -> Quantity[u.m]:
+    rotations = counts / (gear_ratio * FALCON_CPR)
+    metres = rotations * circumference.to_value(u.m)
+    return metres * u.m
+
+
+def metres_to_falcon(metres: Quantity[u.m], circumference: Quantity["length"], gear_ratio: float) -> float:
+    rotations = metres.to_value(u.m) / circumference.to_value(u.m)
+    counts = rotations * (gear_ratio * FALCON_CPR)
+    return counts

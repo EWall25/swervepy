@@ -4,7 +4,7 @@ import numpy as np
 import wpilib
 import wpimath.controller
 from wpimath.geometry import Rotation2d
-from wpimath.kinematics import SwerveModuleState
+from wpimath.kinematics import SwerveModuleState, SwerveModulePosition
 
 from . import conversions
 from .configs import SwerveParameters, SwerveModuleParameters, CTREConfigs
@@ -63,6 +63,9 @@ class SwerveModule:
         wpilib.SmartDashboard.putNumber(f"{self.corner.name} Desired Angle (deg)", desired_state.angle.degrees())
         wpilib.SmartDashboard.putNumber(f"{self.corner.name} Desired Velocity (mps)", desired_state.speed)
 
+    def zero_distance(self):
+        self.drive_motor.setSelectedSensorPosition(0)
+
     def _config_angle_encoder(self, config: ctre.CANCoderConfiguration):
         self.angle_encoder.configFactoryDefault()
         self.angle_encoder.configAllSettings(config)
@@ -102,6 +105,20 @@ class SwerveModule:
             ).value
         )
         return SwerveModuleState(velocity, angle)
+
+    @property
+    def position(self) -> SwerveModulePosition:
+        distance = conversions.falcon_to_metres(
+            self.drive_motor.getSelectedSensorPosition(),
+            self.swerve_params.wheel_circumference,
+            self.swerve_params.drive_gear_ratio,
+        ).value
+        angle = Rotation2d.fromDegrees(
+            conversions.falcon_to_degrees(
+                self.angle_motor.getSelectedSensorVelocity(), self.swerve_params.angle_gear_ratio
+            ).value
+        )
+        return SwerveModulePosition(distance, angle)
 
     @property
     def absolute_encoder_rotation(self) -> Rotation2d:
