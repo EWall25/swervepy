@@ -5,7 +5,8 @@ from typing import NamedTuple
 import ctre
 import wpimath.trajectory
 import wpimath.geometry
-from astropy.units import Quantity
+
+from .units import *
 
 
 class CANDeviceID(NamedTuple):
@@ -23,7 +24,7 @@ class ModuleCorner(enum.IntEnum):
 @dataclass
 class SwerveParameters:
     # Drivetrain Constants
-    wheel_circumference: Quantity["length"]
+    wheel_circumference: Length
 
     open_loop_ramp: float
     closed_loop_ramp: float
@@ -32,8 +33,8 @@ class SwerveParameters:
     angle_gear_ratio: float
 
     # Swerve Profiling
-    max_speed: Quantity["velocity"]
-    max_angular_velocity: Quantity["angular velocity"]
+    max_speed: Velocity
+    max_angular_velocity: AngularVelocity
 
     # Swerve Current Limiting
     angle_continuous_current_limit: int
@@ -84,7 +85,7 @@ class SwerveModuleParameters:
     corner: ModuleCorner
     relative_position: wpimath.geometry.Translation2d
 
-    angle_offset: Quantity["angle"]
+    angle_offset: Angle
 
     drive_motor_id: CANDeviceID
     angle_motor_id: CANDeviceID
@@ -93,8 +94,8 @@ class SwerveModuleParameters:
 
 @dataclass
 class AutoParameters:
-    max_speed: Quantity["velocity"]
-    max_acceleration: Quantity["acceleration"]
+    max_speed: Velocity
+    max_acceleration: Acceleration
     # max_angular_speed: Quantity["angular velocity"]
     # max_angular_acceleration: Quantity["angular acceleration"]
 

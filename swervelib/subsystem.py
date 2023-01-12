@@ -5,8 +5,6 @@ import commands2
 import ctre
 
 import wpimath.controller
-from astropy import units as u
-from astropy.units import Quantity
 from wpimath.geometry import Translation2d, Pose2d, Rotation2d
 from wpimath.kinematics import (
     SwerveDrive4Odometry,
@@ -19,6 +17,7 @@ from wpimath.trajectory import Trajectory
 
 from .configs import SwerveModuleParameters, SwerveParameters, AutoParameters
 from .mod import SwerveModule
+from .units import AngularVelocity, u
 
 
 class Swerve(commands2.SubsystemBase):
@@ -59,17 +58,18 @@ class Swerve(commands2.SubsystemBase):
         # Unpack a tuple of swerve module positions into four arguments using the * symbol
         self.odometry.update(self.heading, *self.module_positions)
 
-    def drive(self, translation: Translation2d, rotation: Quantity[u.rad / u.s], field_relative: bool, open_loop: bool):
+    def drive(self, translation: Translation2d, rotation: AngularVelocity, field_relative: bool, open_loop: bool):
+        rotation.ito(u.rad / u.s)
         speeds = (
             ChassisSpeeds.fromFieldRelativeSpeeds(
-                translation.x, translation.y, rotation.to_value(u.rad / u.s), self.heading
+                translation.x, translation.y, rotation.m, self.heading
             )
             if field_relative
-            else ChassisSpeeds(translation.x, translation.y, rotation.to_value(u.rad / u.s))
+            else ChassisSpeeds(translation.x, translation.y, rotation.m)
         )
         swerve_module_states = self.kinematics.toSwerveModuleStates(speeds)
         swerve_module_states = SwerveDrive4Kinematics.desaturateWheelSpeeds(
-            swerve_module_states, self.swerve_params.max_speed.to_value(u.m / u.s)
+            swerve_module_states, self.swerve_params.max_speed.m_as(u.m / u.s)
         )
 
         for i in range(4):
@@ -80,7 +80,7 @@ class Swerve(commands2.SubsystemBase):
         self, desired_states: tuple[SwerveModuleState, SwerveModuleState, SwerveModuleState, SwerveModuleState]
     ):
         desired_states = SwerveDrive4Kinematics.desaturateWheelSpeeds(
-            desired_states, self.swerve_params.max_speed.to_value(u.m / u.s)
+            desired_states, self.swerve_params.max_speed.m_as(u.m / u.s)
         )
 
         for i in range(4):
@@ -138,7 +138,7 @@ class Swerve(commands2.SubsystemBase):
         return commands2.SequentialCommandGroup(
             commands2.RunCommand(
                 lambda: self.drive(
-                    Translation2d(translation(), strafe()) * self.swerve_params.max_speed.to_value(u.m / u.s),
+                    Translation2d(translation(), strafe()) * self.swerve_params.max_speed.m_as(u.m / u.s),
                     rotation() * self.swerve_params.max_angular_velocity,
                     field_relative,
                     open_loop,

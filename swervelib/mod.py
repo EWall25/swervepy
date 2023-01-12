@@ -1,4 +1,3 @@
-import astropy.units as u
 import ctre
 import numpy as np
 import wpilib
@@ -8,6 +7,7 @@ from wpimath.kinematics import SwerveModuleState, SwerveModulePosition
 
 from . import conversions
 from .configs import SwerveParameters, SwerveModuleParameters, CTREConfigs
+from .units import u
 
 
 class SwerveModule:
@@ -40,7 +40,7 @@ class SwerveModule:
         desired_state = optimize(desired_state, self.state.angle)
 
         if open_loop:
-            percent_output = desired_state.speed / self.swerve_params.max_speed.to_value(u.m / u.s)
+            percent_output = desired_state.speed / self.swerve_params.max_speed.m_as(u.m / u.s)
             self.drive_motor.set(ctre.ControlMode.PercentOutput, percent_output)
         else:
             velocity = conversions.mps_to_falcon(
@@ -85,7 +85,7 @@ class SwerveModule:
         self.drive_motor.setSelectedSensorPosition(0)
 
     def _reset_to_absolute(self):
-        # Convert from WPILib Rotation2d units to astropy rotation units
+        # Convert from WPILib Rotation2d units to pint rotation units
         absolute_position = self.absolute_encoder_rotation.degrees() * u.deg
 
         absolute_position -= self.angle_offset
@@ -98,11 +98,11 @@ class SwerveModule:
             self.drive_motor.getSelectedSensorVelocity(),
             self.swerve_params.wheel_circumference,
             self.swerve_params.drive_gear_ratio,
-        ).value
+        ).m
         angle = Rotation2d.fromDegrees(
             conversions.falcon_to_degrees(
                 self.angle_motor.getSelectedSensorVelocity(), self.swerve_params.angle_gear_ratio
-            ).value
+            ).m
         )
         return SwerveModuleState(velocity, angle)
 
@@ -112,11 +112,11 @@ class SwerveModule:
             self.drive_motor.getSelectedSensorPosition(),
             self.swerve_params.wheel_circumference,
             self.swerve_params.drive_gear_ratio,
-        ).value
+        ).m
         angle = Rotation2d.fromDegrees(
             conversions.falcon_to_degrees(
                 self.angle_motor.getSelectedSensorVelocity(), self.swerve_params.angle_gear_ratio
-            ).value
+            ).m
         )
         return SwerveModulePosition(distance, angle)
 

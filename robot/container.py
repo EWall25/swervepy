@@ -1,12 +1,11 @@
 import math
 
-import astropy.units as u
 import ctre
 import wpilib
 from wpimath.geometry import Translation2d
 
-from swervelib import Swerve, SwerveParameters, SwerveModuleParameters
-from swervelib.configs import CANDeviceID, ModuleCorner
+from swervelib import Swerve, SwerveParameters, SwerveModuleParameters, CANDeviceID, ModuleCorner
+from swervelib.units import u
 
 
 class RobotContainer:
@@ -14,11 +13,11 @@ class RobotContainer:
         field_relative = True
         open_loop = True
 
-        track_width = (21.73 * u.imperial.inch).to_value(u.m)
-        wheel_base = (21.73 * u.imperial.inch).to_value(u.m)
+        track_width = (21.73 * u.inch).m_as(u.m)
+        wheel_base = (21.73 * u.inch).m_as(u.m)
         # fmt: off
         swerve_params = SwerveParameters(
-            wheel_circumference=4 * math.pi * u.imperial.inch,  # SDS Wheel Circumference
+            wheel_circumference=4 * math.pi * u.inch,  # SDS Wheel Circumference
 
             open_loop_ramp=0,
             closed_loop_ramp=0,
