@@ -3,6 +3,7 @@ from typing import Callable
 
 import commands2
 import ctre
+import wpilib
 
 import wpimath.controller
 from wpimath.geometry import Translation2d, Pose2d, Rotation2d
@@ -57,6 +58,12 @@ class Swerve(commands2.SubsystemBase):
     def periodic(self):
         # Unpack a tuple of swerve module positions into four arguments using the * symbol
         self.odometry.update(self.heading, *self.module_positions)
+
+        for mod in self.swerve_modules:
+            wpilib.SmartDashboard.putNumber(
+                f"{mod.corner.name} Absolute Rotation (deg)",
+                mod.absolute_encoder_rotation.degrees(),
+            )
 
     def drive(self, translation: Translation2d, rotation: AngularVelocity, field_relative: bool, open_loop: bool):
         rotation.ito(u.rad / u.s)
