@@ -26,8 +26,9 @@ class SwerveParameters:
     # Drivetrain Constants
     wheel_circumference: Length
 
-    open_loop_ramp: float
-    closed_loop_ramp: float
+    drive_open_loop_ramp: float
+    drive_closed_loop_ramp: float
+    angle_ramp: float
 
     drive_gear_ratio: float
     angle_gear_ratio: float
@@ -78,6 +79,7 @@ class SwerveParameters:
     # Gyro
     invert_gyro: bool  # Gyro should be CCW+
     gyro_id: int
+    fake_gyro: bool = False
 
 
 @dataclass
@@ -126,6 +128,7 @@ class CTREConfigs:
         swerve_angle_config.slot0.kF = params.angle_kF
         swerve_angle_config.supplyCurrLimit = angle_supply_limit
         swerve_angle_config.initializationStrategy = ctre.SensorInitializationStrategy.BootToZero
+        swerve_angle_config.closedloopRamp = params.angle_ramp
 
         # Swerve Drive Motor Configuration
         drive_supply_limit = ctre.SupplyCurrentLimitConfiguration(
@@ -141,8 +144,8 @@ class CTREConfigs:
         swerve_drive_config.slot0.kF = params.drive_kF
         swerve_drive_config.supplyCurrLimit = drive_supply_limit
         swerve_drive_config.initializationStrategy = ctre.SensorInitializationStrategy.BootToZero
-        swerve_drive_config.openloopRamp = params.open_loop_ramp
-        swerve_drive_config.closedloopRamp = params.closed_loop_ramp
+        swerve_drive_config.openloopRamp = params.drive_open_loop_ramp
+        swerve_drive_config.closedloopRamp = params.drive_closed_loop_ramp
 
         # Swerve CANCoder Configuration
         swerve_cancoder_config.absoluteSensorRange = ctre.AbsoluteSensorRange.Unsigned_0_to_360

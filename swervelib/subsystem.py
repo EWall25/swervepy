@@ -17,6 +17,7 @@ from wpimath.kinematics import (
 from wpimath.trajectory import Trajectory
 
 from .configs import SwerveModuleParameters, SwerveParameters, AutoParameters
+from .dummy import Dummy
 from .mod import SwerveModule
 from .units import AngularVelocity, u
 
@@ -35,7 +36,10 @@ class Swerve(commands2.SubsystemBase):
 
         self.swerve_params = swerve_params
 
-        self.gyro = ctre.WPI_PigeonIMU(swerve_params.gyro_id)
+        if swerve_params.fake_gyro:
+            self.gyro = Dummy()
+        else:
+            self.gyro = ctre.WPI_PigeonIMU(swerve_params.gyro_id)
         self.gyro.configFactoryDefault()
         self.zero_heading()
 
@@ -59,11 +63,7 @@ class Swerve(commands2.SubsystemBase):
         # Unpack a tuple of swerve module positions into four arguments using the * symbol
         self.odometry.update(self.heading, *self.module_positions)
 
-        for mod in self.swerve_modules:
-            wpilib.SmartDashboard.putNumber(
-                f"{mod.corner.name} Absolute Rotation (deg)",
-                mod.absolute_encoder_rotation.degrees(),
-            )
+        self._update_dashboard()
 
     def drive(self, translation: Translation2d, rotation: AngularVelocity, field_relative: bool, open_loop: bool):
         rotation.ito(u.rad / u.s)
@@ -148,7 +148,8 @@ class Swerve(commands2.SubsystemBase):
     ):
         return commands2.RunCommand(
             lambda: self.drive(
-                Translation2d(translation(), strafe()) * self.swerve_params.max_speed.m_as(u.m / u.s),
+                # https://docs.wpilib.org/en/stable/docs/software/advanced-controls/geometry/coordinate-systems.html#robot-coordinate-system
+                Translation2d(translation(), -strafe()) * self.swerve_params.max_speed.m_as(u.m / u.s),
                 rotation() * self.swerve_params.max_angular_velocity,
                 field_relative,
                 open_loop,

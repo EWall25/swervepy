@@ -106,7 +106,7 @@ class SwerveModule:
         ).m
         angle = Rotation2d.fromDegrees(
             conversions.falcon_to_degrees(
-                self.angle_motor.getSelectedSensorVelocity(), self.swerve_params.angle_gear_ratio
+                self.angle_motor.getSelectedSensorPosition(), self.swerve_params.angle_gear_ratio
             ).m
         )
         return SwerveModuleState(velocity, angle)
@@ -120,7 +120,7 @@ class SwerveModule:
         ).m
         angle = Rotation2d.fromDegrees(
             conversions.falcon_to_degrees(
-                self.angle_motor.getSelectedSensorVelocity(), self.swerve_params.angle_gear_ratio
+                self.angle_motor.getSelectedSensorPosition(), self.swerve_params.angle_gear_ratio
             ).m
         )
         return SwerveModulePosition(distance, angle)
