@@ -91,6 +91,8 @@ class SwerveModuleParameters:
     angle_motor_id: CANDeviceID
     angle_encoder_id: CANDeviceID
 
+    fake: bool = False
+
 
 @dataclass
 class AutoParameters:

@@ -1,5 +1,4 @@
 import ctre
-import numpy as np
 import wpilib
 import wpimath.controller
 from wpimath.geometry import Rotation2d
@@ -7,6 +6,7 @@ from wpimath.kinematics import SwerveModuleState, SwerveModulePosition
 
 from . import conversions
 from .configs import SwerveParameters, SwerveModuleParameters, CTREConfigs
+from .dummy import Dummy
 from .units import u
 
 
@@ -23,6 +23,11 @@ class SwerveModule:
             swerve_params.drive_kV,
             swerve_params.drive_kA,
         )
+
+        # Set up the CAN devices as NoOp objects for testing swerve without all devices on the robot
+        if module_params.fake:
+            self.angle_encoder, self.drive_motor, self.angle_motor = [Dummy()] * 3
+            return
 
         ctre_configs = CTREConfigs(swerve_params)
 
@@ -125,6 +130,10 @@ class SwerveModule:
         return Rotation2d.fromDegrees(self.angle_encoder.getAbsolutePosition())
 
 
+def _sign(num):
+    return 1 if num > 0 else -1 if num < 0 else 0
+
+
 def place_in_proper_0_to_360_scope(scope_reference: float, new_angle: float):
     # Place the new_angle in the range that is a multiple of [0, 360] (e.g., [360, 720]) which is closest
     # to the scope_reference
@@ -158,6 +167,6 @@ def optimize(desired_state: SwerveModuleState, current_angle: Rotation2d):
 
     if abs(delta) > 90:
         target_speed *= -1
-        target_angle -= 180 * np.sign(delta)
+        target_angle -= 180 * _sign(delta)
 
     return SwerveModuleState(target_speed, Rotation2d.fromDegrees(target_angle))

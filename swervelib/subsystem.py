@@ -68,9 +68,7 @@ class Swerve(commands2.SubsystemBase):
     def drive(self, translation: Translation2d, rotation: AngularVelocity, field_relative: bool, open_loop: bool):
         rotation.ito(u.rad / u.s)
         speeds = (
-            ChassisSpeeds.fromFieldRelativeSpeeds(
-                translation.x, translation.y, rotation.m, self.heading
-            )
+            ChassisSpeeds.fromFieldRelativeSpeeds(translation.x, translation.y, rotation.m, self.heading)
             if field_relative
             else ChassisSpeeds(translation.x, translation.y, rotation.m)
         )
@@ -103,6 +101,15 @@ class Swerve(commands2.SubsystemBase):
     def _zero_module_positions(self):
         for mod in self.swerve_modules:
             mod.zero_distance()
+
+    def _update_dashboard(self):
+        for mod in self.swerve_modules:
+            wpilib.SmartDashboard.putNumber(
+                f"{mod.corner.name} CANCoder Absolute Rotation (deg)",
+                mod.absolute_encoder_rotation.degrees(),
+            )
+            wpilib.SmartDashboard.putNumber(f"{mod.corner.name} Drive Speed (mps)", mod.state.speed)
+            wpilib.SmartDashboard.putNumber(f"{mod.corner.name} Azimuth Angle (deg)", mod.state.angle.degrees())
 
     @property
     def pose(self) -> Pose2d:
@@ -139,19 +146,29 @@ class Swerve(commands2.SubsystemBase):
         field_relative: bool,
         open_loop: bool,
     ):
+        return commands2.RunCommand(
+            lambda: self.drive(
+                Translation2d(translation(), strafe()) * self.swerve_params.max_speed.m_as(u.m / u.s),
+                rotation() * self.swerve_params.max_angular_velocity,
+                field_relative,
+                open_loop,
+            ),
+            self,
+        )
+
+    def teleop_with_ski_stop_command(
+        self,
+        translation: Callable[[], float],
+        strafe: Callable[[], float],
+        rotation: Callable[[], float],
+        field_relative: bool,
+        open_loop: bool,
+    ):
         def received_input():
             return translation() != 0 or strafe() != 0 or rotation() != 0
 
         return commands2.SequentialCommandGroup(
-            commands2.RunCommand(
-                lambda: self.drive(
-                    Translation2d(translation(), strafe()) * self.swerve_params.max_speed.m_as(u.m / u.s),
-                    rotation() * self.swerve_params.max_angular_velocity,
-                    field_relative,
-                    open_loop,
-                ),
-                self,
-            )
+            self.teleop_command(translation, strafe, rotation, field_relative, open_loop)
             # When the driver stops moving joysticks, perform a ski stop (45 degree wheels)
             .until(lambda: not received_input()),
             commands2.SequentialCommandGroup(
