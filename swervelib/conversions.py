@@ -1,16 +1,18 @@
+import wpimath.geometry
+
 from .units import *
 
 FALCON_CPR = 2048
 DEGREES_PER_ROTATION = 360
 
 
-def falcon_to_degrees(counts: float, gear_ratio: float) -> Angle:
+def falcon_to_degrees(counts: float, gear_ratio: float) -> wpimath.geometry.Rotation2d:
     degrees = counts * (DEGREES_PER_ROTATION / (gear_ratio * FALCON_CPR))
-    return degrees * u.deg
+    return wpimath.geometry.Rotation2d.fromDegrees(degrees)
 
 
-def degrees_to_falcon(degrees: Angle, gear_ratio: float) -> float:
-    ticks = degrees.m_as(u.deg) / (DEGREES_PER_ROTATION / (gear_ratio * FALCON_CPR))
+def degrees_to_falcon(degrees: wpimath.geometry.Rotation2d, gear_ratio: float) -> float:
+    ticks = degrees.degrees() / (DEGREES_PER_ROTATION / (gear_ratio * FALCON_CPR))
     return ticks
 
 

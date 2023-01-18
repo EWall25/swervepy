@@ -87,7 +87,7 @@ class SwerveModuleParameters:
     corner: ModuleCorner
     relative_position: wpimath.geometry.Translation2d
 
-    angle_offset: Angle
+    angle_offset: wpimath.geometry.Rotation2d
 
     drive_motor_id: CANDeviceID
     angle_motor_id: CANDeviceID

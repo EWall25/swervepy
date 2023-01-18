@@ -61,7 +61,7 @@ class SwerveModule:
             )
 
         angle = conversions.degrees_to_falcon(
-            desired_state.angle.degrees() * u.deg, self.swerve_params.angle_gear_ratio
+            desired_state.angle, self.swerve_params.angle_gear_ratio
         )
         self.angle_motor.set(ctre.ControlMode.Position, angle)
 
@@ -80,7 +80,6 @@ class SwerveModule:
         self.angle_motor.configAllSettings(config)
         self.angle_motor.setInverted(self.swerve_params.invert_angle_motor)
         self.angle_motor.setNeutralMode(self.swerve_params.angle_neutral_mode)
-        self._reset_to_absolute()
 
     def _config_drive_motor(self, config: ctre.TalonFXConfiguration):
         self.drive_motor.configFactoryDefault()
@@ -89,13 +88,11 @@ class SwerveModule:
         self.drive_motor.setNeutralMode(self.swerve_params.drive_neutral_mode)
         self.drive_motor.setSelectedSensorPosition(0)
 
-    def _reset_to_absolute(self):
-        # Convert from WPILib Rotation2d units to pint rotation units
-        absolute_position = self.absolute_encoder_rotation.degrees() * u.deg
-
+    def reset_to_absolute(self):
+        absolute_position = self.absolute_encoder_rotation
         absolute_position -= self.angle_offset
-        absolute_position = conversions.degrees_to_falcon(absolute_position, self.swerve_params.angle_gear_ratio)
-        self.angle_motor.setSelectedSensorPosition(absolute_position)
+        falcon_ticks = conversions.degrees_to_falcon(absolute_position, self.swerve_params.angle_gear_ratio)
+        self.angle_motor.setSelectedSensorPosition(falcon_ticks)
 
     @property
     def state(self) -> SwerveModuleState:
@@ -104,11 +101,8 @@ class SwerveModule:
             self.swerve_params.wheel_circumference,
             self.swerve_params.drive_gear_ratio,
         ).m
-        angle = Rotation2d.fromDegrees(
-            conversions.falcon_to_degrees(
-                self.angle_motor.getSelectedSensorPosition(), self.swerve_params.angle_gear_ratio
-            ).m
-        )
+        angle = conversions.falcon_to_degrees(self.angle_motor.getSelectedSensorPosition(),
+                                              self.swerve_params.angle_gear_ratio)
         return SwerveModuleState(velocity, angle)
 
     @property
@@ -118,11 +112,8 @@ class SwerveModule:
             self.swerve_params.wheel_circumference,
             self.swerve_params.drive_gear_ratio,
         ).m
-        angle = Rotation2d.fromDegrees(
-            conversions.falcon_to_degrees(
-                self.angle_motor.getSelectedSensorPosition(), self.swerve_params.angle_gear_ratio
-            ).m
-        )
+        angle = conversions.falcon_to_degrees(self.angle_motor.getSelectedSensorPosition(),
+                                              self.swerve_params.angle_gear_ratio)
         return SwerveModulePosition(distance, angle)
 
     @property
