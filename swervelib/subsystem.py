@@ -1,4 +1,5 @@
 import math
+import time
 from typing import Callable
 
 import commands2
@@ -36,6 +37,7 @@ class Swerve(commands2.SubsystemBase):
 
         self.swerve_params = swerve_params
 
+        # If a flag is set, create a NoOp object in place of the gyro for testing without hardware
         if swerve_params.fake_gyro:
             self.gyro = Dummy()
         else:
@@ -51,12 +53,17 @@ class Swerve(commands2.SubsystemBase):
         # Create four swerve modules and pass each a unique set of parameters
         self.swerve_modules = tuple(SwerveModule(module_param, swerve_params) for module_param in module_params)
 
+        # Pause for a second to allow the motors time to configure themselves before resetting their positions.
+        # See https://github.com/Team364/BaseFalconSwerve/issues/8 for more info.
+        # NOTE: This locks up the main thread and makes robot startup slower.
+        time.sleep(1)
+        self.reset_modules_to_absolute()
+
         # Create kinematics in the same order as the swerve modules tuple
         self.kinematics = SwerveDrive4Kinematics(*[module_param.relative_position for module_param in module_params])
 
         # Reset the driven distance of each module before constructing odometry
-        self._zero_module_positions()
-
+        self.zero_module_distances()
         self.odometry = SwerveDrive4Odometry(self.kinematics, self.heading, self.module_positions)
 
     def periodic(self):
@@ -92,24 +99,36 @@ class Swerve(commands2.SubsystemBase):
             mod: SwerveModule = self.swerve_modules[i]
             mod.desire_state(desired_states[i], False)
 
+    def reset_modules_to_absolute(self):
+        """Reset the azimuth motors' position readings to their absolute encoder's."""
+        for mod in self.swerve_modules:
+            mod.reset_to_absolute()
+
     def zero_heading(self):
         self.gyro.setYaw(0)
 
     def reset_odometry(self, pose: Pose2d):
         self.odometry.resetPosition(pose, self.heading, *self.module_positions)
 
-    def _zero_module_positions(self):
+    def zero_module_distances(self):
         for mod in self.swerve_modules:
             mod.zero_distance()
 
     def _update_dashboard(self):
+        # TODO: Fix loop overruns caused by this method
+        wpilib.SmartDashboard.putNumber("Heading (deg)", self.heading.degrees())
+        # t1_start = time.perf_counter()
         for mod in self.swerve_modules:
+            mod_state = mod.state
             wpilib.SmartDashboard.putNumber(
                 f"{mod.corner.name} CANCoder Absolute Rotation (deg)",
                 mod.absolute_encoder_rotation.degrees(),
             )
-            wpilib.SmartDashboard.putNumber(f"{mod.corner.name} Drive Speed (mps)", mod.state.speed)
-            wpilib.SmartDashboard.putNumber(f"{mod.corner.name} Azimuth Angle (deg)", mod.state.angle.degrees())
+            wpilib.SmartDashboard.putNumber(f"{mod.corner.name} Drive Speed (mps)", mod_state.speed)
+            wpilib.SmartDashboard.putNumber(f"{mod.corner.name} Drive Speed (falcon)", mod.drive_motor.getSelectedSensorVelocity())
+            wpilib.SmartDashboard.putNumber(f"{mod.corner.name} Azimuth Angle (deg)", mod_state.angle.degrees())
+        # t1_stop = time.perf_counter()
+        # print(f"Elapsed time: {t1_stop - t1_start}")
 
     @property
     def pose(self) -> Pose2d:
