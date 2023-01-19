@@ -23,8 +23,8 @@ def falcon_to_rpm(velocity: float, gear_ratio: float) -> float:
     return mechanism_rpm
 
 
-def rpm_to_falcon(rmp: float, gear_ratio: float) -> float:
-    motor_rpm = rmp * gear_ratio
+def rpm_to_falcon(rpm: float, gear_ratio: float) -> float:
+    motor_rpm = rpm * gear_ratio
     # Falcon velocity is in units/100ms, so multiplying by 600 changes to units/min.
     ticks = motor_rpm * (FALCON_CPR / 600)
     return ticks

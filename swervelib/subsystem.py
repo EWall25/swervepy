@@ -22,17 +22,17 @@ from .dummy import Dummy
 from .mod import SwerveModule
 from .units import AngularVelocity, u
 
+SwerveModuleParameters4 = tuple[
+    SwerveModuleParameters, SwerveModuleParameters, SwerveModuleParameters, SwerveModuleParameters
+]
+SwerveModuleState4 = tuple[SwerveModuleState, SwerveModuleState, SwerveModuleState, SwerveModuleState]
+SwerveModulePosition4 = tuple[SwerveModulePosition, SwerveModulePosition, SwerveModulePosition, SwerveModulePosition]
+
 
 class Swerve(commands2.SubsystemBase):
     __slots__ = "odometry", "swerve_modules", "gyro", "swerve_params", "kinematics"
 
-    def __init__(
-        self,
-        module_params: tuple[
-            SwerveModuleParameters, SwerveModuleParameters, SwerveModuleParameters, SwerveModuleParameters
-        ],
-        swerve_params: SwerveParameters,
-    ):
+    def __init__(self, module_params: SwerveModuleParameters4, swerve_params: SwerveParameters):
         commands2.SubsystemBase.__init__(self)
 
         self.swerve_params = swerve_params
@@ -88,9 +88,7 @@ class Swerve(commands2.SubsystemBase):
             mod: SwerveModule = self.swerve_modules[i]
             mod.desire_state(swerve_module_states[i], open_loop)
 
-    def set_module_states(
-        self, desired_states: tuple[SwerveModuleState, SwerveModuleState, SwerveModuleState, SwerveModuleState]
-    ):
+    def set_module_states(self, desired_states: SwerveModuleState4):
         desired_states = SwerveDrive4Kinematics.desaturateWheelSpeeds(
             desired_states, self.swerve_params.max_speed.m_as(u.m / u.s)
         )
@@ -99,16 +97,16 @@ class Swerve(commands2.SubsystemBase):
             mod: SwerveModule = self.swerve_modules[i]
             mod.desire_state(desired_states[i], False)
 
-    def reset_modules_to_absolute(self):
-        """Reset the azimuth motors' position readings to their absolute encoder's."""
-        for mod in self.swerve_modules:
-            mod.reset_to_absolute()
-
     def zero_heading(self):
         self.gyro.setYaw(0)
 
     def reset_odometry(self, pose: Pose2d):
         self.odometry.resetPosition(pose, self.heading, *self.module_positions)
+
+    def reset_modules_to_absolute(self):
+        """Reset the azimuth motors' position readings to their absolute encoder's."""
+        for mod in self.swerve_modules:
+            mod.reset_to_absolute()
 
     def zero_module_distances(self):
         for mod in self.swerve_modules:
@@ -117,32 +115,26 @@ class Swerve(commands2.SubsystemBase):
     def _update_dashboard(self):
         # TODO: Fix loop overruns caused by this method
         wpilib.SmartDashboard.putNumber("Heading (deg)", self.heading.degrees())
-        # t1_start = time.perf_counter()
         for mod in self.swerve_modules:
-            mod_state = mod.state
             wpilib.SmartDashboard.putNumber(
                 f"{mod.corner.name} CANCoder Absolute Rotation (deg)",
                 mod.absolute_encoder_rotation.degrees(),
             )
-            wpilib.SmartDashboard.putNumber(f"{mod.corner.name} Drive Speed (mps)", mod_state.speed)
-            wpilib.SmartDashboard.putNumber(f"{mod.corner.name} Drive Speed (falcon)", mod.drive_motor.getSelectedSensorVelocity())
-            wpilib.SmartDashboard.putNumber(f"{mod.corner.name} Azimuth Angle (deg)", mod_state.angle.degrees())
-        # t1_stop = time.perf_counter()
-        # print(f"Elapsed time: {t1_stop - t1_start}")
+            wpilib.SmartDashboard.putNumber(f"{mod.corner.name} Drive Speed (mps)", mod.velocity.m)
+            # wpilib.SmartDashboard.putNumber(f"{mod.corner.name} Drive Speed (falcon)", mod.drive_motor.getSelectedSensorVelocity())
+            wpilib.SmartDashboard.putNumber(f"{mod.corner.name} Azimuth Angle (deg)", mod.angle.degrees())
 
     @property
     def pose(self) -> Pose2d:
         return self.odometry.getPose()
 
     @property
-    def module_states(self) -> tuple[SwerveModuleState, SwerveModuleState, SwerveModuleState, SwerveModuleState]:
+    def module_states(self) -> SwerveModuleState4:
         # noinspection PyTypeChecker
         return tuple(mod.state for mod in self.swerve_modules)
 
     @property
-    def module_positions(
-        self,
-    ) -> tuple[SwerveModulePosition, SwerveModulePosition, SwerveModulePosition, SwerveModulePosition]:
+    def module_positions(self) -> SwerveModulePosition4:
         # noinspection PyTypeChecker
         return tuple(mod.position for mod in self.swerve_modules)
 
