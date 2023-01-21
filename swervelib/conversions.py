@@ -1,7 +1,5 @@
 import wpimath.geometry
 
-from .units import *
-
 FALCON_CPR = 2048
 DEGREES_PER_ROTATION = 360
 
@@ -30,27 +28,27 @@ def rpm_to_falcon(rpm: float, gear_ratio: float) -> float:
     return ticks
 
 
-def falcon_to_mps(velocity: float, circumference: Length, gear_ratio: float) -> Velocity:
+def falcon_to_mps(velocity: float, circumference: float, gear_ratio: float) -> float:
     wheel_rpm = falcon_to_rpm(velocity, gear_ratio)
     # Divide by 60 to change from m/min to m/s
-    wheel_mps = (wheel_rpm * circumference.m_as(u.m)) / 60
-    return wheel_mps * (u.m / u.s)
+    wheel_mps = (wheel_rpm * circumference) / 60
+    return wheel_mps
 
 
-def mps_to_falcon(velocity: Velocity, circumference: Length, gear_ratio: float) -> float:
+def mps_to_falcon(velocity: float, circumference: float, gear_ratio: float) -> float:
     # Multiply by 60 to change m/s to m/min
-    wheel_rpm = (velocity.m_as(u.m / u.s) * 60) / circumference.m_as(u.m)
+    wheel_rpm = (velocity * 60) / circumference
     wheel_velocity = rpm_to_falcon(wheel_rpm, gear_ratio)
     return wheel_velocity
 
 
-def falcon_to_metres(counts: float, circumference: Length, gear_ratio: float) -> Length:
+def falcon_to_metres(counts: float, circumference: float, gear_ratio: float) -> float:
     rotations = counts / (gear_ratio * FALCON_CPR)
-    metres = rotations * circumference.m_as(u.m)
-    return metres * u.m
+    metres = rotations * circumference
+    return metres
 
 
-def metres_to_falcon(metres: Length, circumference: Length, gear_ratio: float) -> float:
-    rotations = metres.m_as(u.m) / circumference.m_as(u.m)
+def metres_to_falcon(metres: float, circumference: float, gear_ratio: float) -> float:
+    rotations = metres / circumference
     counts = rotations * (gear_ratio * FALCON_CPR)
     return counts

@@ -7,14 +7,15 @@ from wpimath.kinematics import SwerveModuleState, SwerveModulePosition
 from . import conversions
 from .configs import SwerveParameters, SwerveModuleParameters, CTREConfigs
 from .dummy import Dummy
-from .units import u, Velocity, Distance
+from .units import u
 
 
 class SwerveModule:
     __slots__ = "drive_motor", "angle_motor", "angle_encoder", "swerve_params", "angle_offset", "feedforward", "corner"
 
     def __init__(self, module_params: SwerveModuleParameters, swerve_params: SwerveParameters):
-        self.swerve_params = swerve_params
+        # noinspection PyTypeChecker
+        self.swerve_params: SwerveParameters = swerve_params.in_standard_units()
         self.angle_offset = module_params.angle_offset
         self.corner = module_params.corner
 
@@ -45,7 +46,7 @@ class SwerveModule:
         desired_state = optimize(desired_state, self.state.angle)
 
         if open_loop:
-            percent_output = desired_state.speed / self.swerve_params.max_speed.m_as(u.m / u.s)
+            percent_output = desired_state.speed / self.swerve_params.max_speed
             self.drive_motor.set(ctre.ControlMode.PercentOutput, percent_output)
         else:
             velocity = conversions.mps_to_falcon(
@@ -93,7 +94,7 @@ class SwerveModule:
         self.angle_motor.setSelectedSensorPosition(falcon_ticks)
 
     @property
-    def velocity(self) -> Velocity:
+    def velocity(self) -> float:
         return conversions.falcon_to_mps(
             self.drive_motor.getSelectedSensorVelocity(),
             self.swerve_params.wheel_circumference,
@@ -101,7 +102,7 @@ class SwerveModule:
         )
 
     @property
-    def distance(self) -> Distance:
+    def distance(self) -> float:
         return conversions.falcon_to_metres(
             self.drive_motor.getSelectedSensorPosition(),
             self.swerve_params.wheel_circumference,
@@ -117,11 +118,11 @@ class SwerveModule:
 
     @property
     def state(self) -> SwerveModuleState:
-        return SwerveModuleState(self.velocity.m, self.angle)
+        return SwerveModuleState(self.velocity, self.angle)
 
     @property
     def position(self) -> SwerveModulePosition:
-        return SwerveModulePosition(self.distance.m, self.angle)
+        return SwerveModulePosition(self.distance, self.angle)
 
     @property
     def absolute_encoder_rotation(self) -> Rotation2d:

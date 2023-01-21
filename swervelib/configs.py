@@ -1,3 +1,4 @@
+import copy
 import enum
 from dataclasses import dataclass
 from typing import NamedTuple
@@ -5,8 +6,9 @@ from typing import NamedTuple
 import ctre
 import wpimath.trajectory
 import wpimath.geometry
+from pint import Quantity
 
-from .units import *
+from .units import u
 
 
 class CANDeviceID(NamedTuple):
@@ -24,7 +26,7 @@ class ModuleCorner(enum.IntEnum):
 @dataclass
 class SwerveParameters:
     # Drivetrain Constants
-    wheel_circumference: Length
+    wheel_circumference: Quantity
 
     drive_open_loop_ramp: float
     drive_closed_loop_ramp: float
@@ -34,8 +36,8 @@ class SwerveParameters:
     angle_gear_ratio: float
 
     # Swerve Profiling
-    max_speed: Velocity
-    max_angular_velocity: AngularVelocity
+    max_speed: Quantity
+    max_angular_velocity: Quantity
 
     # Swerve Current Limiting
     angle_continuous_current_limit: int
@@ -81,6 +83,13 @@ class SwerveParameters:
     gyro_id: int
     fake_gyro: bool = False
 
+    def in_standard_units(self):
+        data = copy.deepcopy(self)
+        data.wheel_circumference = data.wheel_circumference.m_as(u.m)
+        data.max_speed = data.max_speed.m_as(u.m / u.s)
+        data.max_angular_velocity = data.max_angular_velocity.m_as(u.rad / u.s)
+        return data
+
 
 @dataclass
 class SwerveModuleParameters:
@@ -98,8 +107,8 @@ class SwerveModuleParameters:
 
 @dataclass
 class AutoParameters:
-    max_speed: Velocity
-    max_acceleration: Acceleration
+    max_speed: Quantity
+    max_acceleration: Quantity
     # max_angular_speed: Quantity["angular velocity"]
     # max_angular_acceleration: Quantity["angular acceleration"]
 

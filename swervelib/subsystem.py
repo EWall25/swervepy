@@ -20,7 +20,6 @@ from wpimath.trajectory import Trajectory
 from .configs import SwerveModuleParameters, SwerveParameters, AutoParameters
 from .dummy import Dummy
 from .mod import SwerveModule
-from .units import AngularVelocity, u
 
 SwerveModuleParameters4 = tuple[
     SwerveModuleParameters, SwerveModuleParameters, SwerveModuleParameters, SwerveModuleParameters
@@ -35,7 +34,8 @@ class Swerve(commands2.SubsystemBase):
     def __init__(self, module_params: SwerveModuleParameters4, swerve_params: SwerveParameters):
         commands2.SubsystemBase.__init__(self)
 
-        self.swerve_params = swerve_params
+        # noinspection PyTypeChecker
+        self.swerve_params: SwerveParameters = swerve_params.in_standard_units()
 
         # If a flag is set, create a NoOp object in place of the gyro for testing without hardware
         if swerve_params.fake_gyro:
@@ -72,16 +72,15 @@ class Swerve(commands2.SubsystemBase):
 
         self._update_dashboard()
 
-    def drive(self, translation: Translation2d, rotation: AngularVelocity, field_relative: bool, open_loop: bool):
-        rotation.ito(u.rad / u.s)
+    def drive(self, translation: Translation2d, rotation: float, field_relative: bool, open_loop: bool):
         speeds = (
-            ChassisSpeeds.fromFieldRelativeSpeeds(translation.x, translation.y, rotation.m, self.heading)
+            ChassisSpeeds.fromFieldRelativeSpeeds(translation.x, translation.y, rotation, self.heading)
             if field_relative
-            else ChassisSpeeds(translation.x, translation.y, rotation.m)
+            else ChassisSpeeds(translation.x, translation.y, rotation)
         )
         swerve_module_states = self.kinematics.toSwerveModuleStates(speeds)
         swerve_module_states = SwerveDrive4Kinematics.desaturateWheelSpeeds(
-            swerve_module_states, self.swerve_params.max_speed.m_as(u.m / u.s)
+            swerve_module_states, self.swerve_params.max_speed
         )
 
         for i in range(4):
@@ -89,9 +88,7 @@ class Swerve(commands2.SubsystemBase):
             mod.desire_state(swerve_module_states[i], open_loop)
 
     def set_module_states(self, desired_states: SwerveModuleState4):
-        desired_states = SwerveDrive4Kinematics.desaturateWheelSpeeds(
-            desired_states, self.swerve_params.max_speed.m_as(u.m / u.s)
-        )
+        desired_states = SwerveDrive4Kinematics.desaturateWheelSpeeds(desired_states, self.swerve_params.max_speed)
 
         for i in range(4):
             mod: SwerveModule = self.swerve_modules[i]
@@ -120,7 +117,7 @@ class Swerve(commands2.SubsystemBase):
                 f"{mod.corner.name} CANCoder Absolute Rotation (deg)",
                 mod.absolute_encoder_rotation.degrees(),
             )
-            wpilib.SmartDashboard.putNumber(f"{mod.corner.name} Drive Speed (mps)", mod.velocity.m)
+            wpilib.SmartDashboard.putNumber(f"{mod.corner.name} Drive Speed (mps)", mod.velocity)
             # wpilib.SmartDashboard.putNumber(f"{mod.corner.name} Drive Speed (falcon)", mod.drive_motor.getSelectedSensorVelocity())
             wpilib.SmartDashboard.putNumber(f"{mod.corner.name} Azimuth Angle (deg)", mod.angle.degrees())
 
@@ -160,7 +157,7 @@ class Swerve(commands2.SubsystemBase):
         return commands2.RunCommand(
             lambda: self.drive(
                 # https://docs.wpilib.org/en/stable/docs/software/advanced-controls/geometry/coordinate-systems.html#robot-coordinate-system
-                Translation2d(translation(), -strafe()) * self.swerve_params.max_speed.m_as(u.m / u.s),
+                Translation2d(translation(), -strafe()) * self.swerve_params.max_speed,
                 rotation() * self.swerve_params.max_angular_velocity,
                 field_relative,
                 open_loop,
