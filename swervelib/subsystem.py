@@ -56,8 +56,9 @@ class Swerve(commands2.SubsystemBase):
         # Pause for a second to allow the motors time to configure themselves before resetting their positions.
         # See https://github.com/Team364/BaseFalconSwerve/issues/8 for more info.
         # NOTE: This locks up the main thread and makes robot startup slower.
-        time.sleep(1)
-        self.reset_modules_to_absolute()
+        # TODO: Might not need to do this with REV
+        # time.sleep(1)
+        # self.reset_modules_to_absolute()
 
         # Create kinematics in the same order as the swerve modules tuple
         self.kinematics = SwerveDrive4Kinematics(*[module_param.relative_position for module_param in module_params])

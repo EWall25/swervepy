@@ -1,6 +1,7 @@
 import math
 
 import ctre
+import rev
 import wpilib
 from wpimath.geometry import Translation2d, Rotation2d
 
@@ -32,13 +33,13 @@ class RobotContainer:
 
             angle_continuous_current_limit=40,
             angle_peak_current_limit=60,
-            angle_peak_current_duration=0.01,
-            angle_enable_current_limit=True,
+            # angle_peak_current_duration=0.01,
+            # angle_enable_current_limit=True,
 
             drive_continuous_current_limit=40,
             drive_peak_current_limit=60,
-            drive_peak_current_duration=0.01,
-            drive_enable_current_limit=True,
+            # drive_peak_current_duration=0.01,
+            # drive_enable_current_limit=True,
 
             angle_kP=1,
             angle_kI=0,
@@ -54,8 +55,8 @@ class RobotContainer:
             drive_kV=0 / 12,
             drive_kA=0 / 12,
 
-            angle_neutral_mode=ctre.NeutralMode.Brake,
-            drive_neutral_mode=ctre.NeutralMode.Coast,
+            angle_neutral_mode=rev.CANSparkMax.IdleMode.kBrake,
+            drive_neutral_mode=rev.CANSparkMax.IdleMode.kCoast,
 
             invert_angle_motor=False,
             invert_drive_motor=False,
@@ -71,32 +72,32 @@ class RobotContainer:
                 corner=ModuleCorner.FRONT_LEFT,
                 relative_position=Translation2d(wheel_base / 2, track_width / 2),
                 angle_offset=Rotation2d.fromDegrees(0),
-                drive_motor_id=CANDeviceID(0),
-                angle_motor_id=CANDeviceID(4),
+                drive_motor_id=0,
+                angle_motor_id=4,
                 angle_encoder_id=CANDeviceID(0),
             ),
             SwerveModuleParameters(
                 corner=ModuleCorner.FRONT_RIGHT,
                 relative_position=Translation2d(wheel_base / 2, -track_width / 2),
                 angle_offset=Rotation2d.fromDegrees(0),
-                drive_motor_id=CANDeviceID(1),
-                angle_motor_id=CANDeviceID(5),
+                drive_motor_id=1,
+                angle_motor_id=5,
                 angle_encoder_id=CANDeviceID(1),
             ),
             SwerveModuleParameters(
                 corner=ModuleCorner.BACK_LEFT,
                 relative_position=Translation2d(-wheel_base / 2, track_width / 2),
                 angle_offset=Rotation2d.fromDegrees(0),
-                drive_motor_id=CANDeviceID(2),
-                angle_motor_id=CANDeviceID(6),
+                drive_motor_id=2,
+                angle_motor_id=6,
                 angle_encoder_id=CANDeviceID(2),
             ),
             SwerveModuleParameters(
                 corner=ModuleCorner.BACK_RIGHT,
                 relative_position=Translation2d(-wheel_base / 2, -track_width / 2),
                 angle_offset=Rotation2d.fromDegrees(0),
-                drive_motor_id=CANDeviceID(3),
-                angle_motor_id=CANDeviceID(7),
+                drive_motor_id=3,
+                angle_motor_id=7,
                 angle_encoder_id=CANDeviceID(3),
             ),
         )
