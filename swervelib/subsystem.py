@@ -73,6 +73,14 @@ class Swerve(commands2.SubsystemBase):
         self._update_dashboard()
 
     def drive(self, translation: Translation2d, rotation: float, field_relative: bool, open_loop: bool):
+        """
+        Drive the robot.
+        :param translation: The desired movement of the robot in metres
+        :param rotation: The rotation of the robot in rads/sec, where CCW+
+        :param field_relative: Is "forward" facing the front of the robot or the front of the driver?
+        :param open_loop: If False, use velocity control. Else, use percent output
+        """
+
         speeds = (
             ChassisSpeeds.fromFieldRelativeSpeeds(translation.x, translation.y, rotation, self.heading)
             if field_relative
@@ -110,7 +118,6 @@ class Swerve(commands2.SubsystemBase):
             mod.zero_distance()
 
     def _update_dashboard(self):
-        # TODO: Fix loop overruns caused by this method
         wpilib.SmartDashboard.putNumber("Heading (deg)", self.heading.degrees())
         for mod in self.swerve_modules:
             wpilib.SmartDashboard.putNumber(
@@ -118,7 +125,6 @@ class Swerve(commands2.SubsystemBase):
                 mod.absolute_encoder_rotation.degrees(),
             )
             wpilib.SmartDashboard.putNumber(f"{mod.corner.name} Drive Speed (mps)", mod.velocity)
-            # wpilib.SmartDashboard.putNumber(f"{mod.corner.name} Drive Speed (falcon)", mod.drive_motor.getSelectedSensorVelocity())
             wpilib.SmartDashboard.putNumber(f"{mod.corner.name} Azimuth Angle (deg)", mod.angle.degrees())
 
     @property
