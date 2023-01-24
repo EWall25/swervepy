@@ -7,7 +7,6 @@ from wpimath.kinematics import SwerveModuleState, SwerveModulePosition
 from . import conversions
 from .configs import SwerveParameters, SwerveModuleParameters, CTREConfigs
 from .dummy import Dummy
-from .units import u
 
 
 class SwerveModule:
@@ -50,7 +49,7 @@ class SwerveModule:
             self.drive_motor.set(ctre.ControlMode.PercentOutput, percent_output)
         else:
             velocity = conversions.mps_to_falcon(
-                desired_state.speed * (u.m / u.s),
+                desired_state.speed,
                 self.swerve_params.wheel_circumference,
                 self.swerve_params.drive_gear_ratio,
             )
