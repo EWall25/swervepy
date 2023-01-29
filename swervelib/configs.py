@@ -6,9 +6,11 @@ from typing import NamedTuple
 import ctre
 import wpimath.trajectory
 import wpimath.geometry
+import robotpy_apriltag as apriltag
 from pint import Quantity
 
 from .units import u
+from .vision import CameraDefinition
 
 
 class CANDeviceID(NamedTuple):
@@ -103,6 +105,12 @@ class SwerveModuleParameters:
     angle_encoder_id: CANDeviceID
 
     fake: bool = False
+
+
+@dataclass
+class VisionParameters:
+    camera_definitions: list[CameraDefinition]
+    field_layout: apriltag.AprilTagFieldLayout
 
 
 @dataclass

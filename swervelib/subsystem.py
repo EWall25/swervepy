@@ -1,15 +1,15 @@
 import math
 import time
-from typing import Callable
+from typing import Callable, Optional
 
 import commands2
 import ctre
 import wpilib
 
 import wpimath.controller
+from wpimath.estimator import SwerveDrive4PoseEstimator
 from wpimath.geometry import Translation2d, Pose2d, Rotation2d
 from wpimath.kinematics import (
-    SwerveDrive4Odometry,
     ChassisSpeeds,
     SwerveDrive4Kinematics,
     SwerveModuleState,
@@ -17,9 +17,10 @@ from wpimath.kinematics import (
 )
 from wpimath.trajectory import Trajectory
 
-from .configs import SwerveModuleParameters, SwerveParameters, AutoParameters
+from .configs import SwerveModuleParameters, SwerveParameters, AutoParameters, VisionParameters
 from .dummy import Dummy
 from .mod import SwerveModule
+from .vision import AprilTagCameraCollection
 
 SwerveModuleParameters4 = tuple[
     SwerveModuleParameters, SwerveModuleParameters, SwerveModuleParameters, SwerveModuleParameters
@@ -29,9 +30,14 @@ SwerveModulePosition4 = tuple[SwerveModulePosition, SwerveModulePosition, Swerve
 
 
 class Swerve(commands2.SubsystemBase):
-    __slots__ = "odometry", "swerve_modules", "gyro", "swerve_params", "kinematics"
+    __slots__ = "odometry", "swerve_modules", "gyro", "swerve_params", "kinematics", "vision_estimator"
 
-    def __init__(self, module_params: SwerveModuleParameters4, swerve_params: SwerveParameters):
+    def __init__(
+        self,
+        module_params: SwerveModuleParameters4,
+        swerve_params: SwerveParameters,
+        vision_params: Optional[VisionParameters] = None,
+    ):
         commands2.SubsystemBase.__init__(self)
 
         # noinspection PyTypeChecker
@@ -62,15 +68,31 @@ class Swerve(commands2.SubsystemBase):
         # Create kinematics in the same order as the swerve modules tuple
         self.kinematics = SwerveDrive4Kinematics(*[module_param.relative_position for module_param in module_params])
 
+        # Set up an object that will estimate the robot's pose based on vision. This estimation will later be fused
+        # with encoder and gyro data for a more accurate pose.
+        if vision_params:
+            self.vision_estimator = AprilTagCameraCollection(
+                vision_params.camera_definitions, vision_params.field_layout
+            )
+
         # Reset the driven distance of each module before constructing odometry
         self.zero_module_distances()
-        self.odometry = SwerveDrive4Odometry(self.kinematics, self.heading, self.module_positions)
+        self.odometry = SwerveDrive4PoseEstimator(self.kinematics, self.heading, self.module_positions, Pose2d(0, 0, 0))
 
     def periodic(self):
-        # Unpack a tuple of swerve module positions into four arguments using the * symbol
-        self.odometry.update(self.heading, *self.module_positions)
+        # Use encoder and gyro data to get an initial prediction of the robot's pose
+        self.odometry.update(self.heading, self.module_positions)
+
+        # Enhance the previous estimation by fusing it with vision data
+        if hasattr(self, "vision_estimator"):
+            self._update_odometry_from_vision()
 
         self._update_dashboard()
+
+    def _update_odometry_from_vision(self):
+        timestamp = wpilib.Timer.getFPGATimestamp()
+        vision_pose = self.vision_estimator.estimate_pose(self.pose)
+        self.odometry.addVisionMeasurement(vision_pose, timestamp)
 
     def drive(self, translation: Translation2d, rotation: float, field_relative: bool, open_loop: bool):
         """
@@ -129,7 +151,7 @@ class Swerve(commands2.SubsystemBase):
 
     @property
     def pose(self) -> Pose2d:
-        return self.odometry.getPose()
+        return self.odometry.getEstimatedPosition()
 
     @property
     def module_states(self) -> SwerveModuleState4:
