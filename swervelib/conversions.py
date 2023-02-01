@@ -1,3 +1,7 @@
+"""
+A collection of methods for converting between native Falcon 500 units and standard units, like metres.
+"""
+
 import wpimath.geometry
 
 FALCON_CPR = 2048

@@ -1,3 +1,10 @@
+"""
+A collection of configuration classes.
+
+Some classes use 'Quantity' objects from the Pint unit system.
+These quantities allow you to input parameters (e.g. wheel circumference) in any valid unit, such as inches or metres.
+"""
+
 import copy
 import enum
 from dataclasses import dataclass
