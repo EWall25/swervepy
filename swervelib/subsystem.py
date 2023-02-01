@@ -30,6 +30,18 @@ SwerveModulePosition4 = tuple[SwerveModulePosition, SwerveModulePosition, Swerve
 
 
 class Swerve(commands2.SubsystemBase):
+    """
+    This is a swerve subsystem that can be integrated into any Command-based robot code.
+    It is designed for a 4-wheel swerve drive with Falcon 500 motors, CTRE CANCoders, and a CTRE Pigeon IMU.
+
+    All methods and commands that take driver input use the WPILib cartesian coordinate system, where:
+        * The positive x direction is the same direction that either the robot or the driver is facing
+        * The positive y direction is perpendicular to the x-axis, facing to the left of the robot or the driver
+        * Positive theta (rotation around the z-axis) is counter-clockwise, otherwise known as CCW+
+    This coordinate system is detailed here:
+    https://docs.wpilib.org/en/stable/docs/software/advanced-controls/geometry/coordinate-systems.html#robot-coordinate-system.
+    """
+
     __slots__ = "odometry", "swerve_modules", "gyro", "swerve_params", "kinematics", "vision_estimator"
 
     def __init__(
@@ -38,8 +50,16 @@ class Swerve(commands2.SubsystemBase):
         swerve_params: SwerveParameters,
         vision_params: Optional[VisionParameters] = None,
     ):
+        """
+        Constructor for a Swerve subsystem.
+
+        :param module_params: A tuple of module-specific parameters that does not need to be ordered in any particular way
+        :param swerve_params: General parameters describing the drivetrain's hardware
+        """
+
         commands2.SubsystemBase.__init__(self)
 
+        # Convert the parameters to decimal values because doing unit conversions every iteration takes too long
         # noinspection PyTypeChecker
         self.swerve_params: SwerveParameters = swerve_params.in_standard_units()
 
@@ -52,11 +72,13 @@ class Swerve(commands2.SubsystemBase):
         self.zero_heading()
 
         # Sort the module parameters list into front-left, front-right, back-left, back-right order
-        # The RelativeModulePosition enum has maps 0 to front-left and 3 to back-right, so the items are
+        # The RelativeModulePosition enum maps 0 to front-left and 3 to back-right, so the items are
         # sorted in ascending order according to the enum value.
+        # We do this to easily identify which module is in which position for i.e. the ski stop command.
         module_params = sorted(module_params, key=lambda param: param.corner)
 
-        # Create four swerve modules and pass each a unique set of parameters
+        # Create four swerve modules and pass each a unique set of parameters. This tuple has the same swerve module
+        # order as the module_params tuple above it.
         self.swerve_modules = tuple(SwerveModule(module_param, swerve_params) for module_param in module_params)
 
         # Pause for a second to allow the motors time to configure themselves before resetting their positions.
@@ -65,7 +87,8 @@ class Swerve(commands2.SubsystemBase):
         time.sleep(1)
         self.reset_modules_to_absolute()
 
-        # Create kinematics in the same order as the swerve modules tuple
+        # Kinematics are used to calculate individual wheel speeds from a desired robot velocity and direction.
+        # This is required for controlling the robot with one flight stick, instead of a separate stick per wheel.
         self.kinematics = SwerveDrive4Kinematics(*[module_param.relative_position for module_param in module_params])
 
         # Set up an object that will estimate the robot's pose based on vision. This estimation will later be fused
@@ -75,13 +98,15 @@ class Swerve(commands2.SubsystemBase):
                 vision_params.camera_definitions, vision_params.field_layout
             )
 
-        # Reset the driven distance of each module before constructing odometry
+        # Odometry tracks the robot's position using its wheel encoders and gyro, so that the robot
+        # can follow paths in autonomous.
         self.zero_module_distances()
         self.odometry = SwerveDrive4PoseEstimator(self.kinematics, self.heading, self.module_positions, Pose2d(0, 0, 0))
 
     def periodic(self):
-        # Use encoder and gyro data to get an initial prediction of the robot's pose
-        self.odometry.update(self.heading, self.module_positions)
+        # Odometry must be updated every iteration with the robot's heading and its wheels' driven distance and angle.
+        # These parameters are used to calculate the robot's overall position.
+        self.odometry.update(self.heading, *self.module_positions)
 
         # Enhance the previous estimation by fusing it with vision data
         if hasattr(self, "vision_estimator"):
@@ -97,6 +122,7 @@ class Swerve(commands2.SubsystemBase):
     def drive(self, translation: Translation2d, rotation: float, field_relative: bool, open_loop: bool):
         """
         Drive the robot.
+
         :param translation: The desired movement of the robot in metres
         :param rotation: The rotation of the robot in rads/sec, where CCW+
         :param field_relative: Is "forward" facing the front of the robot or the front of the driver?
@@ -118,6 +144,13 @@ class Swerve(commands2.SubsystemBase):
             mod.desire_state(swerve_module_states[i], open_loop)
 
     def set_module_states(self, desired_states: SwerveModuleState4):
+        """
+        Command each module to a specified state using closed-loop control.
+
+        :param desired_states: The desired states of each module. This list must be in front-left, front-right,
+        back-left, back-right order
+        """
+
         desired_states = SwerveDrive4Kinematics.desaturateWheelSpeeds(desired_states, self.swerve_params.max_speed)
 
         for i in range(4):
@@ -184,8 +217,7 @@ class Swerve(commands2.SubsystemBase):
     ):
         return commands2.RunCommand(
             lambda: self.drive(
-                # https://docs.wpilib.org/en/stable/docs/software/advanced-controls/geometry/coordinate-systems.html#robot-coordinate-system
-                Translation2d(translation(), -strafe()) * self.swerve_params.max_speed,
+                Translation2d(translation(), strafe()) * self.swerve_params.max_speed,
                 rotation() * self.swerve_params.max_angular_velocity,
                 field_relative,
                 open_loop,
@@ -223,6 +255,8 @@ class Swerve(commands2.SubsystemBase):
         theta_controller = wpimath.controller.ProfiledPIDControllerRadians(1, 0, 0, params.theta_controller_constraints)
         theta_controller.enableContinuousInput(-math.pi, math.pi)
 
+        # TODO: Check if this command works with the current set_module_states method because set_module_states takes
+        # parameters in FL, FR, BL, BR order
         command = commands2.Swerve4ControllerCommand(
             trajectory,
             lambda: self.pose,
@@ -242,7 +276,9 @@ class Swerve(commands2.SubsystemBase):
         return command
 
     def ski_stop_command(self):
-        # Turn all swerve modules 45 degrees so the robot is harder to stop
+        """Turn the wheels into an 'X' shape to make the robot more difficult to push."""
+
+        # TODO: These angles currently make an "O" instead of an "X"
         # fmt: off
         angles = (
             45, 315,  # Front Left, Front Right

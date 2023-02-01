@@ -10,14 +10,30 @@ from .dummy import Dummy
 
 
 class SwerveModule:
+    """
+    One swerve module. A swerve drivetrain is made up of four modules and is represented by the Swerve class.
+    """
+
     __slots__ = "drive_motor", "angle_motor", "angle_encoder", "swerve_params", "angle_offset", "feedforward", "corner"
 
     def __init__(self, module_params: SwerveModuleParameters, swerve_params: SwerveParameters):
+        """
+        Constructor for a SwerveModule.
+
+        :param module_params: Module-specific parameters that describe location, device IDs, and offsets
+        :param swerve_params: General parameters describing the drivetrain's hardware
+        """
+
+        # Convert the parameters to decimal values because doing unit conversions every iteration takes too long
         # noinspection PyTypeChecker
         self.swerve_params: SwerveParameters = swerve_params.in_standard_units()
+
         self.angle_offset = module_params.angle_offset
         self.corner = module_params.corner
 
+        # Feedforward predicts the voltage required to spin a wheel up to a velocity in closed-loop control.
+        # Feedforward is different from feedback (PID) in that it exerts control proactively rather than reactively
+        # when error is detected.
         self.feedforward = wpimath.controller.SimpleMotorFeedforwardMeters(
             swerve_params.drive_kS,
             swerve_params.drive_kV,
@@ -41,6 +57,14 @@ class SwerveModule:
         self._config_angle_motor(ctre_configs.swerve_angle_config)
 
     def desire_state(self, desired_state: SwerveModuleState, open_loop: bool):
+        """
+        Begin exerting control to reach a desired state. This method only needs to be called when there is a change in
+        desired state, not periodically, because it offloads feedback control onto the motor controllers.
+
+        :param desired_state: The module's new desired state
+        :param open_loop: If False, use velocity control. Else, use percent output
+        """
+
         # Optimize the desired state so that the module rotates to it as quick as possible
         desired_state = optimize(desired_state, self.state.angle)
 
@@ -135,7 +159,6 @@ def _sign(num):
 def place_in_proper_0_to_360_scope(scope_reference: float, new_angle: float) -> float:
     # Place the new_angle in the range that is a multiple of [0, 360] (e.g., [360, 720]) which is closest
     # to the scope_reference
-    # TODO: Write tests
     lower_offset = scope_reference % 360
     lower_bound = scope_reference - lower_offset
     upper_bound = lower_bound + 360
