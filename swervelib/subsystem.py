@@ -55,6 +55,7 @@ class Swerve(commands2.SubsystemBase):
 
         :param module_params: A tuple of module-specific parameters that does not need to be ordered in any particular way
         :param swerve_params: General parameters describing the drivetrain's hardware
+        :param vision_params: NetworkTables and position data for each camera. If equal to None, no vision is used
         """
 
         commands2.SubsystemBase.__init__(self)
@@ -75,7 +76,7 @@ class Swerve(commands2.SubsystemBase):
         # The RelativeModulePosition enum maps 0 to front-left and 3 to back-right, so the items are
         # sorted in ascending order according to the enum value.
         # We do this to easily identify which module is in which position for i.e. the ski stop command.
-        module_params = sorted(module_params, key=lambda param: param.corner)
+        module_params = tuple(sorted(module_params, key=lambda param: param.corner))
 
         # Create four swerve modules and pass each a unique set of parameters. This tuple has the same swerve module
         # order as the module_params tuple above it.
@@ -106,7 +107,7 @@ class Swerve(commands2.SubsystemBase):
     def periodic(self):
         # Odometry must be updated every iteration with the robot's heading and its wheels' driven distance and angle.
         # These parameters are used to calculate the robot's overall position.
-        self.odometry.update(self.heading, *self.module_positions)
+        self.odometry.update(self.heading, self.module_positions)
 
         # Enhance the previous estimation by fusing it with vision data
         if hasattr(self, "vision_estimator"):
@@ -161,7 +162,7 @@ class Swerve(commands2.SubsystemBase):
         self.gyro.setYaw(0)
 
     def reset_odometry(self, pose: Pose2d):
-        self.odometry.resetPosition(pose, self.heading, *self.module_positions)
+        self.odometry.resetPosition(self.heading, self.module_positions, pose)
 
     def reset_modules_to_absolute(self):
         """Reset the azimuth motors' position readings to their absolute encoder's."""
@@ -270,7 +271,7 @@ class Swerve(commands2.SubsystemBase):
 
         # If this is the first path in a sequence, reset the robot's pose so that it aligns with the start of the path
         if first_path:
-            initial_pose = trajectory.getInitialState().pose
+            initial_pose = trajectory.initialPose()
             command = command.beforeStarting(lambda: self.reset_odometry(initial_pose))
 
         return command
