@@ -5,7 +5,7 @@ import wpilib
 from wpimath.geometry import Translation2d, Rotation2d
 
 from swervelib import Swerve, SwerveParameters, SwerveModuleParameters, CANDeviceID, ModuleCorner
-from swervelib.units import u
+from swervelib import u
 
 
 class RobotContainer:

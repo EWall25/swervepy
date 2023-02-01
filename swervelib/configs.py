@@ -15,7 +15,7 @@ import wpimath.trajectory
 import wpimath.geometry
 from pint import Quantity
 
-from .units import u
+from . import u
 
 
 class CANDeviceID(NamedTuple):

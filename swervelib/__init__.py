@@ -12,7 +12,12 @@ __all__ = [
     "Swerve",
     "ModuleCorner",
     "CANDeviceID",
+    "u",
 ]
+
+from pint import UnitRegistry
+
+u = UnitRegistry()
 
 from .configs import CTREConfigs, SwerveParameters, SwerveModuleParameters, ModuleCorner, CANDeviceID
 from .mod import SwerveModule
