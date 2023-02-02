@@ -69,7 +69,7 @@ class Swerve(commands2.SubsystemBase):
         # The RelativeModulePosition enum maps 0 to front-left and 3 to back-right, so the items are
         # sorted in ascending order according to the enum value.
         # We do this to easily identify which module is in which position for i.e. the ski stop command.
-        module_params = sorted(module_params, key=lambda param: param.corner)
+        module_params = tuple(sorted(module_params, key=lambda param: param.corner))
 
         # Create four swerve modules and pass each a unique set of parameters. This tuple has the same swerve module
         # order as the module_params tuple above it.
