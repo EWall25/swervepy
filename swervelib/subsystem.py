@@ -243,12 +243,12 @@ class Swerve(commands2.SubsystemBase):
             wpimath.controller.PIDController(1, 0, 0),
             theta_controller,
             self.set_module_states,
-            self,
+            [self],
         )
 
         # If this is the first path in a sequence, reset the robot's pose so that it aligns with the start of the path
         if first_path:
-            initial_pose = trajectory.getInitialState().pose
+            initial_pose = trajectory.initialPose()
             command = command.beforeStarting(lambda: self.reset_odometry(initial_pose))
 
         return command
