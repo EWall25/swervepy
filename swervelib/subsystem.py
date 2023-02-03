@@ -139,7 +139,7 @@ class Swerve(commands2.SubsystemBase):
         self.gyro.setYaw(0)
 
     def reset_odometry(self, pose: Pose2d):
-        self.odometry.resetPosition(pose, self.heading, *self.module_positions)
+        self.odometry.resetPosition(self.heading, pose, *self.module_positions)
 
     def reset_modules_to_absolute(self):
         """Reset the azimuth motors' position readings to their absolute encoder's."""
