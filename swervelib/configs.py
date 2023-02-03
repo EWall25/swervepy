@@ -127,7 +127,7 @@ class AutoParameters:
     # max_angular_speed: Quantity["angular velocity"]
     # max_angular_acceleration: Quantity["angular acceleration"]
 
-    theta_controller_constraints: wpimath.trajectory.TrapezoidProfile.Constraints
+    theta_controller_constraints: wpimath.trajectory.TrapezoidProfileRadians.Constraints
 
 
 class CTREConfigs:
