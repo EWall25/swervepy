@@ -7,17 +7,33 @@ from wpimath.kinematics import SwerveModuleState, SwerveModulePosition
 from . import conversions
 from .configs import SwerveParameters, SwerveModuleParameters, CTREConfigs
 from .dummy import Dummy
-from .units import u
 
 
 class SwerveModule:
+    """
+    One swerve module. A swerve drivetrain is made up of four modules and is represented by the Swerve class.
+    """
+
     __slots__ = "drive_motor", "angle_motor", "angle_encoder", "swerve_params", "angle_offset", "feedforward", "corner"
 
     def __init__(self, module_params: SwerveModuleParameters, swerve_params: SwerveParameters):
-        self.swerve_params = swerve_params
+        """
+        Constructor for a SwerveModule.
+
+        :param module_params: Module-specific parameters that describe location, device IDs, and offsets
+        :param swerve_params: General parameters describing the drivetrain's hardware
+        """
+
+        # Convert the parameters to decimal values because doing unit conversions every iteration takes too long
+        # noinspection PyTypeChecker
+        self.swerve_params: SwerveParameters = swerve_params.in_standard_units()
+
         self.angle_offset = module_params.angle_offset
         self.corner = module_params.corner
 
+        # Feedforward predicts the voltage required to spin a wheel up to a velocity in closed-loop control.
+        # Feedforward is different from feedback (PID) in that it exerts control proactively rather than reactively
+        # when error is detected.
         self.feedforward = wpimath.controller.SimpleMotorFeedforwardMeters(
             swerve_params.drive_kS,
             swerve_params.drive_kV,
@@ -41,15 +57,23 @@ class SwerveModule:
         self._config_angle_motor(ctre_configs.swerve_angle_config)
 
     def desire_state(self, desired_state: SwerveModuleState, open_loop: bool):
+        """
+        Begin exerting control to reach a desired state. This method only needs to be called when there is a change in
+        desired state, not periodically, because it offloads feedback control onto the motor controllers.
+
+        :param desired_state: The module's new desired state
+        :param open_loop: If False, use velocity control. Else, use percent output
+        """
+
         # Optimize the desired state so that the module rotates to it as quick as possible
         desired_state = optimize(desired_state, self.state.angle)
 
         if open_loop:
-            percent_output = desired_state.speed / self.swerve_params.max_speed.m_as(u.m / u.s)
+            percent_output = desired_state.speed / self.swerve_params.max_speed
             self.drive_motor.set(ctre.ControlMode.PercentOutput, percent_output)
         else:
             velocity = conversions.mps_to_falcon(
-                desired_state.speed * (u.m / u.s),
+                desired_state.speed,
                 self.swerve_params.wheel_circumference,
                 self.swerve_params.drive_gear_ratio,
             )
@@ -60,16 +84,11 @@ class SwerveModule:
                 self.feedforward.calculate(desired_state.speed),
             )
 
-        angle = conversions.degrees_to_falcon(
-            desired_state.angle.degrees() * u.deg, self.swerve_params.angle_gear_ratio
-        )
+        angle = conversions.degrees_to_falcon(desired_state.angle, self.swerve_params.angle_gear_ratio)
         self.angle_motor.set(ctre.ControlMode.Position, angle)
 
         wpilib.SmartDashboard.putNumber(f"{self.corner.name} Desired Angle (deg)", desired_state.angle.degrees())
         wpilib.SmartDashboard.putNumber(f"{self.corner.name} Desired Velocity (mps)", desired_state.speed)
-
-    def zero_distance(self):
-        self.drive_motor.setSelectedSensorPosition(0)
 
     def _config_angle_encoder(self, config: ctre.CANCoderConfiguration):
         self.angle_encoder.configFactoryDefault()
@@ -80,7 +99,6 @@ class SwerveModule:
         self.angle_motor.configAllSettings(config)
         self.angle_motor.setInverted(self.swerve_params.invert_angle_motor)
         self.angle_motor.setNeutralMode(self.swerve_params.angle_neutral_mode)
-        self._reset_to_absolute()
 
     def _config_drive_motor(self, config: ctre.TalonFXConfiguration):
         self.drive_motor.configFactoryDefault()
@@ -89,41 +107,45 @@ class SwerveModule:
         self.drive_motor.setNeutralMode(self.swerve_params.drive_neutral_mode)
         self.drive_motor.setSelectedSensorPosition(0)
 
-    def _reset_to_absolute(self):
-        # Convert from WPILib Rotation2d units to pint rotation units
-        absolute_position = self.absolute_encoder_rotation.degrees() * u.deg
+    def zero_distance(self):
+        self.drive_motor.setSelectedSensorPosition(0)
 
+    def reset_to_absolute(self):
+        absolute_position = self.absolute_encoder_rotation
         absolute_position -= self.angle_offset
-        absolute_position = conversions.degrees_to_falcon(absolute_position, self.swerve_params.angle_gear_ratio)
-        self.angle_motor.setSelectedSensorPosition(absolute_position)
+        falcon_ticks = conversions.degrees_to_falcon(absolute_position, self.swerve_params.angle_gear_ratio)
+        self.angle_motor.setSelectedSensorPosition(falcon_ticks)
 
     @property
-    def state(self) -> SwerveModuleState:
-        velocity = conversions.falcon_to_mps(
+    def velocity(self) -> float:
+        return conversions.falcon_to_mps(
             self.drive_motor.getSelectedSensorVelocity(),
             self.swerve_params.wheel_circumference,
             self.swerve_params.drive_gear_ratio,
-        ).m
-        angle = Rotation2d.fromDegrees(
-            conversions.falcon_to_degrees(
-                self.angle_motor.getSelectedSensorPosition(), self.swerve_params.angle_gear_ratio
-            ).m
         )
-        return SwerveModuleState(velocity, angle)
 
     @property
-    def position(self) -> SwerveModulePosition:
-        distance = conversions.falcon_to_metres(
+    def distance(self) -> float:
+        return conversions.falcon_to_metres(
             self.drive_motor.getSelectedSensorPosition(),
             self.swerve_params.wheel_circumference,
             self.swerve_params.drive_gear_ratio,
-        ).m
-        angle = Rotation2d.fromDegrees(
-            conversions.falcon_to_degrees(
-                self.angle_motor.getSelectedSensorPosition(), self.swerve_params.angle_gear_ratio
-            ).m
         )
-        return SwerveModulePosition(distance, angle)
+
+    @property
+    def angle(self) -> Rotation2d:
+        return conversions.falcon_to_degrees(
+            self.angle_motor.getSelectedSensorPosition(),
+            self.swerve_params.angle_gear_ratio,
+        )
+
+    @property
+    def state(self) -> SwerveModuleState:
+        return SwerveModuleState(self.velocity, self.angle)
+
+    @property
+    def position(self) -> SwerveModulePosition:
+        return SwerveModulePosition(self.distance, self.angle)
 
     @property
     def absolute_encoder_rotation(self) -> Rotation2d:
@@ -134,10 +156,9 @@ def _sign(num):
     return 1 if num > 0 else -1 if num < 0 else 0
 
 
-def place_in_proper_0_to_360_scope(scope_reference: float, new_angle: float):
+def place_in_proper_0_to_360_scope(scope_reference: float, new_angle: float) -> float:
     # Place the new_angle in the range that is a multiple of [0, 360] (e.g., [360, 720]) which is closest
     # to the scope_reference
-    # TODO: Write tests
     lower_offset = scope_reference % 360
     lower_bound = scope_reference - lower_offset
     upper_bound = lower_bound + 360
