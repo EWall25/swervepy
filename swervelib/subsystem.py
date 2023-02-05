@@ -42,7 +42,7 @@ class Swerve(commands2.SubsystemBase):
     https://docs.wpilib.org/en/stable/docs/software/advanced-controls/geometry/coordinate-systems.html#robot-coordinate-system.
     """
 
-    __slots__ = "odometry", "swerve_modules", "gyro", "swerve_params", "kinematics", "vision_estimator"
+    __slots__ = "odometry", "swerve_modules", "gyro", "swerve_params", "kinematics", "vision_estimator", "field"
 
     def __init__(
         self,
@@ -104,6 +104,10 @@ class Swerve(commands2.SubsystemBase):
         self.zero_module_distances()
         self.odometry = SwerveDrive4PoseEstimator(self.kinematics, self.heading, self.module_positions, Pose2d(0, 0, 0))
 
+        # A field element to visualize the robot's estimated pose on
+        self.field = wpilib.Field2d()
+        wpilib.SmartDashboard.putData("Field", self.field)
+
     def periodic(self):
         # Odometry must be updated every iteration with the robot's heading and its wheels' driven distance and angle.
         # These parameters are used to calculate the robot's overall position.
@@ -119,6 +123,7 @@ class Swerve(commands2.SubsystemBase):
         timestamp = wpilib.Timer.getFPGATimestamp()
         vision_pose = self.vision_estimator.estimate_pose(self.pose)
         self.odometry.addVisionMeasurement(vision_pose, timestamp)
+        self.field.setRobotPose(vision_pose)
 
     def drive(self, translation: Translation2d, rotation: float, field_relative: bool, open_loop: bool):
         """
