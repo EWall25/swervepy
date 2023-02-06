@@ -7,10 +7,12 @@ These quantities allow you to input parameters (e.g. wheel circumference) in any
 
 import copy
 import enum
+from abc import ABC
 from dataclasses import dataclass
 from typing import NamedTuple
 
 import ctre
+import rev
 import wpimath.trajectory
 import wpimath.geometry
 import robotpy_apriltag as apriltag
@@ -20,7 +22,7 @@ from . import u
 from .vision import CameraDefinition
 
 
-class CANDeviceID(NamedTuple):
+class CanFDDeviceID(NamedTuple):
     number: int
     canbus: str = ""
 
@@ -32,8 +34,8 @@ class ModuleCorner(enum.IntEnum):
     BACK_RIGHT = 3
 
 
-@dataclass
-class SwerveParameters:
+@dataclass(kw_only=True)
+class SwerveParameters(ABC):
     # Drivetrain Constants
     wheel_circumference: Quantity
 
@@ -51,13 +53,9 @@ class SwerveParameters:
     # Swerve Current Limiting
     angle_continuous_current_limit: int
     angle_peak_current_limit: int
-    angle_peak_current_duration: float
-    angle_enable_current_limit: bool
 
     drive_continuous_current_limit: int
     drive_peak_current_limit: int
-    drive_peak_current_duration: float
-    drive_enable_current_limit: bool
 
     # Angle Motor PID
     angle_kP: float
@@ -75,10 +73,6 @@ class SwerveParameters:
     drive_kS: float
     drive_kV: float
     drive_kA: float
-
-    # Neutral Modes
-    angle_neutral_mode: ctre.NeutralMode
-    drive_neutral_mode: ctre.NeutralMode
 
     # Motor Inverts
     invert_angle_motor: bool
@@ -100,18 +94,49 @@ class SwerveParameters:
         return data
 
 
-@dataclass
-class SwerveModuleParameters:
+@dataclass(kw_only=True)
+class CTRESwerveParameters(SwerveParameters):
+    # Swerve Current Limiting
+    angle_peak_current_duration: float
+    angle_enable_current_limit: bool
+
+    drive_peak_current_duration: float
+    drive_enable_current_limit: bool
+
+    # Neutral Modes
+    angle_neutral_mode: ctre.NeutralMode
+    drive_neutral_mode: ctre.NeutralMode
+
+
+@dataclass(kw_only=True)
+class REVSwerveParameters(SwerveParameters):
+    # Neutral Modes
+    angle_neutral_mode: rev.CANSparkMax.IdleMode
+    drive_neutral_mode: rev.CANSparkMax.IdleMode
+
+
+@dataclass(kw_only=True)
+class SwerveModuleParameters(ABC):
     corner: ModuleCorner
     relative_position: wpimath.geometry.Translation2d
 
     angle_offset: wpimath.geometry.Rotation2d
 
-    drive_motor_id: CANDeviceID
-    angle_motor_id: CANDeviceID
-    angle_encoder_id: CANDeviceID
+    angle_encoder_id: CanFDDeviceID
 
     fake: bool = False
+
+
+@dataclass(kw_only=True)
+class CTRESwerveModuleParameters(SwerveModuleParameters):
+    drive_motor_id: CanFDDeviceID
+    angle_motor_id: CanFDDeviceID
+
+
+@dataclass(kw_only=True)
+class REVSwerveModuleParameters(SwerveModuleParameters):
+    drive_motor_id: int
+    angle_motor_id: int
 
 
 @dataclass
@@ -124,59 +149,59 @@ class VisionParameters:
 class AutoParameters:
     max_speed: Quantity
     max_acceleration: Quantity
-    # max_angular_speed: Quantity["angular velocity"]
-    # max_angular_acceleration: Quantity["angular acceleration"]
 
     theta_controller_constraints: wpimath.trajectory.TrapezoidProfileRadians.Constraints
 
 
-class CTREConfigs:
-    __slots__ = "swerve_angle_config", "swerve_drive_config", "swerve_cancoder_config"
+def create_TalonFX_angle_config(params: CTRESwerveParameters):
+    swerve_angle_config = ctre.TalonFXConfiguration()
 
-    def __init__(self, params: SwerveParameters):
-        swerve_angle_config = ctre.TalonFXConfiguration()
-        swerve_drive_config = ctre.TalonFXConfiguration()
-        swerve_cancoder_config = ctre.CANCoderConfiguration()
+    angle_supply_limit = ctre.SupplyCurrentLimitConfiguration(
+        params.angle_enable_current_limit,
+        params.angle_continuous_current_limit,
+        params.angle_peak_current_limit,
+        params.angle_peak_current_duration,
+    )
 
-        # Swerve Angle Motor Configuration
-        angle_supply_limit = ctre.SupplyCurrentLimitConfiguration(
-            params.angle_enable_current_limit,
-            params.angle_continuous_current_limit,
-            params.angle_peak_current_limit,
-            params.angle_peak_current_duration,
-        )
+    swerve_angle_config.slot0.kP = params.angle_kP
+    swerve_angle_config.slot0.kI = params.angle_kI
+    swerve_angle_config.slot0.kD = params.angle_kD
+    swerve_angle_config.slot0.kF = params.angle_kF
+    swerve_angle_config.supplyCurrLimit = angle_supply_limit
+    swerve_angle_config.initializationStrategy = ctre.SensorInitializationStrategy.BootToZero
+    swerve_angle_config.closedloopRamp = params.angle_ramp
 
-        swerve_angle_config.slot0.kP = params.angle_kP
-        swerve_angle_config.slot0.kI = params.angle_kI
-        swerve_angle_config.slot0.kD = params.angle_kD
-        swerve_angle_config.slot0.kF = params.angle_kF
-        swerve_angle_config.supplyCurrLimit = angle_supply_limit
-        swerve_angle_config.initializationStrategy = ctre.SensorInitializationStrategy.BootToZero
-        swerve_angle_config.closedloopRamp = params.angle_ramp
+    return swerve_angle_config
 
-        # Swerve Drive Motor Configuration
-        drive_supply_limit = ctre.SupplyCurrentLimitConfiguration(
-            params.drive_enable_current_limit,
-            params.drive_continuous_current_limit,
-            params.drive_peak_current_limit,
-            params.drive_peak_current_duration,
-        )
 
-        swerve_drive_config.slot0.kP = params.drive_kP
-        swerve_drive_config.slot0.kI = params.drive_kI
-        swerve_drive_config.slot0.kD = params.drive_kD
-        swerve_drive_config.slot0.kF = params.drive_kF
-        swerve_drive_config.supplyCurrLimit = drive_supply_limit
-        swerve_drive_config.initializationStrategy = ctre.SensorInitializationStrategy.BootToZero
-        swerve_drive_config.openloopRamp = params.drive_open_loop_ramp
-        swerve_drive_config.closedloopRamp = params.drive_closed_loop_ramp
+def create_TalonFX_drive_config(params: CTRESwerveParameters):
+    swerve_drive_config = ctre.TalonFXConfiguration()
 
-        # Swerve CANCoder Configuration
-        swerve_cancoder_config.absoluteSensorRange = ctre.AbsoluteSensorRange.Unsigned_0_to_360
-        swerve_cancoder_config.sensorDirection = params.invert_angle_encoder
-        swerve_cancoder_config.initializationStrategy = ctre.SensorInitializationStrategy.BootToAbsolutePosition
-        swerve_cancoder_config.sensorTimeBase = ctre.SensorTimeBase.PerSecond
+    drive_supply_limit = ctre.SupplyCurrentLimitConfiguration(
+        params.drive_enable_current_limit,
+        params.drive_continuous_current_limit,
+        params.drive_peak_current_limit,
+        params.drive_peak_current_duration,
+    )
 
-        self.swerve_angle_config = swerve_angle_config
-        self.swerve_drive_config = swerve_drive_config
-        self.swerve_cancoder_config = swerve_cancoder_config
+    swerve_drive_config.slot0.kP = params.drive_kP
+    swerve_drive_config.slot0.kI = params.drive_kI
+    swerve_drive_config.slot0.kD = params.drive_kD
+    swerve_drive_config.slot0.kF = params.drive_kF
+    swerve_drive_config.supplyCurrLimit = drive_supply_limit
+    swerve_drive_config.initializationStrategy = ctre.SensorInitializationStrategy.BootToZero
+    swerve_drive_config.openloopRamp = params.drive_open_loop_ramp
+    swerve_drive_config.closedloopRamp = params.drive_closed_loop_ramp
+
+    return swerve_drive_config
+
+
+def create_CANCoder_config(params: SwerveParameters):
+    swerve_cancoder_config = ctre.CANCoderConfiguration()
+
+    swerve_cancoder_config.absoluteSensorRange = ctre.AbsoluteSensorRange.Unsigned_0_to_360
+    swerve_cancoder_config.sensorDirection = params.invert_angle_encoder
+    swerve_cancoder_config.initializationStrategy = ctre.SensorInitializationStrategy.BootToAbsolutePosition
+    swerve_cancoder_config.sensorTimeBase = ctre.SensorTimeBase.PerSecond
+
+    return swerve_cancoder_config

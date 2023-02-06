@@ -1,3 +1,4 @@
+import enum
 import math
 import time
 from typing import Callable, Optional
@@ -17,9 +18,18 @@ from wpimath.kinematics import (
 )
 from wpimath.trajectory import Trajectory
 
-from .configs import SwerveModuleParameters, SwerveParameters, AutoParameters, VisionParameters
+from .configs import (
+    SwerveModuleParameters,
+    SwerveParameters,
+    AutoParameters,
+    CTRESwerveModuleParameters,
+    CTRESwerveParameters,
+    REVSwerveParameters,
+    REVSwerveModuleParameters,
+    VisionParameters,
+)
 from .dummy import Dummy
-from .mod import SwerveModule
+from .mod import SwerveModule, CTRESwerveModule, REVSwerveModule
 from .vision import AprilTagCameraCollection
 
 SwerveModuleParameters4 = tuple[
@@ -27,6 +37,11 @@ SwerveModuleParameters4 = tuple[
 ]
 SwerveModuleState4 = tuple[SwerveModuleState, SwerveModuleState, SwerveModuleState, SwerveModuleState]
 SwerveModulePosition4 = tuple[SwerveModulePosition, SwerveModulePosition, SwerveModulePosition, SwerveModulePosition]
+
+
+class DrivetrainVendor(enum.Enum):
+    CTRE = enum.auto()
+    REV = enum.auto()
 
 
 class Swerve(commands2.SubsystemBase):
@@ -60,6 +75,14 @@ class Swerve(commands2.SubsystemBase):
 
         commands2.SubsystemBase.__init__(self)
 
+        # Determine whether this is a CTRE or REV drive base
+        if isinstance(module_params[0], CTRESwerveModuleParameters) and isinstance(swerve_params, CTRESwerveParameters):
+            vendor = DrivetrainVendor.CTRE
+        elif isinstance(module_params[0], REVSwerveModuleParameters) and isinstance(swerve_params, REVSwerveParameters):
+            vendor = DrivetrainVendor.REV
+        else:
+            raise Exception("Swerve module parameters and swerve parameters are mismatched! Use either CTRE or REV.")
+
         # Convert the parameters to decimal values because doing unit conversions every iteration takes too long
         # noinspection PyTypeChecker
         self.swerve_params: SwerveParameters = swerve_params.in_standard_units()
@@ -80,7 +103,9 @@ class Swerve(commands2.SubsystemBase):
 
         # Create four swerve modules and pass each a unique set of parameters. This tuple has the same swerve module
         # order as the module_params tuple above it.
-        self.swerve_modules = tuple(SwerveModule(module_param, swerve_params) for module_param in module_params)
+        swerve_module_type = CTRESwerveModule if vendor is DrivetrainVendor.CTRE else REVSwerveModule
+        # noinspection PyTypeChecker
+        self.swerve_modules = tuple(swerve_module_type(module_param, swerve_params) for module_param in module_params)
 
         # Pause for a second to allow the motors time to configure themselves before resetting their positions.
         # See https://github.com/Team364/BaseFalconSwerve/issues/8 for more info.
