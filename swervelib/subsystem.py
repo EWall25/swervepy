@@ -172,7 +172,7 @@ class Swerve(commands2.SubsystemBase):
 
         for i in range(4):
             mod: SwerveModule = self.swerve_modules[i]
-            mod.desire_state(swerve_module_states[i], open_loop)
+            mod.desire_state(swerve_module_states[i], open_loop, rotate_in_place=False)
 
     def set_module_states(self, desired_states: SwerveModuleState4):
         """

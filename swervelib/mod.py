@@ -65,13 +65,16 @@ class SwerveModule(ABC):
         self.angle_encoder.configAllSettings(settings)
 
     @abstractmethod
-    def desire_state(self, desired_state: SwerveModuleState, open_loop: bool):
+    def desire_state(self, desired_state: SwerveModuleState, open_loop: bool, rotate_in_place: bool = True):
         """
         Begin exerting control to reach a desired state. This method only needs to be called when there is a change in
         desired state, not periodically, because it offloads feedback control onto the motor controllers.
 
         :param desired_state: The module's new desired state
         :param open_loop: If False, use velocity control. Else, use percent output
+        :param rotate_in_place: If False, the module won't rotate if its desired velocity
+        is under 1% of its max velocity.
+        This prevents unnecessary wear on the treads from snapping back to 0 deg every time the robot stops.
         """
 
     @abstractmethod
@@ -127,7 +130,7 @@ class CTRESwerveModule(SwerveModule):
         self.angle_motor = ctre.WPI_TalonFX(*module_params.angle_motor_id)
         self._config_angle_motor()
 
-    def desire_state(self, desired_state: SwerveModuleState, open_loop: bool):
+    def desire_state(self, desired_state: SwerveModuleState, open_loop: bool, rotate_in_place: bool = True):
         # Optimize the desired state so that the module rotates to it as quick as possible
         desired_state = optimize(desired_state, self.state.angle)
 
@@ -147,7 +150,12 @@ class CTRESwerveModule(SwerveModule):
                 self.feedforward.calculate(desired_state.speed),
             )
 
-        angle = conversions.degrees_to_falcon(desired_state.angle, self.swerve_params.angle_gear_ratio)
+        # Prevent rotating the module if speed is less than 1% to prevent unnecessary wear on treads
+        angle = (
+            conversions.degrees_to_falcon(desired_state.angle, self.swerve_params.angle_gear_ratio)
+            if rotate_in_place or abs(desired_state.speed >= 0.01 * self.swerve_params.max_speed)
+            else self.angle
+        )
         self.angle_motor.set(ctre.ControlMode.Position, angle)
 
         wpilib.SmartDashboard.putNumber(f"{self.corner.name} Desired Angle (deg)", desired_state.angle.degrees())
@@ -232,7 +240,7 @@ class REVSwerveModule(SwerveModule):
         self.angle_integrated_encoder = self.angle_motor.getEncoder()
         self._config_angle_motor()
 
-    def desire_state(self, desired_state: SwerveModuleState, open_loop: bool):
+    def desire_state(self, desired_state: SwerveModuleState, open_loop: bool, rotate_in_place: bool = True):
         # Optimize the desired state so that the module rotates to it as quick as possible
         desired_state = optimize(desired_state, self.state.angle)
 
@@ -245,7 +253,12 @@ class REVSwerveModule(SwerveModule):
                 velocity, rev.CANSparkMax.ControlType.kVelocity, arbFeedforward=self.feedforward.calculate(velocity)
             )
 
-        angle = desired_state.angle.degrees()
+        # Prevent rotating the module if speed is less than 1% to prevent unnecessary wear on treads
+        angle = (
+            desired_state.angle.degrees()
+            if rotate_in_place or abs(desired_state.speed >= 0.01 * self.swerve_params.max_speed)
+            else self.angle
+        )
         self.angle_controller.setReference(angle, rev.CANSparkMax.ControlType.kPosition)
 
         wpilib.SmartDashboard.putNumber(f"{self.corner.name} Desired Angle (deg)", angle)
