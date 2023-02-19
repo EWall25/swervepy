@@ -107,9 +107,9 @@ class RobotContainer:
         self.swerve = Swerve(module_params, swerve_params)
         self.swerve.setDefaultCommand(
             self.swerve.teleop_command(
-                lambda: deadband(-self.stick.getRawAxis(1), 0.01),
-                lambda: deadband(self.stick.getRawAxis(0), 0.01),
-                lambda: deadband(-self.stick.getRawAxis(2), 0.01),  # Invert for CCW+
+                lambda: deadband(-self.stick.getRawAxis(1), 0.03),
+                lambda: deadband(self.stick.getRawAxis(0), 0.03),
+                lambda: deadband(-self.stick.getRawAxis(2), 0.03),  # Invert for CCW+
                 field_relative,
                 open_loop,
             )

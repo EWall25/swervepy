@@ -25,7 +25,16 @@ class SwerveModule(ABC):
     One swerve module. A swerve drivetrain is made up of four modules and is represented by the Swerve class.
     """
 
-    __slots__ = "drive_motor", "angle_motor", "angle_encoder", "swerve_params", "angle_offset", "feedforward", "corner"
+    __slots__ = (
+        "drive_motor",
+        "angle_motor",
+        "angle_encoder",
+        "swerve_params",
+        "angle_offset",
+        "feedforward",
+        "corner",
+        "last_angle",
+    )
 
     def __init__(self, module_params: SwerveModuleParameters, swerve_params: SwerveParameters):
         """
@@ -130,6 +139,8 @@ class CTRESwerveModule(SwerveModule):
         self.angle_motor = ctre.WPI_TalonFX(*module_params.angle_motor_id)
         self._config_angle_motor()
 
+        self.last_angle = self.angle
+
     def desire_state(self, desired_state: SwerveModuleState, open_loop: bool, rotate_in_place: bool = True):
         # Optimize the desired state so that the module rotates to it as quick as possible
         desired_state = optimize(desired_state, self.state.angle)
@@ -152,13 +163,19 @@ class CTRESwerveModule(SwerveModule):
 
         # Prevent rotating the module if speed is less than 1% to prevent unnecessary wear on treads
         angle = (
-            conversions.degrees_to_falcon(desired_state.angle, self.swerve_params.angle_gear_ratio)
-            if rotate_in_place or abs(desired_state.speed >= 0.01 * self.swerve_params.max_speed)
+            desired_state.angle
+            if rotate_in_place or abs(desired_state.speed) >= 0.01 * self.swerve_params.max_speed
             else self.angle
         )
-        self.angle_motor.set(ctre.ControlMode.Position, angle)
+        converted_angle = conversions.degrees_to_falcon(angle, self.swerve_params.angle_gear_ratio)
+        self.angle_motor.set(ctre.ControlMode.Position, converted_angle)
 
-        wpilib.SmartDashboard.putNumber(f"{self.corner.name} Desired Angle (deg)", desired_state.angle.degrees())
+        if self.corner.value == 0:
+            print(self.last_angle.degrees())
+
+        self.last_angle = angle
+
+        wpilib.SmartDashboard.putNumber(f"{self.corner.name} Desired Angle (deg)", angle.degrees())
         wpilib.SmartDashboard.putNumber(f"{self.corner.name} Desired Velocity (mps)", desired_state.speed)
 
     def _config_angle_motor(self):
@@ -240,6 +257,8 @@ class REVSwerveModule(SwerveModule):
         self.angle_integrated_encoder = self.angle_motor.getEncoder()
         self._config_angle_motor()
 
+        self.last_angle = self.angle
+
     def desire_state(self, desired_state: SwerveModuleState, open_loop: bool, rotate_in_place: bool = True):
         # Optimize the desired state so that the module rotates to it as quick as possible
         desired_state = optimize(desired_state, self.state.angle)
@@ -255,11 +274,13 @@ class REVSwerveModule(SwerveModule):
 
         # Prevent rotating the module if speed is less than 1% to prevent unnecessary wear on treads
         angle = (
-            desired_state.angle.degrees()
-            if rotate_in_place or abs(desired_state.speed >= 0.01 * self.swerve_params.max_speed)
-            else self.angle
+            desired_state.angle
+            if rotate_in_place or abs(desired_state.speed) >= 0.01 * self.swerve_params.max_speed
+            else self.last_angle
         )
-        self.angle_controller.setReference(angle, rev.CANSparkMax.ControlType.kPosition)
+        self.angle_controller.setReference(angle.degrees(), rev.CANSparkMax.ControlType.kPosition)
+
+        self.last_angle = angle
 
         wpilib.SmartDashboard.putNumber(f"{self.corner.name} Desired Angle (deg)", angle)
         wpilib.SmartDashboard.putNumber(f"{self.corner.name} Desired Velocity (mps)", velocity)
@@ -281,7 +302,7 @@ class REVSwerveModule(SwerveModule):
         position_conversion_factor = self.swerve_params.wheel_circumference / self.swerve_params.angle_gear_ratio
         self.angle_integrated_encoder.setPositionConversionFactor(position_conversion_factor)
 
-        self.angle_motor.burnFlash()
+        # self.angle_motor.burnFlash()
         self.reset_to_absolute()
 
     def _config_drive_motor(self):
@@ -305,7 +326,7 @@ class REVSwerveModule(SwerveModule):
         self.drive_integrated_encoder.setPositionConversionFactor(position_conversion_factor)
         self.drive_integrated_encoder.setVelocityConversionFactor(position_conversion_factor / 60)
 
-        self.drive_motor.burnFlash()
+        # self.drive_motor.burnFlash()
         self.drive_integrated_encoder.setPosition(0)
 
     def zero_distance(self):
