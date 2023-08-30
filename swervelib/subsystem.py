@@ -16,6 +16,7 @@ from wpimath.kinematics import (
     SwerveModuleState,
     SwerveModulePosition,
 )
+import wpimath.kinematics
 from wpimath.trajectory import Trajectory
 
 from .configs import (
