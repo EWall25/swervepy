@@ -66,7 +66,7 @@ class CoaxialDriveMotor(Protocol):
 
     @property
     @abstractmethod
-    def position(self) -> float:
+    def distance(self) -> float:
         raise NotImplementedError
 
 
@@ -98,4 +98,11 @@ class Gyro(Protocol):
     @property
     @abstractmethod
     def heading(self) -> Rotation2d:
+        raise NotImplementedError
+
+
+class AbsoluteEncoder(Protocol):
+    @property
+    @abstractmethod
+    def absolute_position(self) -> Rotation2d:
         raise NotImplementedError
