@@ -18,26 +18,30 @@ if TYPE_CHECKING:
 
 
 class CoaxialSwerveModule(SwerveModule):
-    def __init__(self, _motor: CoaxialDriveMotor, azimuth_motor: CoaxialAzimuthMotor):
-        self.__motor = _motor
+    def __init__(self, drive_motor: CoaxialDriveMotor, azimuth_motor: CoaxialAzimuthMotor):
+        self._drive_motor = drive_motor
         self._azimuth_motor = azimuth_motor
 
     def desire_drive_velocity(self, velocity: float, open_loop: bool):
         if open_loop:
-            self.__motor.follow_velocity_open(velocity)
+            self._drive_motor.follow_velocity_open(velocity)
         else:
-            self.__motor.follow_velocity_closed(velocity)
+            self._drive_motor.follow_velocity_closed(velocity)
 
     def desire_azimuth_angle(self, angle: Rotation2d):
         self._azimuth_motor.follow_angle(angle)
 
+    def reset(self):
+        self._drive_motor.reset()
+        self._azimuth_motor.reset()
+
     @property
     def drive_velocity(self) -> float:
-        return self.__motor.velocity
+        return self._drive_motor.velocity
 
     @property
     def drive_distance(self) -> float:
-        return self.__motor.distance
+        return self._drive_motor.distance
 
     @property
     def azimuth_angle(self) -> Rotation2d:
@@ -59,13 +63,13 @@ class SwerveDrive(commands2.SubsystemBase):
         self.max_velocity: float = max_velocity.m_as(u.m / u.s)
         self.max_angular_velocity = max_angular_velocity
 
+        self.reset_modules()
+
         # There are different classes for each number of swerve modules in a drive base,
         # so construct the class name from number of modules.
         self._kinematics: "SwerveDrive4Kinematics" = getattr(
             wpimath.kinematics, f"SwerveDrive{len(modules)}Kinematics"
         )(*[module.placement for module in self._modules])
-
-        # TODO: Reset modules before constructing odometry
         self._odometry: "SwerveDrive4Odometry" = getattr(wpimath.estimator, f"SwerveDrive{len(modules)}PoseEstimator")(
             self.kinematics, self._gyro.heading, self.module_positions, Pose2d()
         )
@@ -90,6 +94,10 @@ class SwerveDrive(commands2.SubsystemBase):
     # TODO: Add utility methods
     # TODO: Impl dashboard
     # TODO: Add commands
+
+    def reset_modules(self):
+        for module in self._modules:
+            module.reset()
 
 
 class Falcon500CoaxialDriveMotor(CoaxialDriveMotor):
@@ -260,8 +268,8 @@ class Falcon500CoaxialAzimuthMotor(CoaxialAzimuthMotor):
 
     @property
     def rotational_velocity(self) -> Rotation2d:
-        # TODO: Write conversions method for deg/s
-        pass
+        dps = conversions.falcon_to_dps(self._motor.getSelectedSensorVelocity(), self._params.gear_ratio)
+        return Rotation2d.fromDegrees(dps)
 
     @property
     def angle(self) -> Rotation2d:
@@ -276,3 +284,15 @@ class AbsoluteCANCoder(AbsoluteEncoder):
     @property
     def absolute_position(self) -> Rotation2d:
         return Rotation2d.fromDegrees(self._encoder.getAbsolutePosition())
+
+
+class PigeonGyro(Gyro):
+    def __init__(self, id_: int):
+        self._gyro = ctre.PigeonIMU(id_)
+
+    def zero_heading(self):
+        self._gyro.setYaw(0)
+
+    @property
+    def heading(self) -> Rotation2d:
+        return Rotation2d.fromDegrees(self._gyro.getYaw())

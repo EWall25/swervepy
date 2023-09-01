@@ -56,3 +56,12 @@ def metres_to_falcon(metres: float, circumference: float, gear_ratio: float) -> 
     rotations = metres / circumference
     counts = rotations * (gear_ratio * FALCON_CPR)
     return counts
+
+
+def falcon_to_dps(velocity: float, gear_ratio: float) -> float:
+    return falcon_to_rpm(velocity, gear_ratio) * 360 / 60
+
+
+def dps_to_falcon(dps: float, gear_ratio: float) -> float:
+    rpm = dps * 60 / 360
+    return rpm_to_falcon(rpm, gear_ratio)

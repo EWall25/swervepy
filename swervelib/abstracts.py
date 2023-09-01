@@ -25,6 +25,10 @@ class SwerveModule(Protocol):
     def desire_azimuth_angle(self, angle: Rotation2d):
         raise NotImplementedError
 
+    @abstractmethod
+    def reset(self):
+        raise NotImplementedError
+
     @property
     @abstractmethod
     def drive_velocity(self) -> float:
