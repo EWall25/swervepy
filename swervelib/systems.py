@@ -4,12 +4,14 @@ from typing import TYPE_CHECKING, Callable
 
 import commands2
 import ctre
+import wpilib
 import wpimath.kinematics
 import wpimath.estimator
 from pint import Quantity
 from wpimath.geometry import Rotation2d, Translation2d, Pose2d
 from wpimath.kinematics import SwerveModulePosition, ChassisSpeeds, SwerveModuleState
 from wpimath.controller import SimpleMotorFeedforwardMeters
+from wpiutil import SendableBuilder
 
 from . import u, conversions
 from .abstracts import SwerveModule, CoaxialDriveMotor, CoaxialAzimuthMotor, Gyro, AbsoluteEncoder
@@ -20,18 +22,25 @@ if TYPE_CHECKING:
 
 
 class CoaxialSwerveModule(SwerveModule):
+    last_commanded_drive_velocity = 0
+    last_commanded_azimuth_angle = Rotation2d.fromDegrees(0)
+
     def __init__(self, drive_motor: CoaxialDriveMotor, azimuth_motor: CoaxialAzimuthMotor, placement: Translation2d):
+        super().__init__()
+
         self._drive_motor = drive_motor
         self._azimuth_motor = azimuth_motor
         self.placement = placement
 
     def desire_drive_velocity(self, velocity: float, open_loop: bool):
+        self.last_commanded_drive_velocity = velocity
         if open_loop:
             self._drive_motor.follow_velocity_open(velocity)
         else:
             self._drive_motor.follow_velocity_closed(velocity)
 
     def desire_azimuth_angle(self, angle: Rotation2d):
+        self.last_commanded_azimuth_angle = angle
         self._azimuth_motor.follow_angle(angle)
 
     def reset(self):
@@ -53,6 +62,19 @@ class CoaxialSwerveModule(SwerveModule):
     @property
     def azimuth_velocity(self) -> float:
         return self._azimuth_motor.rotational_velocity
+
+    def initSendable(self, builder: SendableBuilder):
+        # fmt: off
+        builder.setSmartDashboardType("CoaxialSwerveModule")
+        builder.addDoubleProperty("Drive Velocity (mps)", lambda: self._drive_motor.velocity, lambda: None)
+        builder.addDoubleProperty("Drive Distance (m)", lambda: self._drive_motor.distance, lambda: None)
+        builder.addDoubleProperty("Azimuth Velocity (radps)", lambda: self._azimuth_motor.rotational_velocity, lambda: None)
+        builder.addDoubleProperty("Azimuth Position (rad)", lambda: self._azimuth_motor.angle.radians(), lambda: None)
+        builder.addDoubleProperty("Azimuth Position (deg)", lambda: self._azimuth_motor.angle.degrees(), lambda: None)
+        builder.addDoubleProperty("Desired Drive Velocity (mps)", lambda: self.last_commanded_drive_velocity, lambda: None)
+        builder.addDoubleProperty("Desired Azimuth Position (rad)", lambda: self.last_commanded_azimuth_angle.radians(), lambda: None)
+        builder.addDoubleProperty("Desired Azimuth Position (deg)", lambda: self.last_commanded_azimuth_angle.degrees(), lambda: None)
+        # fmt: on
 
 
 class SwerveDrive(commands2.SubsystemBase):
@@ -76,6 +98,9 @@ class SwerveDrive(commands2.SubsystemBase):
         self._odometry: "SwerveDrive4PoseEstimator" = getattr(
             wpimath.estimator, f"SwerveDrive{len(modules)}PoseEstimator"
         )(self._kinematics, self._gyro.heading, self.module_positions, Pose2d())
+
+        for i, module in enumerate(modules):
+            wpilib.SmartDashboard.putData(f"Module {i}", module)
 
     def periodic(self):
         self._odometry.update(self._gyro.heading, self.module_positions)
@@ -102,7 +127,6 @@ class SwerveDrive(commands2.SubsystemBase):
         return tuple(module.module_position for module in self._modules)
 
     # TODO: Add utility methods
-    # TODO: Impl dashboard
     # TODO: Add commands
 
     def reset_modules(self):
@@ -316,8 +340,12 @@ class Falcon500CoaxialAzimuthMotor(CoaxialAzimuthMotor):
 
 class AbsoluteCANCoder(AbsoluteEncoder):
     def __init__(self, id_: int):
+        super().__init__()
+
         self._encoder = ctre.CANCoder(id_)
         self._encoder.configAbsoluteSensorRange(ctre.AbsoluteSensorRange.Unsigned_0_to_360)
+
+        wpilib.SmartDashboard.putData(f"Absolute CANCoder {id_}", self)
 
     @property
     def absolute_position(self) -> Rotation2d:
@@ -326,8 +354,12 @@ class AbsoluteCANCoder(AbsoluteEncoder):
 
 class PigeonGyro(Gyro):
     def __init__(self, id_: int, invert: bool = False):
+        super().__init__()
+
         self._gyro = ctre.PigeonIMU(id_)
         self.invert = invert
+
+        wpilib.SmartDashboard.putData("Pigeon IMU", self)
 
     def zero_heading(self):
         self._gyro.setYaw(0)

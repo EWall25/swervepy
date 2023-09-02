@@ -1,11 +1,16 @@
-from abc import abstractmethod
+from abc import abstractmethod, ABC, ABCMeta
 from typing import Protocol
 
 from wpimath.geometry import Rotation2d, Translation2d
 from wpimath.kinematics import SwerveModuleState, SwerveModulePosition
+from wpiutil import Sendable, SendableBuilder
 
 
-class SwerveModule(Protocol):
+class SendableABCMeta(ABCMeta, type(Sendable)):
+    pass
+
+
+class SwerveModule(Sendable, metaclass=SendableABCMeta):
     placement: Translation2d
 
     def desire_state(self, state: SwerveModuleState, drive_open_loop):
@@ -94,7 +99,7 @@ class CoaxialAzimuthMotor(Protocol):
         raise NotImplementedError
 
 
-class Gyro(Protocol):
+class Gyro(Sendable, metaclass=SendableABCMeta):
     @abstractmethod
     def zero_heading(self):
         raise NotImplementedError
@@ -104,9 +109,19 @@ class Gyro(Protocol):
     def heading(self) -> Rotation2d:
         raise NotImplementedError
 
+    def initSendable(self, builder: SendableBuilder):
+        builder.setSmartDashboardType("Gyro")
+        builder.addDoubleProperty("Absolute Rotation (rad)", lambda: self.heading.radians(), lambda: None)
+        builder.addDoubleProperty("Absolute Rotation (deg)", lambda: self.heading.degrees(), lambda: None)
 
-class AbsoluteEncoder(Protocol):
+
+class AbsoluteEncoder(Sendable, metaclass=SendableABCMeta):
     @property
     @abstractmethod
     def absolute_position(self) -> Rotation2d:
         raise NotImplementedError
+
+    def initSendable(self, builder: SendableBuilder):
+        builder.setSmartDashboardType("Encoder")
+        builder.addDoubleProperty("Absolute Rotation (rad)", lambda: self.absolute_position.radians(), lambda: None)
+        builder.addDoubleProperty("Absolute Rotation (deg)", lambda: self.absolute_position.degrees(), lambda: None)
