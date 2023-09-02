@@ -46,7 +46,7 @@ class SwerveModule(Protocol):
 
     @property
     @abstractmethod
-    def azimuth_velocity(self) -> Rotation2d:
+    def azimuth_velocity(self) -> float:
         raise NotImplementedError
 
 
@@ -85,7 +85,7 @@ class CoaxialAzimuthMotor(Protocol):
 
     @property
     @abstractmethod
-    def rotational_velocity(self) -> Rotation2d:
+    def rotational_velocity(self) -> float:
         raise NotImplementedError
 
     @property

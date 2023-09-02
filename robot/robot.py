@@ -6,7 +6,7 @@ import wpilib
 
 sys.path.append(str(Path(__file__).parent.parent.absolute()))
 
-from container import RobotContainer
+from container2 import RobotContainer
 
 
 class Robot(commands2.TimedCommandRobot):

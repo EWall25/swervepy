@@ -1,5 +1,6 @@
+import copy
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable
 
 import commands2
 import ctre
@@ -7,20 +8,22 @@ import wpimath.kinematics
 import wpimath.estimator
 from pint import Quantity
 from wpimath.geometry import Rotation2d, Translation2d, Pose2d
-from wpimath.kinematics import SwerveModulePosition, ChassisSpeeds
+from wpimath.kinematics import SwerveModulePosition, ChassisSpeeds, SwerveModuleState
 from wpimath.controller import SimpleMotorFeedforwardMeters
 
 from . import u, conversions
 from .abstracts import SwerveModule, CoaxialDriveMotor, CoaxialAzimuthMotor, Gyro, AbsoluteEncoder
 
 if TYPE_CHECKING:
-    from wpimath.kinematics import SwerveDrive4Kinematics, SwerveDrive4Odometry
+    from wpimath.kinematics import SwerveDrive4Kinematics
+    from wpimath.estimator import SwerveDrive4PoseEstimator
 
 
 class CoaxialSwerveModule(SwerveModule):
-    def __init__(self, drive_motor: CoaxialDriveMotor, azimuth_motor: CoaxialAzimuthMotor):
+    def __init__(self, drive_motor: CoaxialDriveMotor, azimuth_motor: CoaxialAzimuthMotor, placement: Translation2d):
         self._drive_motor = drive_motor
         self._azimuth_motor = azimuth_motor
+        self.placement = placement
 
     def desire_drive_velocity(self, velocity: float, open_loop: bool):
         if open_loop:
@@ -48,20 +51,20 @@ class CoaxialSwerveModule(SwerveModule):
         return self._azimuth_motor.angle
 
     @property
-    def azimuth_velocity(self) -> Rotation2d:
+    def azimuth_velocity(self) -> float:
         return self._azimuth_motor.rotational_velocity
 
 
 class SwerveDrive(commands2.SubsystemBase):
     def __init__(
-        self, modules: tuple[SwerveModule, ...], gyro: Gyro, max_velocity: Quantity, max_angular_velocity: Rotation2d
+        self, modules: tuple[SwerveModule, ...], gyro: Gyro, max_velocity: Quantity, max_angular_velocity: Quantity
     ):
         super().__init__()
 
         self._modules = modules
         self._gyro = gyro
         self.max_velocity: float = max_velocity.m_as(u.m / u.s)
-        self.max_angular_velocity = max_angular_velocity
+        self.max_angular_velocity: float = max_angular_velocity.m_as(u.rad / u.s)
 
         self.reset_modules()
 
@@ -70,18 +73,25 @@ class SwerveDrive(commands2.SubsystemBase):
         self._kinematics: "SwerveDrive4Kinematics" = getattr(
             wpimath.kinematics, f"SwerveDrive{len(modules)}Kinematics"
         )(*[module.placement for module in self._modules])
-        self._odometry: "SwerveDrive4Odometry" = getattr(wpimath.estimator, f"SwerveDrive{len(modules)}PoseEstimator")(
-            self.kinematics, self._gyro.heading, self.module_positions, Pose2d()
-        )
+        self._odometry: "SwerveDrive4PoseEstimator" = getattr(
+            wpimath.estimator, f"SwerveDrive{len(modules)}PoseEstimator"
+        )(self._kinematics, self._gyro.heading, self.module_positions, Pose2d())
 
-    def drive(self, translation: Translation2d, rotation: Rotation2d, field_relative: bool, open_loop: bool):
+    def periodic(self):
+        self._odometry.update(self._gyro.heading, self.module_positions)
+
+    def drive(self, translation: Translation2d, rotation: float, field_relative: bool, open_loop: bool):
         speeds = (
-            ChassisSpeeds.fromFieldRelativeSpeeds(translation.x, translation.y, rotation, self.heading)
+            ChassisSpeeds.fromFieldRelativeSpeeds(translation.x, translation.y, rotation, self._gyro.heading)
             if field_relative
             else ChassisSpeeds(translation.x, translation.y, rotation)
         )
         swerve_module_states = self._kinematics.toSwerveModuleStates(speeds)
-        swerve_module_states = self._kinematics.desaturateWheelSpeeds(swerve_module_states, self.max_velocity)
+
+        self.desire_module_states(swerve_module_states, open_loop)
+
+    def desire_module_states(self, states: tuple[SwerveModuleState, ...], open_loop: bool = False):
+        swerve_module_states = self._kinematics.desaturateWheelSpeeds(states, self.max_velocity)
 
         for i in range(4):
             module: SwerveModule = self._modules[i]
@@ -99,14 +109,32 @@ class SwerveDrive(commands2.SubsystemBase):
         for module in self._modules:
             module.reset()
 
+    def teleop_command(
+        self,
+        translation: Callable[[], float],
+        strafe: Callable[[], float],
+        rotation: Callable[[], float],
+        field_relative: bool,
+        open_loop: bool,
+    ):
+        return commands2.RunCommand(
+            lambda: self.drive(
+                Translation2d(translation(), strafe()) * self.max_velocity,
+                rotation() * self.max_angular_velocity,
+                field_relative,
+                open_loop,
+            ),
+            self,
+        )
+
 
 class Falcon500CoaxialDriveMotor(CoaxialDriveMotor):
     @dataclass
     class Parameters:
-        wheel_circumference: float  # m
+        wheel_circumference: Quantity
         gear_ratio: float
 
-        max_speed: float  # m/s
+        max_speed: Quantity
 
         open_loop_ramp_rate: float
         closed_loop_ramp_rate: float
@@ -126,6 +154,12 @@ class Falcon500CoaxialDriveMotor(CoaxialDriveMotor):
         kA: float
 
         invert_motor: bool
+
+        def in_standard_units(self):
+            data = copy.deepcopy(self)
+            data.wheel_circumference = data.wheel_circumference.m_as(u.m)
+            data.max_speed = data.max_speed.m_as(u.m / u.s)
+            return data
 
         def create_TalonFX_config(self) -> ctre.TalonFXConfiguration:
             motor_config = ctre.TalonFXConfiguration()
@@ -148,7 +182,7 @@ class Falcon500CoaxialDriveMotor(CoaxialDriveMotor):
             return motor_config
 
     def __init__(self, id_: int, parameters: Parameters):
-        self._params = parameters
+        self._params = parameters.in_standard_units()
 
         # TODO: Accept CAN IDs on other busses
         self._motor = ctre.TalonFX(id_)
@@ -204,7 +238,7 @@ class Falcon500CoaxialAzimuthMotor(CoaxialAzimuthMotor):
     class Parameters:
         gear_ratio: float
 
-        max_angular_velocity: Rotation2d
+        max_angular_velocity: Quantity
 
         ramp_rate: float
 
@@ -219,6 +253,11 @@ class Falcon500CoaxialAzimuthMotor(CoaxialAzimuthMotor):
         kD: float
 
         invert_motor: bool
+
+        def in_standard_units(self):
+            data = copy.deepcopy(self)
+            data.max_angular_velocity = data.max_angular_velocity.m_as(u.rad / u.s)
+            return data
 
         def create_TalonFX_config(self) -> ctre.TalonFXConfiguration:
             motor_config = ctre.TalonFXConfiguration()
@@ -240,7 +279,7 @@ class Falcon500CoaxialAzimuthMotor(CoaxialAzimuthMotor):
             return motor_config
 
     def __init__(self, id_: int, azimuth_offset: Rotation2d, parameters: Parameters, absolute_encoder: AbsoluteEncoder):
-        self._params = parameters
+        self._params = parameters.in_standard_units()
 
         # TODO: Accept CAN IDs on other busses
         self._motor = ctre.TalonFX(id_)
@@ -267,9 +306,8 @@ class Falcon500CoaxialAzimuthMotor(CoaxialAzimuthMotor):
         self._motor.setSelectedSensorPosition(converted_position)
 
     @property
-    def rotational_velocity(self) -> Rotation2d:
-        dps = conversions.falcon_to_dps(self._motor.getSelectedSensorVelocity(), self._params.gear_ratio)
-        return Rotation2d.fromDegrees(dps)
+    def rotational_velocity(self) -> float:
+        return conversions.falcon_to_radps(self._motor.getSelectedSensorVelocity(), self._params.gear_ratio)
 
     @property
     def angle(self) -> Rotation2d:
@@ -287,12 +325,16 @@ class AbsoluteCANCoder(AbsoluteEncoder):
 
 
 class PigeonGyro(Gyro):
-    def __init__(self, id_: int):
+    def __init__(self, id_: int, invert: bool = False):
         self._gyro = ctre.PigeonIMU(id_)
+        self.invert = invert
 
     def zero_heading(self):
         self._gyro.setYaw(0)
 
     @property
     def heading(self) -> Rotation2d:
-        return Rotation2d.fromDegrees(self._gyro.getYaw())
+        yaw = self._gyro.getYaw()
+        if self.invert:
+            yaw = 360 - yaw
+        return Rotation2d.fromDegrees(yaw)
