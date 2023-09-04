@@ -1,4 +1,4 @@
-from abc import abstractmethod, ABC, ABCMeta
+from abc import abstractmethod, ABCMeta
 from typing import Protocol
 
 from wpimath.geometry import Rotation2d, Translation2d
@@ -111,8 +111,8 @@ class Gyro(Sendable, metaclass=SendableABCMeta):
 
     def initSendable(self, builder: SendableBuilder):
         builder.setSmartDashboardType("Gyro")
-        builder.addDoubleProperty("Absolute Rotation (rad)", lambda: self.heading.radians(), lambda: None)
-        builder.addDoubleProperty("Absolute Rotation (deg)", lambda: self.heading.degrees(), lambda: None)
+        builder.addDoubleProperty("Value", lambda: self.heading.degrees(), lambda: None)
+        builder.addDoubleProperty("Heading (rad)", lambda: self.heading.radians(), lambda: None)
 
 
 class AbsoluteEncoder(Sendable, metaclass=SendableABCMeta):

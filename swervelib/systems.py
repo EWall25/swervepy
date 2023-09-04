@@ -1,9 +1,11 @@
 import copy
+import time
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING, Callable, Optional
 
 import commands2
 import ctre
+import ctre.sensors
 import wpilib
 import wpimath.kinematics
 import wpimath.estimator
@@ -79,15 +81,24 @@ class CoaxialSwerveModule(SwerveModule):
 
 class SwerveDrive(commands2.SubsystemBase):
     def __init__(
-        self, modules: tuple[SwerveModule, ...], gyro: Gyro, max_velocity: Quantity, max_angular_velocity: Quantity
+        self,
+        modules: tuple[SwerveModule, ...],
+        gyro: Gyro,
+        max_velocity: Quantity,
+        max_angular_velocity: Quantity,
+        vision_pose_callback: Callable[[Pose2d], Optional[Pose2d]] = lambda _: None,
     ):
         super().__init__()
 
         self._modules = modules
         self._gyro = gyro
+        self._vision_pose_callback = vision_pose_callback
         self.max_velocity: float = max_velocity.m_as(u.m / u.s)
         self.max_angular_velocity: float = max_angular_velocity.m_as(u.rad / u.s)
 
+        # Pause init for a second before setting module offsets to avoid a bug related to inverting motors.
+        # Fixes https://github.com/Team364/BaseFalconSwerve/issues/8.
+        time.sleep(1)
         self.reset_modules()
 
         # There are different classes for each number of swerve modules in a drive base,
@@ -104,6 +115,10 @@ class SwerveDrive(commands2.SubsystemBase):
 
     def periodic(self):
         self._odometry.update(self._gyro.heading, self.module_positions)
+
+        vision_pose = self._vision_pose_callback(self.pose)
+        if vision_pose:
+            self._odometry.addVisionMeasurement(vision_pose, wpilib.Timer.getFPGATimestamp())
 
     def drive(self, translation: Translation2d, rotation: float, field_relative: bool, open_loop: bool):
         speeds = (
@@ -126,12 +141,21 @@ class SwerveDrive(commands2.SubsystemBase):
     def module_positions(self) -> tuple[SwerveModulePosition, ...]:
         return tuple(module.module_position for module in self._modules)
 
-    # TODO: Add utility methods
+    @property
+    def pose(self) -> Pose2d:
+        return self._odometry.getEstimatedPosition()
+
     # TODO: Add commands
 
     def reset_modules(self):
         for module in self._modules:
             module.reset()
+
+    def zero_heading(self):
+        self._gyro.zero_heading()
+
+    def reset_odometry(self, pose: Pose2d):
+        self._odometry.resetPosition(self._gyro.heading, self.module_positions, pose)
 
     def teleop_command(
         self,
@@ -356,7 +380,7 @@ class PigeonGyro(Gyro):
     def __init__(self, id_: int, invert: bool = False):
         super().__init__()
 
-        self._gyro = ctre.PigeonIMU(id_)
+        self._gyro = ctre.sensors.PigeonIMU(id_)
         self.invert = invert
 
         wpilib.SmartDashboard.putData("Pigeon IMU", self)
