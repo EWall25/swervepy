@@ -4,8 +4,15 @@ import ctre
 import wpilib
 from wpimath.geometry import Translation2d, Rotation2d
 
-from swervelib import Swerve, CTRESwerveModuleParameters, CanFDDeviceID, ModuleCorner, CTRESwerveParameters
 from swervelib import u
+from swervelib.impl import (
+    SwerveDrive,
+    PigeonGyro,
+    CoaxialSwerveModule,
+    Falcon500CoaxialDriveComponent,
+    Falcon500CoaxialAzimuthComponent,
+    AbsoluteCANCoder,
+)
 
 
 class RobotContainer:
@@ -15,101 +22,77 @@ class RobotContainer:
 
         track_width = (21.73 * u.inch).m_as(u.m)
         wheel_base = (21.73 * u.inch).m_as(u.m)
-        # fmt: off
-        swerve_params = CTRESwerveParameters(
-            wheel_circumference=4 * math.pi * u.inch,  # SDS Wheel Circumference
+        max_speed = 4.5 * (u.m / u.s)
+        max_angular_velocity = 11.5 * (u.rad / u.s)
 
-            drive_open_loop_ramp=0,
-            drive_closed_loop_ramp=0,
-            angle_ramp=0,
-
-            # Mk4i L2 Gear Ratios
-            drive_gear_ratio=6.75 / 1,
-            angle_gear_ratio=(150 / 7) / 1,
-
-            max_speed=4.5 * (u.m / u.s),
-            max_angular_velocity=11.5 * (u.rad / u.s),
-
-            angle_continuous_current_limit=40,
-            angle_peak_current_limit=60,
-            angle_peak_current_duration=0.01,
-            angle_enable_current_limit=True,
-
-            drive_continuous_current_limit=40,
-            drive_peak_current_limit=60,
-            drive_peak_current_duration=0.01,
-            drive_enable_current_limit=True,
-
-            angle_kP=1,
-            angle_kI=0,
-            angle_kD=0,
-            angle_kF=0,
-
-            drive_kP=1,
-            drive_kI=0,
-            drive_kD=0,
-            drive_kF=0,
-
-            drive_kS=1 / 12,
-            drive_kV=0 / 12,
-            drive_kA=0 / 12,
-
-            angle_neutral_mode=ctre.NeutralMode.Brake,
-            drive_neutral_mode=ctre.NeutralMode.Coast,
-
-            invert_angle_motor=False,
-            invert_drive_motor=False,
-            invert_angle_encoder=False,
-
-            invert_gyro=True,
-            gyro_id=0,
+        drive_params = Falcon500CoaxialDriveComponent.Parameters(
+            wheel_circumference=4 * math.pi * u.inch,
+            gear_ratio=6.75 / 1,  # SDS Mk4i L2
+            max_speed=max_speed,
+            open_loop_ramp_rate=0,
+            closed_loop_ramp_rate=0,
+            continuous_current_limit=40,
+            peak_current_limit=60,
+            peak_current_duration=0.01,
+            neutral_mode=ctre.NeutralMode.Coast,
+            kP=0,
+            kI=0,
+            kD=0,
+            kS=0,
+            kV=0,
+            kA=0,
+            invert_motor=False,
         )
+        azimuth_params = Falcon500CoaxialAzimuthComponent.Parameters(
+            gear_ratio=150 / 7,  # SDS Mk4i
+            max_angular_velocity=max_angular_velocity,
+            ramp_rate=0,
+            continuous_current_limit=40,
+            peak_current_limit=60,
+            peak_current_duration=0.01,
+            neutral_mode=ctre.NeutralMode.Brake,
+            kP=0,
+            kI=0,
+            kD=0,
+            invert_motor=False,
+        )
+
+        gyro = PigeonGyro(0, True)
+
         # When defining module positions for kinematics, +x values represent moving toward the front of the robot, and
         # +y values represent moving toward the left of the robot
-        module_params = (
-            CTRESwerveModuleParameters(
-                corner=ModuleCorner.FRONT_LEFT,
-                relative_position=Translation2d(wheel_base / 2, track_width / 2),
-                angle_offset=Rotation2d.fromDegrees(0),
-                drive_motor_id=CanFDDeviceID(0),
-                angle_motor_id=CanFDDeviceID(4),
-                angle_encoder_id=CanFDDeviceID(0),
+        modules = (
+            CoaxialSwerveModule(
+                Falcon500CoaxialDriveComponent(0, drive_params),
+                Falcon500CoaxialAzimuthComponent(4, Rotation2d.fromDegrees(0), azimuth_params, AbsoluteCANCoder(0)),
+                Translation2d(wheel_base / 2, track_width / 2),
             ),
-            CTRESwerveModuleParameters(
-                corner=ModuleCorner.FRONT_RIGHT,
-                relative_position=Translation2d(wheel_base / 2, -track_width / 2),
-                angle_offset=Rotation2d.fromDegrees(0),
-                drive_motor_id=CanFDDeviceID(1),
-                angle_motor_id=CanFDDeviceID(5),
-                angle_encoder_id=CanFDDeviceID(1),
+            CoaxialSwerveModule(
+                Falcon500CoaxialDriveComponent(1, drive_params),
+                Falcon500CoaxialAzimuthComponent(5, Rotation2d.fromDegrees(0), azimuth_params, AbsoluteCANCoder(1)),
+                Translation2d(wheel_base / 2, track_width / 2),
             ),
-            CTRESwerveModuleParameters(
-                corner=ModuleCorner.BACK_LEFT,
-                relative_position=Translation2d(-wheel_base / 2, track_width / 2),
-                angle_offset=Rotation2d.fromDegrees(0),
-                drive_motor_id=CanFDDeviceID(2),
-                angle_motor_id=CanFDDeviceID(6),
-                angle_encoder_id=CanFDDeviceID(2),
+            CoaxialSwerveModule(
+                Falcon500CoaxialDriveComponent(2, drive_params),
+                Falcon500CoaxialAzimuthComponent(6, Rotation2d.fromDegrees(0), azimuth_params, AbsoluteCANCoder(2)),
+                Translation2d(wheel_base / 2, track_width / 2),
             ),
-            CTRESwerveModuleParameters(
-                corner=ModuleCorner.BACK_RIGHT,
-                relative_position=Translation2d(-wheel_base / 2, -track_width / 2),
-                angle_offset=Rotation2d.fromDegrees(0),
-                drive_motor_id=CanFDDeviceID(3),
-                angle_motor_id=CanFDDeviceID(7),
-                angle_encoder_id=CanFDDeviceID(3),
+            CoaxialSwerveModule(
+                Falcon500CoaxialDriveComponent(3, drive_params),
+                Falcon500CoaxialAzimuthComponent(7, Rotation2d.fromDegrees(0), azimuth_params, AbsoluteCANCoder(3)),
+                Translation2d(wheel_base / 2, track_width / 2),
             ),
         )
-        # fmt: on
 
         self.stick = wpilib.Joystick(0)
 
-        self.swerve = Swerve(module_params, swerve_params)
+        self.swerve = SwerveDrive(modules, gyro, max_speed, max_angular_velocity)
+
         self.swerve.setDefaultCommand(
             self.swerve.teleop_command(
                 lambda: deadband(-self.stick.getRawAxis(1), 0.03),
-                lambda: deadband(self.stick.getRawAxis(0), 0.03),
-                lambda: deadband(-self.stick.getRawAxis(2), 0.03),  # Invert for CCW+
+                lambda: deadband(-self.stick.getRawAxis(0), 0.03),
+                lambda: deadband(-self.stick.getRawAxis(4), 0.03),  # Invert for CCW+
                 field_relative,
                 open_loop,
             )

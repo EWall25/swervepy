@@ -1,0 +1,34 @@
+from abc import abstractmethod
+
+from wpimath.geometry import Rotation2d
+from wpiutil import Sendable, SendableBuilder
+
+from . import SendableABCMeta
+
+
+class Gyro(Sendable, metaclass=SendableABCMeta):
+    @abstractmethod
+    def zero_heading(self):
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def heading(self) -> Rotation2d:
+        raise NotImplementedError
+
+    def initSendable(self, builder: SendableBuilder):
+        builder.setSmartDashboardType("Gyro")
+        builder.addDoubleProperty("Value", lambda: self.heading.degrees(), lambda: None)
+        builder.addDoubleProperty("Heading (rad)", lambda: self.heading.radians(), lambda: None)
+
+
+class AbsoluteEncoder(Sendable, metaclass=SendableABCMeta):
+    @property
+    @abstractmethod
+    def absolute_position(self) -> Rotation2d:
+        raise NotImplementedError
+
+    def initSendable(self, builder: SendableBuilder):
+        builder.setSmartDashboardType("Encoder")
+        builder.addDoubleProperty("Absolute Rotation (rad)", lambda: self.absolute_position.radians(), lambda: None)
+        builder.addDoubleProperty("Absolute Rotation (deg)", lambda: self.absolute_position.degrees(), lambda: None)
