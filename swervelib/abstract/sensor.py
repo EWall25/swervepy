@@ -18,8 +18,8 @@ class Gyro(Sendable, metaclass=SendableABCMeta):
 
     def initSendable(self, builder: SendableBuilder):
         builder.setSmartDashboardType("Gyro")
-        builder.addDoubleProperty("Value", lambda: self.heading.degrees(), lambda: None)
-        builder.addDoubleProperty("Heading (rad)", lambda: self.heading.radians(), lambda: None)
+        builder.addDoubleProperty("Value", lambda: self.heading.degrees(), lambda _: None)
+        builder.addDoubleProperty("Heading (rad)", lambda: self.heading.radians(), lambda _: None)
 
 
 class AbsoluteEncoder(Sendable, metaclass=SendableABCMeta):
@@ -30,5 +30,5 @@ class AbsoluteEncoder(Sendable, metaclass=SendableABCMeta):
 
     def initSendable(self, builder: SendableBuilder):
         builder.setSmartDashboardType("Encoder")
-        builder.addDoubleProperty("Absolute Rotation (rad)", lambda: self.absolute_position.radians(), lambda: None)
-        builder.addDoubleProperty("Absolute Rotation (deg)", lambda: self.absolute_position.degrees(), lambda: None)
+        builder.addDoubleProperty("Absolute Rotation (rad)", lambda: self.absolute_position.radians(), lambda _: None)
+        builder.addDoubleProperty("Absolute Rotation (deg)", lambda: self.absolute_position.degrees(), lambda _: None)

@@ -71,7 +71,7 @@ class SwerveDrive(commands2.SubsystemBase):
         self.desire_module_states(swerve_module_states, open_loop)
 
     def desire_module_states(self, states: tuple[SwerveModuleState, ...], open_loop: bool = False):
-        swerve_module_states = self._kinematics.desaturateWheelSpeeds(states, self.max_velocity)
+        swerve_module_states = self._kinematics.desaturateWheelSpeeds(states, self.max_velocity)  # type: ignore
 
         for i in range(4):
             module: SwerveModule = self._modules[i]
@@ -95,7 +95,7 @@ class SwerveDrive(commands2.SubsystemBase):
         self._gyro.zero_heading()
 
     def reset_odometry(self, pose: Pose2d):
-        self._odometry.resetPosition(self._gyro.heading, self.module_positions, pose)
+        self._odometry.resetPosition(self._gyro.heading, self.module_positions, pose)  # type: ignore
 
     def teleop_command(
         self,
@@ -117,7 +117,7 @@ class SwerveDrive(commands2.SubsystemBase):
 
 
 class CoaxialSwerveModule(SwerveModule):
-    last_commanded_drive_velocity = 0
+    last_commanded_drive_velocity: float = 0
     last_commanded_azimuth_angle = Rotation2d.fromDegrees(0)
 
     def __init__(self, drive: CoaxialDriveComponent, azimuth: CoaxialAzimuthComponent, placement: Translation2d):
@@ -161,12 +161,12 @@ class CoaxialSwerveModule(SwerveModule):
     def initSendable(self, builder: SendableBuilder):
         # fmt: off
         builder.setSmartDashboardType("CoaxialSwerveModule")
-        builder.addDoubleProperty("Drive Velocity (mps)", lambda: self._drive.velocity, lambda: None)
-        builder.addDoubleProperty("Drive Distance (m)", lambda: self._drive.distance, lambda: None)
-        builder.addDoubleProperty("Azimuth Velocity (radps)", lambda: self._azimuth.rotational_velocity, lambda: None)
-        builder.addDoubleProperty("Azimuth Position (rad)", lambda: self._azimuth.angle.radians(), lambda: None)
-        builder.addDoubleProperty("Azimuth Position (deg)", lambda: self._azimuth.angle.degrees(), lambda: None)
-        builder.addDoubleProperty("Desired Drive Velocity (mps)", lambda: self.last_commanded_drive_velocity, lambda: None)
-        builder.addDoubleProperty("Desired Azimuth Position (rad)", lambda: self.last_commanded_azimuth_angle.radians(), lambda: None)
-        builder.addDoubleProperty("Desired Azimuth Position (deg)", lambda: self.last_commanded_azimuth_angle.degrees(), lambda: None)
+        builder.addDoubleProperty("Drive Velocity (mps)", lambda: self._drive.velocity, lambda _: None)
+        builder.addDoubleProperty("Drive Distance (m)", lambda: self._drive.distance, lambda _: None)
+        builder.addDoubleProperty("Azimuth Velocity (radps)", lambda: self._azimuth.rotational_velocity, lambda _: None)
+        builder.addDoubleProperty("Azimuth Position (rad)", lambda: self._azimuth.angle.radians(), lambda _: None)
+        builder.addDoubleProperty("Azimuth Position (deg)", lambda: self._azimuth.angle.degrees(), lambda _: None)
+        builder.addDoubleProperty("Desired Drive Velocity (mps)", lambda: self.last_commanded_drive_velocity, lambda _: None)
+        builder.addDoubleProperty("Desired Azimuth Position (rad)", lambda: self.last_commanded_azimuth_angle.radians(), lambda _: None)
+        builder.addDoubleProperty("Desired Azimuth Position (deg)", lambda: self.last_commanded_azimuth_angle.degrees(), lambda _: None)
         # fmt: on
