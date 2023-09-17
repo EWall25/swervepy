@@ -10,12 +10,12 @@ __all__ = [
     "SwerveDrive",
 ]
 
-from motor import (
+from .motor import (
     Falcon500CoaxialAzimuthComponent,
     Falcon500CoaxialDriveComponent,
     NEOCoaxialDriveComponent,
     NEOExternalSensorCoaxialAzimuthComponent,
     NEOOnboardSensorCoaxialAzimuthComponent,
 )
-from sensor import AbsoluteCANCoder, PigeonGyro
-from system import CoaxialSwerveModule, SwerveDrive
+from .sensor import AbsoluteCANCoder, PigeonGyro
+from .system import CoaxialSwerveModule, SwerveDrive

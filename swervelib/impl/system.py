@@ -3,7 +3,8 @@ from typing import Callable, Optional, TYPE_CHECKING
 
 import commands2
 import wpilib
-import wpimath
+import wpimath.kinematics
+import wpimath.estimator
 from pint import Quantity
 from wpimath.geometry import Rotation2d, Pose2d, Translation2d
 from wpimath.kinematics import ChassisSpeeds, SwerveModuleState, SwerveModulePosition

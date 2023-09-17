@@ -45,6 +45,7 @@ class Falcon500CoaxialDriveComponent(CoaxialDriveComponent):
             data.max_speed = data.max_speed.m_as(u.m / u.s)
             return data
 
+        # noinspection PyPep8Naming
         def create_TalonFX_config(self) -> ctre.TalonFXConfiguration:
             motor_config = ctre.TalonFXConfiguration()
 
@@ -143,6 +144,7 @@ class Falcon500CoaxialAzimuthComponent(CoaxialAzimuthComponent):
             data.max_angular_velocity = data.max_angular_velocity.m_as(u.rad / u.s)
             return data
 
+        # noinspection PyPep8Naming
         def create_TalonFX_config(self) -> ctre.TalonFXConfiguration:
             motor_config = ctre.TalonFXConfiguration()
 

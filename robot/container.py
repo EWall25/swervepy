@@ -2,9 +2,10 @@ import math
 
 import ctre
 import wpilib
-from wpimath.geometry import Translation2d, Rotation2d
+from wpimath.geometry import Translation2d, Rotation2d, Transform3d
+import robotpy_apriltag as apriltag
 
-from swervelib import u
+from swervelib import u, vision
 from swervelib.impl import (
     SwerveDrive,
     PigeonGyro,
@@ -70,19 +71,24 @@ class RobotContainer:
             CoaxialSwerveModule(
                 Falcon500CoaxialDriveComponent(1, drive_params),
                 Falcon500CoaxialAzimuthComponent(5, Rotation2d.fromDegrees(0), azimuth_params, AbsoluteCANCoder(1)),
-                Translation2d(wheel_base / 2, track_width / 2),
+                Translation2d(wheel_base / 2, -track_width / 2),
             ),
             CoaxialSwerveModule(
                 Falcon500CoaxialDriveComponent(2, drive_params),
                 Falcon500CoaxialAzimuthComponent(6, Rotation2d.fromDegrees(0), azimuth_params, AbsoluteCANCoder(2)),
-                Translation2d(wheel_base / 2, track_width / 2),
+                Translation2d(-wheel_base / 2, track_width / 2),
             ),
             CoaxialSwerveModule(
                 Falcon500CoaxialDriveComponent(3, drive_params),
                 Falcon500CoaxialAzimuthComponent(7, Rotation2d.fromDegrees(0), azimuth_params, AbsoluteCANCoder(3)),
-                Translation2d(wheel_base / 2, track_width / 2),
+                Translation2d(-wheel_base / 2, -track_width / 2),
             ),
         )
+
+        # camera_1 = vision.CameraDefinition("camera_1", Transform3d())
+        # camera_collection = vision.AprilTagCameraCollection(
+        #     [camera_1], apriltag.loadAprilTagLayoutField(apriltag.AprilTagField.k2023ChargedUp)
+        # )
 
         self.stick = wpilib.Joystick(0)
 
@@ -90,9 +96,9 @@ class RobotContainer:
 
         self.swerve.setDefaultCommand(
             self.swerve.teleop_command(
-                lambda: deadband(-self.stick.getRawAxis(1), 0.03),
-                lambda: deadband(-self.stick.getRawAxis(0), 0.03),
-                lambda: deadband(-self.stick.getRawAxis(4), 0.03),  # Invert for CCW+
+                lambda: deadband(-self.stick.getRawAxis(1), 0.05),
+                lambda: deadband(-self.stick.getRawAxis(0), 0.05),
+                lambda: deadband(-self.stick.getRawAxis(4), 0.1),  # Invert for CCW+
                 field_relative,
                 open_loop,
             )

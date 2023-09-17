@@ -1,4 +1,4 @@
-import ctre
+import ctre.sensors
 import wpilib
 from wpimath.geometry import Rotation2d
 
@@ -9,8 +9,8 @@ class AbsoluteCANCoder(AbsoluteEncoder):
     def __init__(self, id_: int):
         super().__init__()
 
-        self._encoder = ctre.CANCoder(id_)
-        self._encoder.configAbsoluteSensorRange(ctre.AbsoluteSensorRange.Unsigned_0_to_360)
+        self._encoder = ctre.sensors.CANCoder(id_)
+        self._encoder.configAbsoluteSensorRange(ctre.sensors.AbsoluteSensorRange.Unsigned_0_to_360)
 
         wpilib.SmartDashboard.putData(f"Absolute CANCoder {id_}", self)
 
