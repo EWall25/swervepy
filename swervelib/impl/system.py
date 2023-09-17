@@ -69,14 +69,16 @@ class SwerveDrive(commands2.SubsystemBase):
         )
         swerve_module_states = self._kinematics.toSwerveModuleStates(speeds)
 
-        self.desire_module_states(swerve_module_states, open_loop)
+        self.desire_module_states(swerve_module_states, open_loop, rotate_in_place=False)
 
-    def desire_module_states(self, states: tuple[SwerveModuleState, ...], open_loop: bool = False):
+    def desire_module_states(
+        self, states: tuple[SwerveModuleState, ...], open_loop: bool = False, rotate_in_place: bool = True
+    ):
         swerve_module_states = self._kinematics.desaturateWheelSpeeds(states, self.max_velocity)  # type: ignore
 
         for i in range(4):
             module: SwerveModule = self._modules[i]
-            module.desire_state(swerve_module_states[i], open_loop)
+            module.desire_state(swerve_module_states[i], open_loop, rotate_in_place)
 
     @property
     def module_positions(self) -> tuple[SwerveModulePosition, ...]:

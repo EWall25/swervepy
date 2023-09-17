@@ -10,17 +10,21 @@ from . import SendableABCMeta
 class SwerveModule(Sendable, metaclass=SendableABCMeta):
     placement: Translation2d
 
-    def desire_state(self, state: SwerveModuleState, drive_open_loop):
+    def desire_state(self, state: SwerveModuleState, drive_open_loop: bool, rotate_in_place: bool):
         state = optimize(state, self.azimuth_angle)
+
+        # Prevent rotating the module if drive speed is less than 2 cm/s to prevent feedback-loop jitter
+        angle = state.angle if rotate_in_place or abs(state.speed) > 0.02 else self.azimuth_angle
+
         self.desire_drive_velocity(state.speed, drive_open_loop)
-        self.desire_azimuth_angle(state.angle)
+        self.desire_azimuth_angle(angle)
 
     @property
     def module_position(self) -> SwerveModulePosition:
         return SwerveModulePosition(self.drive_distance, self.azimuth_angle)
 
     @abstractmethod
-    def desire_drive_velocity(self, velocity: float, open_loop):
+    def desire_drive_velocity(self, velocity: float, open_loop: bool):
         raise NotImplementedError
 
     @abstractmethod
