@@ -29,6 +29,6 @@ class AbsoluteEncoder(Sendable, metaclass=SendableABCMeta):
         raise NotImplementedError
 
     def initSendable(self, builder: SendableBuilder):
-        builder.setSmartDashboardType("Encoder")
+        builder.setSmartDashboardType("AbsoluteEncoder")
         builder.addDoubleProperty("Absolute Rotation (rad)", lambda: self.absolute_position.radians(), lambda _: None)
         builder.addDoubleProperty("Absolute Rotation (deg)", lambda: self.absolute_position.degrees(), lambda _: None)
