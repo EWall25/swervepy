@@ -336,10 +336,10 @@ class NEOOnboardSensorCoaxialAzimuthComponent(CoaxialAzimuthComponent):
         self._motor.setInverted(self._params.invert_motor)
         self._motor.setIdleMode(self._params.neutral_mode)
 
-        # TODO: Check position factor for correctness
+        # TODO: Check position & velocity factor for correctness
         position_conversion_factor = 360 / self._params.gear_ratio
         self._encoder.setPositionConversionFactor(position_conversion_factor)
-        # TODO: Set velocity conversion factor
+        self._encoder.setVelocityConversionFactor(position_conversion_factor / 60)
 
     def follow_angle(self, angle: Rotation2d):
         self._controller.setReference(angle.degrees(), rev.CANSparkMax.ControlType.kPosition)

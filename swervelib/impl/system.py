@@ -88,8 +88,6 @@ class SwerveDrive(commands2.SubsystemBase):
     def pose(self) -> Pose2d:
         return self._odometry.getEstimatedPosition()
 
-    # TODO: Add commands
-
     def reset_modules(self):
         for module in self._modules:
             module.reset()
@@ -108,15 +106,49 @@ class SwerveDrive(commands2.SubsystemBase):
         field_relative: bool,
         open_loop: bool,
     ):
-        return commands2.RunCommand(
-            lambda: self.drive(
-                Translation2d(translation(), strafe()) * self.max_velocity,
-                rotation() * self.max_angular_velocity,
-                field_relative,
-                open_loop,
-            ),
+        return self._TeleOpCommand(self, translation, strafe, rotation, field_relative, open_loop)
+
+    class _TeleOpCommand(commands2.CommandBase):
+        def __init__(
             self,
-        )
+            swerve: "SwerveDrive",
+            translation: Callable[[], float],
+            strafe: Callable[[], float],
+            rotation: Callable[[], float],
+            field_relative: bool,
+            open_loop: bool,
+        ):
+            super().__init__()
+            self.addRequirements(swerve)
+
+            self._swerve = swerve
+            self._translation = translation
+            self._strafe = strafe
+            self._rotation = rotation
+            self.field_relative = field_relative
+            self.open_loop = open_loop
+
+        def execute(self):
+            self._swerve.drive(
+                Translation2d(self._translation(), self._strafe()) * self._swerve.max_velocity,
+                self._rotation() * self._swerve.max_angular_velocity,
+                self.field_relative,
+                self.open_loop,
+            )
+
+        def initSendable(self, builder: SendableBuilder):
+            # fmt: off
+            builder.addBooleanProperty("Field Relative", lambda: self.field_relative, lambda val: setattr(self, "field_relative", val))
+            builder.addBooleanProperty("Open Loop", lambda: self.open_loop, lambda val: setattr(self, "open_loop", val))
+            # fmt: on
+
+        def toggle_field_relative(self):
+            self.field_relative = not self.field_relative
+
+        def toggle_open_loop(self):
+            self.open_loop = not self.open_loop
+
+    # TODO: Add trajectory following
 
 
 class CoaxialSwerveModule(SwerveModule):
