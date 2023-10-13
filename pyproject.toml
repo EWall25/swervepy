@@ -2,7 +2,7 @@
 name = "swervelib"
 version = "1.0.0"
 description = "Swerve drive library for FRC"
-authors = ["Ethan Wall <ewall25@jesuittampa.org>"]
+authors = ["Ethan Wall <ethanhwall07@gmail.com>"]
 license = "MIT"
 
 [tool.poetry.dependencies]

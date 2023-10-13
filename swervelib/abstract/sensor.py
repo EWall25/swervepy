@@ -14,6 +14,7 @@ class Gyro(Sendable, metaclass=SendableABCMeta):
     @property
     @abstractmethod
     def heading(self) -> Rotation2d:
+        """CCW+ chassis yaw angle"""
         raise NotImplementedError
 
     def initSendable(self, builder: SendableBuilder):

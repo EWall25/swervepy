@@ -42,6 +42,9 @@ class SwerveDrive(commands2.SubsystemBase):
         time.sleep(1)
         self.reset_modules()
 
+        # Zero heading at startup to set "forward" direction
+        self.zero_heading()
+
         # There are different classes for each number of swerve modules in a drive base,
         # so construct the class name from number of modules.
         self._kinematics: "SwerveDrive4Kinematics" = getattr(
@@ -62,6 +65,16 @@ class SwerveDrive(commands2.SubsystemBase):
             self._odometry.addVisionMeasurement(vision_pose, wpilib.Timer.getFPGATimestamp())
 
     def drive(self, translation: Translation2d, rotation: float, field_relative: bool, open_loop: bool):
+        """
+        Command the robot to provided chassis speeds (translation and rotation)
+
+        :param translation: Translation speed on the XY-plane in m/s where +X is forward and +Y is left
+        :param rotation: Rotation speed around the Z-axis in rad/s where CCW+
+        :param field_relative: If True, gyroscopic zero is used as the forward direction.
+        Else, forward faces the front of the robot.
+        :param open_loop: Use open loop control (True) or closed loop (False)
+        """
+
         speeds = (
             ChassisSpeeds.fromFieldRelativeSpeeds(translation.x, translation.y, rotation, self._gyro.heading)
             if field_relative
@@ -74,6 +87,14 @@ class SwerveDrive(commands2.SubsystemBase):
     def desire_module_states(
         self, states: tuple[SwerveModuleState, ...], open_loop: bool = False, rotate_in_place: bool = True
     ):
+        """
+        Command each individual module to a state
+
+        :param states: List of module states in the order of the swerve module list SwerveDrive was created with
+        :param open_loop: Use open loop control (True) or closed loop (False)
+        :param rotate_in_place: Should the modules rotate while not driving
+        """
+
         swerve_module_states = self._kinematics.desaturateWheelSpeeds(states, self.max_velocity)  # type: ignore
 
         for i in range(4):
@@ -96,6 +117,12 @@ class SwerveDrive(commands2.SubsystemBase):
         self._gyro.zero_heading()
 
     def reset_odometry(self, pose: Pose2d):
+        """
+        Reset the drive base's pose to a new one
+
+        :param pose: The new pose
+        """
+
         self._odometry.resetPosition(self._gyro.heading, self.module_positions, pose)  # type: ignore
 
     def teleop_command(

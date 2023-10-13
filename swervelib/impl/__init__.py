@@ -1,3 +1,8 @@
+"""
+Contains default implementations of components (motors, sensors, modules). The user should instantiate these when
+creating their drive base.
+"""
+
 __all__ = [
     "Falcon500CoaxialAzimuthComponent",
     "Falcon500CoaxialDriveComponent",

@@ -26,6 +26,9 @@ class RobotContainer:
         max_speed = 4.5 * (u.m / u.s)
         max_angular_velocity = 11.5 * (u.rad / u.s)
 
+        # Each component defines a Parameters dataclass with any options applicable to all instances of that component.
+        # For example, wheel circumference is the same for all four modules on a SDS Mk4 drive base, so that is included
+        # in the Parameters class. Motor IDs are different for each instance of a module, so those are not included.
         drive_params = Falcon500CoaxialDriveComponent.Parameters(
             wheel_circumference=4 * math.pi * u.inch,
             gear_ratio=6.75 / 1,  # SDS Mk4i L2
@@ -63,8 +66,13 @@ class RobotContainer:
         # When defining module positions for kinematics, +x values represent moving toward the front of the robot, and
         # +y values represent moving toward the left of the robot
         modules = (
+            # Swerve module implementations are as general as possible (coaxial, differential) but take specific components
+            # like Falcon or NEO drive motors as arguments.
             CoaxialSwerveModule(
+                # Pass in general Parameters and module-specific options
                 Falcon500CoaxialDriveComponent(0, drive_params),
+                # The Azimuth component included the CANCOder (absolute encoder) because it needs to be able to
+                # reset to absolute position
                 Falcon500CoaxialAzimuthComponent(4, Rotation2d.fromDegrees(0), azimuth_params, AbsoluteCANCoder(0)),
                 Translation2d(wheel_base / 2, track_width / 2),
             ),
@@ -92,6 +100,7 @@ class RobotContainer:
 
         self.stick = wpilib.Joystick(0)
 
+        # Define a swerve drive subsystem by passing in a list of SwerveModules and some options
         self.swerve = SwerveDrive(modules, gyro, max_speed, max_angular_velocity)
 
         self.swerve.setDefaultCommand(

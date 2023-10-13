@@ -1,3 +1,8 @@
+"""
+Contains interfaces for components used in a swerve drive base. These are sensors, motors, and the swerve module itself.
+Implementations can be found in the impl module, or the user may define their own.
+"""
+
 __all__ = [
     "SendableABCMeta",
     "CoaxialDriveComponent",

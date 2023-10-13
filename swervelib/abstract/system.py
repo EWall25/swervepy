@@ -11,6 +11,14 @@ class SwerveModule(Sendable, metaclass=SendableABCMeta):
     placement: Translation2d
 
     def desire_state(self, state: SwerveModuleState, drive_open_loop: bool, rotate_in_place: bool):
+        """
+        Command the module to a speed and angle
+
+        :param state: SwerveModuleState representing the module's desired speed and angle
+        :param drive_open_loop: Use open loop control (True) or closed loop (False) to drive the wheel
+        :param rotate_in_place: Should the modules rotate while not driving
+        :return:
+        """
         state = optimize(state, self.azimuth_angle)
 
         # Prevent rotating the module if drive speed is less than 2 cm/s to prevent feedback-loop jitter
@@ -25,6 +33,12 @@ class SwerveModule(Sendable, metaclass=SendableABCMeta):
 
     @abstractmethod
     def desire_drive_velocity(self, velocity: float, open_loop: bool):
+        """
+        Drive the wheel
+
+        :param velocity: Desired velocity in m/s
+        :param open_loop: Use open loop control (True) or closed loop (False)
+        """
         raise NotImplementedError
 
     @abstractmethod
@@ -38,21 +52,25 @@ class SwerveModule(Sendable, metaclass=SendableABCMeta):
     @property
     @abstractmethod
     def drive_velocity(self) -> float:
+        """Drive wheel velocity in m/s"""
         raise NotImplementedError
 
     @property
     @abstractmethod
     def drive_distance(self) -> float:
+        """Driven distance in metres"""
         raise NotImplementedError
 
     @property
     @abstractmethod
     def azimuth_angle(self) -> Rotation2d:
+        """CCW+ module angle"""
         raise NotImplementedError
 
     @property
     @abstractmethod
     def azimuth_velocity(self) -> float:
+        """CCW+ module angular velocity in rad/s"""
         raise NotImplementedError
 
 
