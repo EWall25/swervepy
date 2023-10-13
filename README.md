@@ -11,6 +11,32 @@ Include the `swervelib` folder in your project. Then, import it like any other P
 import swervelib
 ```
 
+## Design Philosophy
+Swerve drivetrains are made up of any number of swerve modules, and swerve modules can be made from different motors and
+sensors. There are a nearly infinite number of configurations, so the library backing the drivetrain must be
+infinitely configurable.
+
+All swerve modules can drive and rotate a wheel, so **swervelib** defines an abstract `SwerveModule`
+with those functions. And, because the basic functionality of all drivetrains is similar (move forward, back, left, right, etc.),
+**swervelib** also provides a concrete `SwerveDrive` class.
+
+Users may implement `SwerveModule` to define _how_ the swerve module drives and rotates. For example, **swervelib** includes a
+`CoaxialSwerveModule` (the most common kind), in which one motor drives a wheel, and another turns it.
+
+Each drivetrain and module is made up of a number of **components**. A **component** is any actuator or sensor with one 
+defined purpose, such as a drive motor, turning motor, or azimuth encoder. Gyros and even swerve modules are **components**
+that comprise a drive base.
+
+**swervelib** defines abstract **components** for the user to implement. For example, `swervelib.abstract.motor`
+contains `CoaxialDriveComponent`. This **component** can follow a velocity and report its velocity. In `swervelib.impl.motor`,
+you will find an implementation of `CoaxialDriveComponent` called `Falcon500CoaxialDriveComponent`. This implementation
+defines how a Falcon 500 should fulfill the purpose of a `CoaxialDriveComponent`. If the user has, for example, a NEO they
+want to use as a drive motor, they can implement it in the same way as **swervelib** implements the Falcon 500.
+
+Then, the user may create a `CoaxialSwerveModule` (or any other implementation of `SwerveModule`) by passing in a
+drive and azimuth component. These components can be changed out like mechanical parts, accelerating
+development.
+
 ## Building a Drive Base
 Let's build a swerve drivetrain. For this example, we'll use SDS Mk4i modules running Falcon 500s.
 
@@ -60,7 +86,7 @@ azimuth_params = swervelib.impl.Falcon500CoaxialAzimuthComponent.Parameters(
 
 Now, we can begin creating a swerve module. 
 To do so, we'll create the components making up a module: motors, encoders, etc. These components are implementations of
-abstract classes that the user can also implement themselves. More on this later.
+abstract classes that the user can also implement themselves.
 
 ```python
 import swervelib.impl
@@ -151,7 +177,7 @@ Check `swervelib.impl` for example implementations of motors, encoders, swerve m
 **swervelib** implements the standard WPILib coordinate system. The robot travels on the XY-plane, and rotates around
 the Z-axis.
 
-+X is always forward, and +Y is left. Counter-clockwise is the positive direction (CCW+). This is **different** than FLL,
++X is always forward, and +Y is left. Counter-clockwise is the positive direction (CCW+). This is **different** from FLL,
 where rotation is clockwise-positive (CW+). "Forward" depends on the frame of reference.
 
 ### Field Coordinate System
