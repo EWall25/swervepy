@@ -8,13 +8,13 @@ import robotpy_apriltag as apriltag
 @dataclass
 class CameraDefinition:
     name: str
-    translation: wpimath.geometry.Transform3d
+    position: wpimath.geometry.Transform3d
 
 
 class AprilTagCameraCollection:
     def __init__(self, camera_definitions: list[CameraDefinition], field_layout: apriltag.AprilTagFieldLayout):
         cameras = [
-            (photonvision.PhotonCamera(definition.name), definition.translation) for definition in camera_definitions
+            (photonvision.PhotonCamera(definition.name), definition.position) for definition in camera_definitions
         ]
         self.pose_estimator = photonvision.RobotPoseEstimator(
             field_layout, photonvision.PoseStrategy.CLOSEST_TO_REFERENCE_POSE, cameras

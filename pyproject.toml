@@ -1,13 +1,13 @@
 [tool.poetry]
 name = "swervelib"
-version = "0.2.0"
+version = "1.0.0"
 description = "Swerve drive library for FRC"
-authors = ["Ethan Wall <ewall25@jesuittampa.org>"]
+authors = ["Ethan Wall <ethanhwall07@gmail.com>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
 python = "~3.11"
-robotpy = {version = "^2023.2.1", extras = ["ctre", "commands2", "rev", "photonvision"]}
+robotpy = {version = "^2023.4.3", extras = ["ctre", "commands2", "rev", "photonvision"]}
 robotpy-apriltag = "^2023.2.1.1"
 Pint = "^0.20.1"
 
