@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "swervelib"
-version = "1.0.0"
+version = "1.1.0"
 description = "Swerve drive library for FRC"
 authors = ["Ethan Wall <ethanhwall07@gmail.com>"]
 license = "MIT"

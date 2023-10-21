@@ -6,21 +6,26 @@ creating their drive base.
 __all__ = [
     "Falcon500CoaxialAzimuthComponent",
     "Falcon500CoaxialDriveComponent",
-    "NEOExternalSensorCoaxialAzimuthComponent",
+    "NEOCoaxialAzimuthComponent",
     "NEOCoaxialDriveComponent",
-    "NEOOnboardSensorCoaxialAzimuthComponent",
+    "NEOCoaxialAzimuthComponent",
     "AbsoluteCANCoder",
     "PigeonGyro",
     "CoaxialSwerveModule",
     "SwerveDrive",
+    "SparkMaxEncoderType",
+    "SparkMaxAbsoluteEncoder",
+    "DummyCoaxialComponent",
+    "DummyGyro",
 ]
 
 from .motor import (
     Falcon500CoaxialAzimuthComponent,
     Falcon500CoaxialDriveComponent,
     NEOCoaxialDriveComponent,
-    NEOExternalSensorCoaxialAzimuthComponent,
-    NEOOnboardSensorCoaxialAzimuthComponent,
+    NEOCoaxialAzimuthComponent,
+    NEOCoaxialAzimuthComponent,
+    DummyCoaxialComponent,
 )
-from .sensor import AbsoluteCANCoder, PigeonGyro
+from .sensor import AbsoluteCANCoder, PigeonGyro, SparkMaxEncoderType, SparkMaxAbsoluteEncoder, DummyGyro
 from .system import CoaxialSwerveModule, SwerveDrive

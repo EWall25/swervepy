@@ -7,6 +7,7 @@ from pint import Quantity
 from wpimath.controller import SimpleMotorFeedforwardMeters
 from wpimath.geometry import Rotation2d
 
+from .sensor import SparkMaxEncoderType, SparkMaxAbsoluteEncoder
 from ..abstract.motor import CoaxialDriveComponent, CoaxialAzimuthComponent
 from .. import conversions, u
 from ..abstract.sensor import AbsoluteEncoder
@@ -164,7 +165,13 @@ class Falcon500CoaxialAzimuthComponent(CoaxialAzimuthComponent):
 
             return motor_config
 
-    def __init__(self, id_: int, azimuth_offset: Rotation2d, parameters: Parameters, absolute_encoder: AbsoluteEncoder):
+    def __init__(
+        self,
+        id_: int,
+        azimuth_offset: Rotation2d,
+        parameters: Parameters,
+        absolute_encoder: AbsoluteEncoder,
+    ):
         self._params = parameters.in_standard_units()
 
         # TODO: Accept CAN IDs on other busses
@@ -259,7 +266,6 @@ class NEOCoaxialDriveComponent(CoaxialDriveComponent):
         self._motor.setInverted(self._params.invert_motor)
         self._motor.setIdleMode(self._params.neutral_mode)
 
-        # TODO: Check velocity conversion factor correctness
         position_conversion_factor = self._params.wheel_circumference / self._params.gear_ratio
         self._encoder.setPositionConversionFactor(position_conversion_factor)
         self._encoder.setVelocityConversionFactor(position_conversion_factor / 60)
@@ -270,7 +276,9 @@ class NEOCoaxialDriveComponent(CoaxialDriveComponent):
 
     def follow_velocity_closed(self, velocity: float):
         self._controller.setReference(
-            velocity, rev.CANSparkMax.ControlType.kVelocity, arbFeedforward=self._feedforward.calculate(velocity)
+            velocity,
+            rev.CANSparkMax.ControlType.kVelocity,
+            arbFeedforward=self._feedforward.calculate(velocity),
         )
 
     def reset(self):
@@ -285,7 +293,7 @@ class NEOCoaxialDriveComponent(CoaxialDriveComponent):
         return self._encoder.getPosition()
 
 
-class NEOOnboardSensorCoaxialAzimuthComponent(CoaxialAzimuthComponent):
+class NEOCoaxialAzimuthComponent(CoaxialAzimuthComponent):
     @dataclass
     class Parameters:
         gear_ratio: float
@@ -310,17 +318,31 @@ class NEOOnboardSensorCoaxialAzimuthComponent(CoaxialAzimuthComponent):
             data.max_angular_velocity = data.max_angular_velocity.m_as(u.rad / u.s)
             return data
 
-    def __init__(self, id_: int, azimuth_offset: Rotation2d, parameters: Parameters, absolute_encoder: AbsoluteEncoder):
+    def __init__(
+        self,
+        id_: int,
+        azimuth_offset: Rotation2d,
+        parameters: Parameters,
+        absolute_encoder: AbsoluteEncoder | SparkMaxEncoderType,
+    ):
         self._params = parameters.in_standard_units()
 
         self._motor = rev.CANSparkMax(id_, rev.CANSparkMax.MotorType.kBrushless)
         self._controller = self._motor.getPIDController()
         self._encoder = self._motor.getEncoder()
 
-        self._absolute_encoder = absolute_encoder
+        # Config must be called before the absolute encoder is set up because config method
+        # factory resets the SPARK MAX
+        self._config()
+
+        if isinstance(absolute_encoder, SparkMaxEncoderType):
+            # Construct an AbsoluteEncoder from sensor plugged into SPARK MAX
+            self._absolute_encoder = SparkMaxAbsoluteEncoder(self._motor, absolute_encoder)
+        else:
+            self._absolute_encoder = absolute_encoder
+
         self._offset = azimuth_offset
 
-        self._config()
         self.reset()
 
     def _config(self):
@@ -336,7 +358,6 @@ class NEOOnboardSensorCoaxialAzimuthComponent(CoaxialAzimuthComponent):
         self._motor.setInverted(self._params.invert_motor)
         self._motor.setIdleMode(self._params.neutral_mode)
 
-        # TODO: Check position & velocity factor for correctness
         position_conversion_factor = 360 / self._params.gear_ratio
         self._encoder.setPositionConversionFactor(position_conversion_factor)
         self._encoder.setVelocityConversionFactor(position_conversion_factor / 60)
@@ -346,7 +367,7 @@ class NEOOnboardSensorCoaxialAzimuthComponent(CoaxialAzimuthComponent):
 
     def reset(self):
         absolute_position = self._absolute_encoder.absolute_position - self._offset
-        self._motor.setSelectedSensorPosition(absolute_position.degrees())
+        self._encoder.setPosition(absolute_position.degrees())
 
     @property
     def rotational_velocity(self) -> float:
@@ -357,70 +378,36 @@ class NEOOnboardSensorCoaxialAzimuthComponent(CoaxialAzimuthComponent):
         return Rotation2d.fromDegrees(self._encoder.getPosition())
 
 
-class NEOExternalSensorCoaxialAzimuthComponent(CoaxialAzimuthComponent):
-    @dataclass
-    class Parameters:
-        max_angular_velocity: Quantity
+class DummyCoaxialComponent(CoaxialDriveComponent, CoaxialAzimuthComponent):
+    """Coaxial drive or azimuth component that does nothing"""
 
-        ramp_rate: float
+    def __init__(self, *args):
+        pass
 
-        continuous_current_limit: int
-        peak_current_limit: int
+    def follow_velocity_open(self, velocity: float):
+        pass
 
-        neutral_mode: rev.CANSparkMax.IdleMode
-
-        kP: float
-        kI: float
-        kD: float
-
-        invert_motor: bool
-        invert_encoder: bool
-
-        def in_standard_units(self):
-            data = copy.deepcopy(self)
-            data.max_angular_velocity = data.max_angular_velocity.m_as(u.rad / u.s)
-            return data
-
-    def __init__(self, id_: int, azimuth_offset: Rotation2d, parameters: Parameters):
-        self._params = parameters.in_standard_units()
-
-        self._motor = rev.CANSparkMax(id_, rev.CANSparkMax.MotorType.kBrushless)
-        self._controller = self._motor.getPIDController()
-        self._encoder = self._motor.getAbsoluteEncoder(rev.SparkMaxAbsoluteEncoder.Type.kDutyCycle)
-
-        self._offset = azimuth_offset
-
-        self._config()
-        self.reset()
-
-    def _config(self):
-        self._controller.setFeedbackDevice(self._encoder)
-
-        self._encoder.setInverted(self._params.invert_encoder)
-        self._encoder.setZeroOffset(self._offset)
-
-        self._motor.restoreFactoryDefaults()
-
-        self._controller.setP(self._params.kP)
-        self._controller.setI(self._params.kI)
-        self._controller.setD(self._params.kD)
-
-        self._motor.setSmartCurrentLimit(self._params.continuous_current_limit)
-        self._motor.setSecondaryCurrentLimit(self._params.peak_current_limit)
-
-        self._motor.setInverted(self._params.invert_motor)
-        self._motor.setIdleMode(self._params.neutral_mode)
-
-    def follow_angle(self, angle: Rotation2d):
-        self._controller.setReference(angle.degrees(), rev.CANSparkMax.ControlType.kPosition)
+    def follow_velocity_closed(self, velocity: float):
+        pass
 
     def reset(self):
         pass
 
     @property
+    def velocity(self) -> float:
+        return 0
+
+    @property
+    def distance(self) -> float:
+        return 0
+
+    def follow_angle(self, angle: Rotation2d):
+        pass
+
+    @property
     def rotational_velocity(self) -> float:
-        return self._encoder.getVelocity()
+        return 0
 
     @property
     def angle(self) -> Rotation2d:
-        return Rotation2d.fromDegrees(self._encoder.getPosition())
+        return Rotation2d.fromDegrees(0)
