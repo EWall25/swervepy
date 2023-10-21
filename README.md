@@ -43,9 +43,9 @@ Let's build a swerve drivetrain. For this example, we'll use SDS Mk4i modules ru
 To build our drive base, we'll eventually create an instance of `SwerveDrive`.
 
 ```python
-import swervelib.impl
+import swervelib.subsystem
 
-swerve = swervelib.impl.SwerveDrive(modules, gyro, max_velocity, max_angular_velocity)
+swerve = swervelib.subsystem.SwerveDrive(modules, gyro, MAX_VELOCITY, MAX_ANGULAR_VELOCITY)
 ```
 
 But first, we need to define some parameters ubiquitous to all our modules.
@@ -135,7 +135,9 @@ gyro = swervelib.impl.PigeonGyro(0, invert=False)
 Finally, we can assemble the drive base.
 
 ```python
-swerve = swervelib.impl.SwerveDrive(modules, gyro, MAX_SPEED, MAX_ANGULAR_VELOCITY)
+import swervelib.subsystem
+
+swerve = swervelib.subsystem.SwerveDrive(modules, gyro, MAX_VELOCITY, MAX_ANGULAR_VELOCITY)
 ```
 
 For more info on assembling drive bases and using commands, check `example_robot`.

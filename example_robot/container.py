@@ -7,13 +7,13 @@ import robotpy_apriltag as apriltag
 
 from swervelib import u, vision
 from swervelib.impl import (
-    SwerveDrive,
     PigeonGyro,
     CoaxialSwerveModule,
     Falcon500CoaxialDriveComponent,
     Falcon500CoaxialAzimuthComponent,
     AbsoluteCANCoder,
 )
+from swervelib.subsystem import SwerveDrive
 
 
 class RobotContainer:

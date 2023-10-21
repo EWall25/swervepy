@@ -12,7 +12,6 @@ __all__ = [
     "AbsoluteCANCoder",
     "PigeonGyro",
     "CoaxialSwerveModule",
-    "SwerveDrive",
     "SparkMaxEncoderType",
     "SparkMaxAbsoluteEncoder",
     "DummyCoaxialComponent",
@@ -28,4 +27,4 @@ from .motor import (
     DummyCoaxialComponent,
 )
 from .sensor import AbsoluteCANCoder, PigeonGyro, SparkMaxEncoderType, SparkMaxAbsoluteEncoder, DummyGyro
-from .system import CoaxialSwerveModule, SwerveDrive
+from .system import CoaxialSwerveModule
