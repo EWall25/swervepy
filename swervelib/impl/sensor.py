@@ -9,10 +9,15 @@ from ..abstract.sensor import AbsoluteEncoder, Gyro
 
 
 class AbsoluteCANCoder(AbsoluteEncoder):
-    def __init__(self, id_: int):
+    def __init__(self, id_: int | tuple[int, str]):
         super().__init__()
 
-        self._encoder = ctre.sensors.CANCoder(id_)
+        # Construct the CANCoder from either a tuple of motor ID and CAN bus ID or just a motor ID
+        try:
+            self._encoder = ctre.sensors.CANCoder(*id_)
+        except TypeError:
+            self._encoder = ctre.sensors.CANCoder(id_)
+
         self._encoder.configAbsoluteSensorRange(ctre.sensors.AbsoluteSensorRange.Unsigned_0_to_360)
 
         wpilib.SmartDashboard.putData(f"Absolute CANCoder {id_}", self)

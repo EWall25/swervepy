@@ -61,17 +61,22 @@ class Falcon500CoaxialDriveComponent(CoaxialDriveComponent):
             motor_config.slot0.kI = self.kI
             motor_config.slot0.kD = self.kD
             motor_config.supplyCurrLimit = supply_limit
-            motor_config.initializationStrategy = ctre.SensorInitializationStrategy.BootToZero
+            motor_config.initializationStrategy = ctre.sensors.SensorInitializationStrategy.BootToZero
             motor_config.openloopRamp = self.open_loop_ramp_rate
             motor_config.closedloopRamp = self.closed_loop_ramp_rate
 
             return motor_config
 
-    def __init__(self, id_: int, parameters: Parameters):
+    def __init__(self, id_: int | tuple[int, str], parameters: Parameters):
         self._params = parameters.in_standard_units()
 
-        # TODO: Accept CAN IDs on other busses
-        self._motor = ctre.TalonFX(id_)
+        try:
+            # Unpack tuple of motor id and CAN bus id into TalonFX constructor
+            self._motor = ctre.TalonFX(*id_)
+        except TypeError:
+            # Only an int was provided for id_
+            self._motor = ctre.TalonFX(id_)
+
         self._config()
         self.reset()
 
@@ -160,22 +165,27 @@ class Falcon500CoaxialAzimuthComponent(CoaxialAzimuthComponent):
             motor_config.slot0.kI = self.kI
             motor_config.slot0.kD = self.kD
             motor_config.supplyCurrLimit = supply_limit
-            motor_config.initializationStrategy = ctre.SensorInitializationStrategy.BootToZero
+            motor_config.initializationStrategy = ctre.sensors.SensorInitializationStrategy.BootToZero
             motor_config.closedloopRamp = self.ramp_rate
 
             return motor_config
 
     def __init__(
         self,
-        id_: int,
+        id_: int | tuple[int, str],
         azimuth_offset: Rotation2d,
         parameters: Parameters,
         absolute_encoder: AbsoluteEncoder,
     ):
         self._params = parameters.in_standard_units()
 
-        # TODO: Accept CAN IDs on other busses
-        self._motor = ctre.TalonFX(id_)
+        try:
+            # Unpack tuple of motor id and CAN bus id into TalonFX constructor
+            self._motor = ctre.TalonFX(*id_)
+        except TypeError:
+            # Only an int was provided for id_
+            self._motor = ctre.TalonFX(id_)
+
         self._absolute_encoder = absolute_encoder
         self._offset = azimuth_offset
 
