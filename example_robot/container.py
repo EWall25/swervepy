@@ -2,10 +2,11 @@ import math
 
 import ctre
 import wpilib
-from wpimath.geometry import Translation2d, Rotation2d, Transform3d
+import wpimath.trajectory
+from wpimath.geometry import Translation2d, Rotation2d, Transform3d, Pose2d
 import robotpy_apriltag as apriltag
 
-from swervelib import u, vision
+from swervelib import u, vision, SwerveDrive, TrajectoryFollowerParameters
 from swervelib.impl import (
     PigeonGyro,
     CoaxialSwerveModule,
@@ -13,7 +14,6 @@ from swervelib.impl import (
     Falcon500CoaxialAzimuthComponent,
     AbsoluteCANCoder,
 )
-from swervelib.subsystem import SwerveDrive
 
 
 class RobotContainer:
@@ -112,6 +112,27 @@ class RobotContainer:
                 open_loop,
             )
         )
+
+    def get_autonomous_command(self):
+        follower_params = TrajectoryFollowerParameters(
+            target_angular_velocity=math.pi * (u.rad / u.s),
+            target_angular_acceleration=math.pi * (u.rad / (u.s * u.s)),
+            theta_kP=1,
+            x_kP=1,
+            y_kP=1,
+        )
+
+        trajectory_config = wpimath.trajectory.TrajectoryConfig(maxVelocity=4.5, maxAcceleration=1)
+
+        trajectory = wpimath.trajectory.TrajectoryGenerator.generateTrajectory(
+            [
+                Pose2d(0, 0, 0),  # Start at (0, 0)
+                Pose2d(1, 0, 0),  # Move 1m forward
+            ],
+            trajectory_config,
+        )
+
+        return self.swerve.follow_trajectory_command(trajectory, follower_params, True)
 
 
 def deadband(value, band):
