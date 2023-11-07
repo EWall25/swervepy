@@ -6,8 +6,8 @@ import wpimath.trajectory
 from wpimath.geometry import Translation2d, Rotation2d, Transform3d, Pose2d
 import robotpy_apriltag as apriltag
 
-from swervelib import u, vision, SwerveDrive, TrajectoryFollowerParameters
-from swervelib.impl import (
+from swervepy import u, vision, SwerveDrive, TrajectoryFollowerParameters
+from swervepy.impl import (
     PigeonGyro,
     CoaxialSwerveModule,
     Falcon500CoaxialDriveComponent,

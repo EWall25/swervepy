@@ -21,8 +21,8 @@ if TYPE_CHECKING:
     from wpimath.estimator import SwerveDrive4PoseEstimator
     from wpimath.kinematics import SwerveDrive4Kinematics
 
-from swervelib import u
-from swervelib.abstract import SwerveModule, Gyro
+from swervepy import u
+from swervepy.abstract import SwerveModule, Gyro
 
 
 class SwerveDrive(commands2.SubsystemBase):
