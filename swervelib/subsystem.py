@@ -62,12 +62,19 @@ class SwerveDrive(commands2.SubsystemBase):
         for i, module in enumerate(modules):
             wpilib.SmartDashboard.putData(f"Module {i}", module)
 
+        # Field to plot auto trajectories and robot pose
+        self.field = wpilib.Field2d()
+        wpilib.SmartDashboard.putData(self.field)
+
     def periodic(self):
-        self._odometry.update(self._gyro.heading, self.module_positions)
+        robot_pose = self._odometry.update(self._gyro.heading, self.module_positions)
 
         vision_pose = self._vision_pose_callback(self.pose)
         if vision_pose:
             self._odometry.addVisionMeasurement(vision_pose, wpilib.Timer.getFPGATimestamp())
+
+        # Visualize robot position on field
+        self.field.setRobotPose(robot_pose)
 
     def drive(self, translation: Translation2d, rotation: float, field_relative: bool, open_loop: bool):
         """
@@ -166,7 +173,7 @@ class SwerveDrive(commands2.SubsystemBase):
             theta_controller,
             self.desire_module_states,
             [self],
-        )
+        ).beforeStarting(lambda: self.field.getObject("traj").setTrajectory(trajectory))
 
         # If this is the first path in a sequence, reset the robot's pose so that it aligns with the start of the path
         if first_path:
