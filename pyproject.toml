@@ -4,6 +4,9 @@ version = "1.3.0"
 description = "Swerve drive library for FRC"
 authors = ["Ethan Wall <ethanhwall07@gmail.com>"]
 license = "MIT"
+readme = "README.md"
+repository = "https://github.com/EWall25/swervepy"
+keywords = ["frc", "swerve-drive"]
 
 [tool.poetry.dependencies]
 python = "~3.11"

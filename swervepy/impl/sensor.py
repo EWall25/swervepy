@@ -47,6 +47,31 @@ class PigeonGyro(Gyro):
         return Rotation2d.fromDegrees(yaw)
 
 
+class Pigeon2Gyro(Gyro):
+    def __init__(self, id_: int | tuple[int, str], invert: bool = False):
+        super().__init__()
+        self.invert = invert
+
+        try:
+            # Unpack tuple of sensor id and CAN bus id into Pigeon2 constructor
+            self._gyro = ctre.sensors.Pigeon2(*id_)
+        except TypeError:
+            # Only an int was provided for id_
+            self._gyro = ctre.sensors.Pigeon2(id_)
+
+        wpilib.SmartDashboard.putData("Pigeon 2", self)
+
+    def zero_heading(self):
+        self._gyro.setYaw(0)
+
+    @property
+    def heading(self) -> Rotation2d:
+        yaw = self._gyro.getYaw()
+        if self.invert:
+            yaw = 360 - yaw
+        return Rotation2d.fromDegrees(yaw)
+
+
 class DummyGyro(Gyro):
     """Gyro that does nothing"""
 
