@@ -10,8 +10,7 @@ keywords = ["frc", "swerve-drive"]
 
 [tool.poetry.dependencies]
 python = "~3.11"
-robotpy = {version = "^2023.4.3", extras = ["ctre", "commands2", "rev", "photonvision"]}
-robotpy-apriltag = "^2023.2.1.1"
+robotpy = {version = "2024.0.0b3.post2", extras = ["phoenix5", "commands2", "rev"]}
 Pint = "^0.20.1"
 
 [tool.poetry.group.dev.dependencies]

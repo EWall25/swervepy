@@ -1,12 +1,11 @@
 import math
 
-import ctre
+import phoenix5
 import wpilib
 import wpimath.trajectory
-from wpimath.geometry import Translation2d, Rotation2d, Transform3d, Pose2d
-import robotpy_apriltag as apriltag
+from wpimath.geometry import Translation2d, Rotation2d, Pose2d
 
-from swervepy import u, vision, SwerveDrive, TrajectoryFollowerParameters
+from swervepy import u, SwerveDrive, TrajectoryFollowerParameters
 from swervepy.impl import (
     PigeonGyro,
     CoaxialSwerveModule,
@@ -38,7 +37,7 @@ class RobotContainer:
             continuous_current_limit=40,
             peak_current_limit=60,
             peak_current_duration=0.01,
-            neutral_mode=ctre.NeutralMode.Coast,
+            neutral_mode=phoenix5.NeutralMode.Coast,
             kP=0,
             kI=0,
             kD=0,
@@ -54,7 +53,7 @@ class RobotContainer:
             continuous_current_limit=40,
             peak_current_limit=60,
             peak_current_duration=0.01,
-            neutral_mode=ctre.NeutralMode.Brake,
+            neutral_mode=phoenix5.NeutralMode.Brake,
             kP=0,
             kI=0,
             kD=0,
@@ -92,11 +91,6 @@ class RobotContainer:
                 Translation2d(-wheel_base / 2, -track_width / 2),
             ),
         )
-
-        # camera_1 = vision.CameraDefinition("camera_1", Transform3d())
-        # camera_collection = vision.AprilTagCameraCollection(
-        #     [camera_1], apriltag.loadAprilTagLayoutField(apriltag.AprilTagField.k2023ChargedUp)
-        # )
 
         self.stick = wpilib.Joystick(0)
 
