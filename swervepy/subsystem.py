@@ -13,7 +13,7 @@ import wpimath.kinematics
 from pint import Quantity
 from wpimath.controller import ProfiledPIDControllerRadians, PIDController
 from wpimath.trajectory import Trajectory, TrapezoidProfileRadians
-from wpimath.geometry import Pose2d, Translation2d
+from wpimath.geometry import Pose2d, Translation2d, Rotation2d
 from wpimath.kinematics import ChassisSpeeds, SwerveModuleState, SwerveModulePosition
 from wpiutil import SendableBuilder
 
@@ -120,6 +120,10 @@ class SwerveDrive(commands2.SubsystemBase):
     @property
     def pose(self) -> Pose2d:
         return self._odometry.getEstimatedPosition()
+
+    @property
+    def heading(self) -> Rotation2d:
+        return self._gyro.heading
 
     def reset_modules(self):
         for module in self._modules:
