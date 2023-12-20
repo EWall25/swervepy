@@ -25,7 +25,7 @@ from swervepy import u
 from swervepy.abstract import SwerveModule, Gyro
 
 
-class SwerveDrive(commands2.SubsystemBase):
+class SwerveDrive(commands2.Subsystem):
     def __init__(
         self,
         modules: tuple[SwerveModule, ...],
@@ -163,6 +163,9 @@ class SwerveDrive(commands2.SubsystemBase):
         :return: Trajectory-follower command
         """
 
+        # TODO: Re-impl trajectory following with new commands rewrite
+        # TODO: Add support for other wheel configurations (e.g., 6-wheel swerve)
+        """
         theta_controller = ProfiledPIDControllerRadians(
             parameters.theta_kP, 0, 0, parameters.theta_controller_constraints
         )
@@ -185,9 +188,11 @@ class SwerveDrive(commands2.SubsystemBase):
             command = command.beforeStarting(lambda: self.reset_odometry(initial_pose))
 
         return command
+        """
+        return commands2.InstantCommand(lambda: wpilib.reportWarning("Trajectory following isn't implemented!"))
 
 
-class _TeleOpCommand(commands2.CommandBase):
+class _TeleOpCommand(commands2.Command):
     def __init__(
         self,
         swerve: SwerveDrive,

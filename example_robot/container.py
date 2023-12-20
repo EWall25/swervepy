@@ -108,6 +108,8 @@ class RobotContainer:
         )
 
     def get_autonomous_command(self):
+        # Example path-following autonomous routine
+        # Doesn't work yet for 2024 because RobotPy is missing some commands
         follower_params = TrajectoryFollowerParameters(
             target_angular_velocity=math.pi * (u.rad / u.s),
             target_angular_acceleration=math.pi * (u.rad / (u.s * u.s)),
