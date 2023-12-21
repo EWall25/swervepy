@@ -10,6 +10,8 @@ Include the `swervepy` folder in your project. Then, import it like any other Py
 ```python
 import swervepy
 ```
+❗❗**IMPORTANT**❗❗ Until pathplannerlib officially releases for Python, you must copy or symlink the [pathplannerlib folder](https://github.com/mjansen4857/pathplanner/tree/main/pathplannerlib-python/pathplannerlib)
+into both `swervepy/pathplannerlib` **and** `example_robot/pathplannerlib` for the project to run.
 
 ## Design Philosophy
 Swerve drivetrains are made up of any number of swerve modules, and swerve modules can be made from different motors and

@@ -3,16 +3,18 @@
 import math
 import time
 from dataclasses import dataclass
-from functools import cached_property
-from typing import Callable, Optional, TYPE_CHECKING
+from functools import singledispatchmethod
+from typing import Callable, Optional, TYPE_CHECKING, Iterable
 
 import commands2
+from pathplannerlib.commands import FollowPathCommand, FollowPathWithEvents
+from pathplannerlib.controller import PPHolonomicDriveController
+from pathplannerlib.config import ReplanningConfig, PIDConstants
+from pathplannerlib.path import PathPlannerPath
 import wpilib
 import wpimath.estimator
 import wpimath.kinematics
 from pint import Quantity
-from wpimath.controller import ProfiledPIDControllerRadians, PIDController
-from wpimath.trajectory import Trajectory, TrapezoidProfileRadians
 from wpimath.geometry import Pose2d, Translation2d, Rotation2d
 from wpimath.kinematics import ChassisSpeeds, SwerveModuleState, SwerveModulePosition
 from wpiutil import SendableBuilder
@@ -76,6 +78,7 @@ class SwerveDrive(commands2.Subsystem):
         # Visualize robot position on field
         self.field.setRobotPose(robot_pose)
 
+    @singledispatchmethod
     def drive(self, translation: Translation2d, rotation: float, field_relative: bool, open_loop: bool):
         """
         Command the robot to provided chassis speeds (translation and rotation)
@@ -95,6 +98,11 @@ class SwerveDrive(commands2.Subsystem):
         swerve_module_states = self._kinematics.toSwerveModuleStates(speeds)
 
         self.desire_module_states(swerve_module_states, open_loop, rotate_in_place=False)
+
+    @drive.register
+    def _(self, chassis_speeds: ChassisSpeeds, field_relative: bool, open_loop: bool):
+        translation = Translation2d(chassis_speeds.vx, chassis_speeds.vy)
+        return self.drive(translation, chassis_speeds.omega, field_relative, open_loop)
 
     def desire_module_states(
         self, states: tuple[SwerveModuleState, ...], open_loop: bool = False, rotate_in_place: bool = True
@@ -125,6 +133,11 @@ class SwerveDrive(commands2.Subsystem):
     def heading(self) -> Rotation2d:
         return self._gyro.heading
 
+    @property
+    def robot_relative_speeds(self) -> ChassisSpeeds:
+        module_states = tuple(module.module_state for module in self._modules)
+        return self._kinematics.toChassisSpeeds(module_states)
+
     def reset_modules(self):
         for module in self._modules:
             module.reset()
@@ -152,44 +165,53 @@ class SwerveDrive(commands2.Subsystem):
         return _TeleOpCommand(self, translation, strafe, rotation, field_relative, open_loop)
 
     def follow_trajectory_command(
-        self, trajectory: Trajectory, parameters: "TrajectoryFollowerParameters", first_path: bool = False
+        self, path: PathPlannerPath, parameters: "TrajectoryFollowerParameters", first_path: bool = False, open_loop: bool = False
     ):
         """
         Build a command that follows a trajectory
 
-        :param trajectory: The path to follow
+        :param path: The path to follow
         :param parameters: Options that determine how the robot will follow the trajectory
         :param first_path: If True, the robot's pose will be reset to the trajectory's initial pose
+        :param open_loop: Use open loop control (True) or closed loop (False) to swerve module speeds. Closed-loop
+        positional control will always be used for trajectory following
         :return: Trajectory-follower command
         """
 
-        # TODO: Re-impl trajectory following with new commands rewrite
-        # TODO: Add support for other wheel configurations (e.g., 6-wheel swerve)
-        """
-        theta_controller = ProfiledPIDControllerRadians(
-            parameters.theta_kP, 0, 0, parameters.theta_controller_constraints
-        )
-        theta_controller.enableContinuousInput(-math.pi, math.pi)
+        # TODO: Re-impl trajectory visualisation on Field2d
 
-        command = commands2.Swerve4ControllerCommand(
-            trajectory,
+        # Find the drive base radius (the distance from the center of the robot to the furthest module)
+        radius = greatest_distance_from_translations([module.placement for module in self._modules])
+
+        # Position feedback controller for following waypoints
+        controller = PPHolonomicDriveController(
+            PIDConstants(parameters.xy_kP),
+            PIDConstants(parameters.theta_kP),
+            parameters.max_drive_velocity.m_as(u.m / u.s),
+            radius,
+        )
+
+        # Trajectory follower command
+        command = FollowPathWithEvents(
+            FollowPathCommand(
+                path,
+                lambda: self.pose,
+                lambda: self.robot_relative_speeds,
+                lambda speeds: self.drive(speeds, field_relative=False, open_loop=open_loop),
+                controller,
+                ReplanningConfig(),
+                self,
+            ),
+            path,
             lambda: self.pose,
-            self._kinematics,
-            PIDController(parameters.x_kP, 0, 0),
-            PIDController(parameters.y_kP, 0, 0),
-            theta_controller,
-            self.desire_module_states,
-            [self],
-        ).beforeStarting(lambda: self.field.getObject("traj").setTrajectory(trajectory))
+        )
 
         # If this is the first path in a sequence, reset the robot's pose so that it aligns with the start of the path
         if first_path:
-            initial_pose = trajectory.initialPose()
-            command = command.beforeStarting(lambda: self.reset_odometry(initial_pose))
+            initial_pose = path.getPreviewStartingHolonomicPose()
+            command = command.beforeStarting(commands2.InstantCommand(lambda: self.reset_odometry(initial_pose)))
 
         return command
-        """
-        return commands2.InstantCommand(lambda: wpilib.reportWarning("Trajectory following isn't implemented!"))
 
 
 class _TeleOpCommand(commands2.Command):
@@ -236,17 +258,18 @@ class _TeleOpCommand(commands2.Command):
 
 @dataclass
 class TrajectoryFollowerParameters:
-    target_angular_velocity: Quantity
-    target_angular_acceleration: Quantity
+    max_drive_velocity: Quantity
 
     # Positional PID constants for X, Y, and theta (rotation) controllers
     theta_kP: float
-    x_kP: float
-    y_kP: float
+    xy_kP: float
 
-    @cached_property
-    def theta_controller_constraints(self):
-        return TrapezoidProfileRadians.Constraints(
-            self.target_angular_velocity.m_as(u.rad / u.s),
-            self.target_angular_acceleration.m_as(u.rad / (u.s * u.s)),
-        )
+
+def greatest_distance_from_translations(translations: Iterable[Translation2d]):
+    """
+    Calculates the magnitude of the longest translation from a list of translations.
+    :param translations: List of translations
+    :return: The magnitude
+    """
+    distances = tuple(math.sqrt(trans.x**2 + trans.y**2) for trans in translations)
+    return max(distances)

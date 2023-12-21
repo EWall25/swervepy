@@ -31,6 +31,10 @@ class SwerveModule(Sendable, metaclass=SendableABCMeta):
     def module_position(self) -> SwerveModulePosition:
         return SwerveModulePosition(self.drive_distance, self.azimuth_angle)
 
+    @property
+    def module_state(self) -> SwerveModuleState:
+        return SwerveModuleState(self.drive_velocity, self.azimuth_angle)
+
     @abstractmethod
     def desire_drive_velocity(self, velocity: float, open_loop: bool):
         """
