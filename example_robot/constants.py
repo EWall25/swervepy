@@ -15,6 +15,7 @@ This file defines constants related to your robot.  These constants include:
 import math
 from collections import namedtuple
 import rev
+import phoenix5
 from swervepy import u
 
 # Physical constants
