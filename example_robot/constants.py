@@ -38,12 +38,15 @@ MECH = namedtuple("Data", mech_data.keys())(**mech_data)
 # Electrical constants
 elec_data = {
     # These current limit parameters are per-motor in the swerve modules
-    "continuous_current_limit": 40,
-    "peak_current_limit": 60,
+    "drive_continuous_current_limit": 40,
+    "azimuth_continuous_current_limit": 30,
+    "drive_peak_current_limit": 60,
+    "azimuth_peak_current_limit": 40,
 
     # Talon FX motor controllers can set peak_current_duration.
     # SparkMAX motor controllers can't.
-    #"peak_current_duration": 0.01,
+    "drive_peak_current_duration": 0.01,
+    "azimuth_peak_current_duration": 0.01,
 
     # time in seconds for propulsion motors to ramp up to full speed
     # reference: https://codedocs.revrobotics.com/java/com/revrobotics/cansparkmax

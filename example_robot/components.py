@@ -13,14 +13,14 @@ from swervepy.impl import (
     DummyGyro,
     AbsoluteDutyCycleEncoder,
     CoaxialSwerveModule,
-    NEOCoaxialDriveComponent,
-    NEOCoaxialAzimuthComponent,
+    Falcon500CoaxialDriveComponent,
+    Falcon500CoaxialAzimuthComponent,
 )
 
 # Define which components you're using (e.g. which motors you're using)
 #
-drive_component_class = NEOCoaxialDriveComponent
-azimuth_component_class = NEOCoaxialAzimuthComponent
+drive_component_class = Falcon500CoaxialDriveComponent
+azimuth_component_class = Falcon500CoaxialAzimuthComponent
 gyro_component_class = DummyGyro
 absolute_encoder_class = AbsoluteDutyCycleEncoder
 
@@ -30,7 +30,7 @@ absolute_encoder_class = AbsoluteDutyCycleEncoder
 # data class has different options, based on the motors it uses etc.)
 #
 drive_param_values = {
-    # These params apply to NEOCoaxialDriveComponent.
+    # NEOCoaxialDriveComponent takes all the following params.
     # Falcon500CoaxialDriveComponent takes all these params, plus one more
     # (peak_current_duration).
     #
@@ -39,9 +39,12 @@ drive_param_values = {
     "max_speed": OP.max_speed,
     "open_loop_ramp_rate": ELEC.open_loop_ramp_rate,
     "closed_loop_ramp_rate": ELEC.closed_loop_ramp_rate,
-    "continuous_current_limit": ELEC.continuous_current_limit,
-    "peak_current_limit": ELEC.peak_current_limit,
-    #"peak_current_duration": 0.01,   # only for Falcon500CoaxialDriveComponent
+    "continuous_current_limit": ELEC.drive_continuous_current_limit,
+    "peak_current_limit": ELEC.drive_peak_current_limit,
+
+    # remove the following line for NEOCoaxialDriveComponent
+    "drive_peak_current_duration": ELEC.drive_peak_current_duration,
+
     "neutral_mode": OP.propulsion_neutral,
     "kP": SW.kP,
     "kI": SW.kI,
@@ -52,16 +55,19 @@ drive_param_values = {
     "invert_motor": MECH.propulsion_motor_inverted,
 }
 azimuth_param_values = {
-    # These params apply to NEOCoaxialAzimuthComponent.
+    # NEOCoaxialDriveComponent takes all the following params.
     # Falcon500CoaxialDriveComponent takes all these params, plus one more
     # (peak_current_duration).
     #
     "gear_ratio": MECH.swerve_module_propulsion_gearing_ratio,
     "max_angular_velocity": OP.max_angular_velocity,
     "ramp_rate": 0,
-    "continuous_current_limit": ELEC.continuous_current_limit,
-    "peak_current_limit": ELEC.peak_current_limit,
-    #"peak_current_duration": 0.01,   # only for Falcon500CoaxialAzimuthComponent
+    "continuous_current_limit": ELEC.azimuth_continuous_current_limit,
+    "peak_current_limit": ELEC.azimuth_peak_current_limit,
+
+    # remove the following line for NEOCoaxialDriveComponent
+    "azimuth_peak_current_duration": ELEC.azimuth_peak_current_duration,
+
     "neutral_mode": OP.steering_neutral,
     "kP": SW.kP,
     "kI": SW.kI,
