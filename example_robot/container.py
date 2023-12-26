@@ -130,15 +130,15 @@ class RobotContainer:
 
     def get_translation_input(self, invert=True):
         raw_stick_val = self.stick.getRawAxis(OP.translation_joystick_axis)
-        return sign * self.process_joystick_input(raw_stick_val, invert=invert)
+        return self.process_joystick_input(raw_stick_val, invert=invert)
 
     def get_strafe_input(self, invert=True):
         raw_stick_val = self.stick.getRawAxis(OP.strafe_joystick_axis)
-        return sign * self.process_joystick_input(raw_stick_val, invert=invert)
+        return self.process_joystick_input(raw_stick_val, invert=invert)
 
     def get_rotation_input(self, invert=True):
         raw_stick_val = self.stick.getRawAxis(OP.rotation_joystick_axis)
-        return sign * self.process_joystick_input(raw_stick_val, invert=invert)
+        return self.process_joystick_input(raw_stick_val, invert=invert)
 
     def get_autonomous_command(self):
         follower_params = TrajectoryFollowerParameters(
