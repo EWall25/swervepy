@@ -36,7 +36,7 @@ class AbsoluteDutyCycleEncoder(AbsoluteEncoder):
 
     @property
     def absolute_position_degrees(self) -> float:
-        pos = self._encoder.getAbsolutePosition() # 0.0 <= pos < 1.0 (rotations)
+        pos = self._encoder.getAbsolutePosition()  # 0.0 <= pos < 1.0 (rotations)
         degrees = 360 * pos
         return degrees
 

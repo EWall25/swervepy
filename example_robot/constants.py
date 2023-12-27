@@ -1,7 +1,7 @@
 """
 This file defines constants related to your robot.  These constants include:
 
- * Physical constants (exterior dimensions, wheel base)
+ * Physical constants (exterior dimensions, wheelbase)
 
  * Mechanical constants (gear reduction ratios)
 
@@ -28,7 +28,7 @@ PHYS = namedtuple("Data", phys_data.keys())(**phys_data)
 
 # Mechanical constants
 mech_data = {
-    "swerve_module_propulsion_gearing_ratio": 6.75,   # SDS Mk4i L2
+    "swerve_module_propulsion_gearing_ratio": 6.75,  # SDS Mk4i L2
     "swerve_module_steering_gearing_ratio": 150 / 7,  # SDS Mk4i
 
     "propulsion_motor_inverted": False,
@@ -70,10 +70,10 @@ elec_data = {
 ELEC = namedtuple("Data", elec_data.keys())(**elec_data)
 
 JOYSTICK_AXES = {
-  "LEFT_X": 0,
-  "LEFT_Y": 1,
-  "RIGHT_X": 4,
-  "RIGHT_Y": 5,
+    "LEFT_X": 0,
+    "LEFT_Y": 1,
+    "RIGHT_X": 4,
+    "RIGHT_Y": 5,
 }
 
 # Operation constants
@@ -84,8 +84,8 @@ op_data = {
     "max_angular_velocity": 11.5 * (u.rad / u.s),
 
     # For NEO / SparkMAX, use the following and comment out the Falcon500 values
-    #"propulsion_neutral": rev.CANSparkMax.IdleMode.kCoast,
-    #"steering_neutral": rev.CANSparkMax.IdleMode.kBrake,
+    # "propulsion_neutral": rev.CANSparkMax.IdleMode.kCoast,
+    # "steering_neutral": rev.CANSparkMax.IdleMode.kBrake,
     # For Falcon500 / TalonFX, use the following and comment out the NEO values
     "propulsion_neutral": phoenix5.NeutralMode.Coast,
     "steering_neutral": phoenix5.NeutralMode.Brake,
@@ -116,8 +116,8 @@ sw_data = {
 
     # Constants for PID control of the propulsion AND steering motors
     # (kP must be non-zero, or azimuth motors won't engage.)
-    "kP": 0.3,   # representative value for Falcon500 motors
-    #"kP": 0.01,   # representative value for NEO motors
+    "kP": 0.3,  # representative value for Falcon500 motors
+    # "kP": 0.01,   # representative value for NEO motors
     "kI": 0,
     "kD": 0,
 

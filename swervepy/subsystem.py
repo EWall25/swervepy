@@ -165,7 +165,11 @@ class SwerveDrive(commands2.Subsystem):
         return _TeleOpCommand(self, translation, strafe, rotation, field_relative, open_loop)
 
     def follow_trajectory_command(
-        self, path: PathPlannerPath, parameters: "TrajectoryFollowerParameters", first_path: bool = False, open_loop: bool = False
+        self,
+        path: PathPlannerPath,
+        parameters: "TrajectoryFollowerParameters",
+        first_path: bool = False,
+        open_loop: bool = False,
     ):
         """
         Build a command that follows a trajectory

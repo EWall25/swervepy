@@ -1,5 +1,6 @@
 import math
 import logging
+
 logger = logging.getLogger("your.robot")
 
 import wpilib
@@ -12,6 +13,7 @@ from swervepy.impl import CoaxialSwerveModule
 from constants import PHYS, MECH, ELEC, OP, SW
 import components
 
+
 class RobotContainer:
     """
     This example robot container should serve as a demonstration for how to
@@ -19,6 +21,7 @@ class RobotContainer:
     code in this module to get a test working.  Instead, edit the values and
     class choices in constants.py.
     """
+
     def __init__(self):
         gyro = components.gyro_component_class(**components.gyro_param_values)
 
@@ -34,49 +37,57 @@ class RobotContainer:
             CoaxialSwerveModule(
                 drive=components.drive_component_class(
                     id_=ELEC.LF_drive_CAN_ID,
-                    parameters=components.drive_params),
+                    parameters=components.drive_params,
+                ),
                 azimuth=components.azimuth_component_class(
                     id_=ELEC.LF_steer_CAN_ID,
                     azimuth_offset=Rotation2d.fromDegrees(0),
                     parameters=components.azimuth_params,
-                    absolute_encoder=self.lf_enc),
-                placement=Translation2d(*components.module_locations['LF']),
+                    absolute_encoder=self.lf_enc,
+                ),
+                placement=Translation2d(*components.module_locations["LF"]),
             ),
             # Right Front module
             CoaxialSwerveModule(
                 drive=components.drive_component_class(
                     id_=ELEC.RF_drive_CAN_ID,
-                    parameters=components.drive_params),
+                    parameters=components.drive_params,
+                ),
                 azimuth=components.azimuth_component_class(
                     id_=ELEC.RF_steer_CAN_ID,
                     azimuth_offset=Rotation2d.fromDegrees(0),
                     parameters=components.azimuth_params,
-                    absolute_encoder=self.rf_enc),
-                placement=Translation2d(*components.module_locations['RF']),
+                    absolute_encoder=self.rf_enc,
+                ),
+                placement=Translation2d(*components.module_locations["RF"]),
             ),
             # Left Back module
             CoaxialSwerveModule(
                 drive=components.drive_component_class(
                     id_=ELEC.LB_drive_CAN_ID,
-                    parameters=components.drive_params),
+                    parameters=components.drive_params,
+                ),
                 azimuth=components.azimuth_component_class(
                     id_=ELEC.LB_steer_CAN_ID,
                     azimuth_offset=Rotation2d.fromDegrees(0),
                     parameters=components.azimuth_params,
-                    absolute_encoder=self.lb_enc),
-                placement=Translation2d(*components.module_locations['LB']),
+                    absolute_encoder=self.lb_enc,
+                ),
+                placement=Translation2d(*components.module_locations["LB"]),
             ),
             # Right Back module
             CoaxialSwerveModule(
                 drive=components.drive_component_class(
                     id_=ELEC.RB_drive_CAN_ID,
-                    parameters=components.drive_params),
+                    parameters=components.drive_params,
+                ),
                 azimuth=components.azimuth_component_class(
                     id_=ELEC.RB_steer_CAN_ID,
                     azimuth_offset=Rotation2d.fromDegrees(0),
                     parameters=components.azimuth_params,
-                    absolute_encoder=self.rb_enc),
-                placement=Translation2d(*components.module_locations['RB']),
+                    absolute_encoder=self.rb_enc,
+                ),
+                placement=Translation2d(*components.module_locations["RB"]),
             ),
         )
 
@@ -85,8 +96,7 @@ class RobotContainer:
         # Define a swerve drive subsystem by passing in a list of SwerveModules
         # and some options
         #
-        self.swerve = SwerveDrive(
-            modules, gyro, OP.max_speed, OP.max_angular_velocity)
+        self.swerve = SwerveDrive(modules, gyro, OP.max_speed, OP.max_angular_velocity)
 
         # Set the swerve subsystem's default command to teleoperate using
         # the controller joysticks
@@ -104,17 +114,14 @@ class RobotContainer:
     def log_data(self):
         for pos in ("LF", "RF", "LB", "RB"):
             encoder = getattr(self, f"{pos.lower()}_enc")
-            wpilib.SmartDashboard.putNumber(
-                f"{pos} absolute encoder", encoder.absolute_position_degrees)
-            wpilib.SmartDashboard.putNumber(
-                f"{pos} absolute encoder", encoder.absolute_position_degrees)
+            wpilib.SmartDashboard.putNumber(f"{pos} absolute encoder", encoder.absolute_position_degrees)
+            wpilib.SmartDashboard.putNumber(f"{pos} absolute encoder", encoder.absolute_position_degrees)
 
     @staticmethod
     def deadband(value, band):
         return value if abs(value) > band else 0
 
-    def process_joystick_input(self, val, deadband=0.1, exponent=1,
-                               invert=False):
+    def process_joystick_input(self, val, deadband=0.1, exponent=1, invert=False):
         """
         Given a raw joystick reading, return the processed value after adjusting
         for real-world UX considerations:
@@ -122,10 +129,10 @@ class RobotContainer:
           * apply an exponent for greater low-velocity control
         """
         deadbanded_input = self.deadband(val, deadband)
-        input_sign = +1 if val > 0 else -1   # this works for val=0 also
+        input_sign = +1 if val > 0 else -1  # this works for val=0 also
         invert_sign = -1 if invert else +1
         # abs required for fractional exponents
-        scaled_input = abs(deadbanded_input)**exponent
+        scaled_input = abs(deadbanded_input) ** exponent
         return invert_sign * input_sign * scaled_input
 
     def get_translation_input(self, invert=True):
@@ -147,17 +154,19 @@ class RobotContainer:
             xy_kP=1,
         )
 
-        bezier_points = PathPlannerPath.bezierFromPoses([
-            Pose2d(1.0, 1.0, Rotation2d.fromDegrees(0)),
-            Pose2d(3.0, 1.0, Rotation2d.fromDegrees(0)),
-            Pose2d(5.0, 3.0, Rotation2d.fromDegrees(90)),
-        ])
+        bezier_points = PathPlannerPath.bezierFromPoses(
+            [
+                Pose2d(1.0, 1.0, Rotation2d.fromDegrees(0)),
+                Pose2d(3.0, 1.0, Rotation2d.fromDegrees(0)),
+                Pose2d(5.0, 3.0, Rotation2d.fromDegrees(90)),
+            ]
+        )
         path = PathPlannerPath(
             bezier_points,
             PathConstraints(3.0, 3.0, 2 * math.pi, 4 * math.pi),
-            GoalEndState(0.0, Rotation2d.fromDegrees(-90)),     # Zero velocity and facing 90 degrees clockwise
+            GoalEndState(0.0, Rotation2d.fromDegrees(-90)),  # Zero velocity and facing 90 degrees clockwise
         )
 
         first_path = True  # reset robot pose to initial pose in trajectory
-        open_loop = True   # don't use built-in motor feedback for velocity
+        open_loop = True  # don't use built-in motor feedback for velocity
         return self.swerve.follow_trajectory_command(path, follower_params, first_path, open_loop)
