@@ -24,9 +24,9 @@ class Falcon500CoaxialDriveComponent(CoaxialDriveComponent):
         open_loop_ramp_rate: float
         closed_loop_ramp_rate: float
 
-        drive_continuous_current_limit: int
-        drive_peak_current_limit: int
-        drive_peak_current_duration: float
+        continuous_current_limit: int
+        peak_current_limit: int
+        peak_current_duration: float
 
         neutral_mode: phoenix5.NeutralMode
 
@@ -52,9 +52,9 @@ class Falcon500CoaxialDriveComponent(CoaxialDriveComponent):
 
             supply_limit = phoenix5.SupplyCurrentLimitConfiguration(
                 True,
-                self.drive_continuous_current_limit,
-                self.drive_peak_current_limit,
-                self.drive_peak_current_duration,
+                self.continuous_current_limit,
+                self.peak_current_limit,
+                self.peak_current_duration,
             )
 
             motor_config.slot0.kP = self.kP
@@ -133,9 +133,9 @@ class Falcon500CoaxialAzimuthComponent(CoaxialAzimuthComponent):
 
         ramp_rate: float
 
-        azimuth_continuous_current_limit: int
-        azimuth_peak_current_limit: int
-        azimuth_peak_current_duration: float
+        continuous_current_limit: int
+        peak_current_limit: int
+        peak_current_duration: float
 
         neutral_mode: phoenix5.NeutralMode
 
@@ -156,9 +156,9 @@ class Falcon500CoaxialAzimuthComponent(CoaxialAzimuthComponent):
 
             supply_limit = phoenix5.SupplyCurrentLimitConfiguration(
                 True,
-                self.azimuth_continuous_current_limit,
-                self.azimuth_peak_current_limit,
-                self.azimuth_peak_current_duration,
+                self.continuous_current_limit,
+                self.peak_current_limit,
+                self.peak_current_duration,
             )
 
             motor_config.slot0.kP = self.kP
@@ -228,8 +228,8 @@ class NEOCoaxialDriveComponent(CoaxialDriveComponent):
         open_loop_ramp_rate: float
         closed_loop_ramp_rate: float
 
-        drive_continuous_current_limit: int
-        drive_peak_current_limit: int
+        continuous_current_limit: int
+        peak_current_limit: int
 
         neutral_mode: rev.CANSparkMax.IdleMode
 
@@ -267,8 +267,8 @@ class NEOCoaxialDriveComponent(CoaxialDriveComponent):
         self._controller.setI(self._params.kI)
         self._controller.setD(self._params.kD)
 
-        self._motor.setSmartCurrentLimit(self._params.drive_continuous_current_limit)
-        self._motor.setSecondaryCurrentLimit(self._params.drive_peak_current_limit)
+        self._motor.setSmartCurrentLimit(self._params.continuous_current_limit)
+        self._motor.setSecondaryCurrentLimit(self._params.peak_current_limit)
 
         self._motor.setOpenLoopRampRate(self._params.open_loop_ramp_rate)
         self._motor.setClosedLoopRampRate(self._params.closed_loop_ramp_rate)
@@ -312,8 +312,8 @@ class NEOCoaxialAzimuthComponent(CoaxialAzimuthComponent):
 
         ramp_rate: float
 
-        azimuth_continuous_current_limit: int
-        azimuth_peak_current_limit: int
+        continuous_current_limit: int
+        peak_current_limit: int
 
         neutral_mode: rev.CANSparkMax.IdleMode
 
@@ -362,8 +362,8 @@ class NEOCoaxialAzimuthComponent(CoaxialAzimuthComponent):
         self._controller.setI(self._params.kI)
         self._controller.setD(self._params.kD)
 
-        self._motor.setSmartCurrentLimit(self._params.azimuth_continuous_current_limit)
-        self._motor.setSecondaryCurrentLimit(self._params.azimuth_peak_current_limit)
+        self._motor.setSmartCurrentLimit(self._params.continuous_current_limit)
+        self._motor.setSecondaryCurrentLimit(self._params.peak_current_limit)
 
         self._motor.setInverted(self._params.invert_motor)
         self._motor.setIdleMode(self._params.neutral_mode)

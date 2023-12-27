@@ -39,11 +39,11 @@ drive_param_values = {
     "max_speed": OP.max_speed,
     "open_loop_ramp_rate": ELEC.open_loop_ramp_rate,
     "closed_loop_ramp_rate": ELEC.closed_loop_ramp_rate,
-    "drive_continuous_current_limit": ELEC.drive_continuous_current_limit,
-    "drive_peak_current_limit": ELEC.drive_peak_current_limit,
+    "continuous_current_limit": ELEC.drive_continuous_current_limit,
+    "peak_current_limit": ELEC.drive_peak_current_limit,
 
     # remove the following line for NEOCoaxialDriveComponent
-    "drive_peak_current_duration": ELEC.drive_peak_current_duration,
+    "peak_current_duration": ELEC.drive_peak_current_duration,
 
     "neutral_mode": OP.propulsion_neutral,
     "kP": SW.kP,
@@ -62,11 +62,11 @@ azimuth_param_values = {
     "gear_ratio": MECH.swerve_module_propulsion_gearing_ratio,
     "max_angular_velocity": OP.max_angular_velocity,
     "ramp_rate": 0,
-    "azimuth_continuous_current_limit": ELEC.azimuth_continuous_current_limit,
-    "azimuth_peak_current_limit": ELEC.azimuth_peak_current_limit,
+    "continuous_current_limit": ELEC.azimuth_continuous_current_limit,
+    "peak_current_limit": ELEC.azimuth_peak_current_limit,
 
     # remove the following line for NEOCoaxialDriveComponent
-    "azimuth_peak_current_duration": ELEC.azimuth_peak_current_duration,
+    "peak_current_duration": ELEC.azimuth_peak_current_duration,
 
     "neutral_mode": OP.steering_neutral,
     "kP": SW.kP,
