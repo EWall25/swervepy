@@ -27,6 +27,27 @@ class AbsoluteCANCoder(AbsoluteEncoder):
         return Rotation2d.fromDegrees(self._encoder.getAbsolutePosition())
 
 
+class AbsoluteDutyCycleEncoder(AbsoluteEncoder):
+    def __init__(self, dio_pin: int):
+        super().__init__()
+
+        self._encoder = wpilib.DutyCycleEncoder(dio_pin)
+        wpilib.SmartDashboard.putData(f"Absolute PWM Encoder {dio_pin}", self)
+
+    @property
+    def absolute_position_degrees(self) -> float:
+        pos = self._encoder.getAbsolutePosition() # 0.0 <= pos < 1.0 (rotations)
+        degrees = 360 * pos
+        return degrees
+
+    @property
+    def absolute_position(self) -> Rotation2d:
+        return Rotation2d.fromDegrees(self.absolute_position_degrees)
+
+    def reset_zero_position(self):
+        self._encoder.setPositionOffset(0)
+
+
 class PigeonGyro(Gyro):
     def __init__(self, id_: int, invert: bool = False):
         super().__init__()

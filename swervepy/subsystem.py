@@ -117,7 +117,7 @@ class SwerveDrive(commands2.Subsystem):
 
         swerve_module_states = self._kinematics.desaturateWheelSpeeds(states, self.max_velocity)  # type: ignore
 
-        for i in range(4):
+        for i in range(len(self._modules)):
             module: SwerveModule = self._modules[i]
             module.desire_state(swerve_module_states[i], open_loop, rotate_in_place)
 

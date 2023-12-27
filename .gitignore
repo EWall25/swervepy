@@ -36,6 +36,10 @@ MANIFEST
 *.manifest
 *.spec
 
+# Text editor auto-save files
+*~
+\#*
+
 # Installer logs
 pip-log.txt
 pip-delete-this-directory.txt
