@@ -107,7 +107,7 @@ class RobotContainer:
                 strafe=self.get_strafe_input,
                 rotation=self.get_rotation_input,
                 field_relative=SW.field_relative,
-                open_loop=SW.open_loop,
+                drive_open_loop=SW.drive_open_loop,
             )
         )
 

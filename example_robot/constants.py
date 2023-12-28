@@ -105,14 +105,14 @@ sw_data = {
     # requires a (non-Dummy) gyro.
     "field_relative": False,
 
-    # open_loop: True if we're not using PID control *for velocity targeting*,
+    # drive_open_loop: True if we're not using PID control *for velocity targeting*,
     # i.e. when a target velocity is calculated, do we use the corresponding
     # CoaxialDriveComponent's follow_velocity_open() method (set motor output
     # proportionally based on target and max velocities) or
     # follow_velocity_closed() method (put motor in PID control mode and set
     # target velocity).
     #
-    "open_loop": True,
+    "drive_open_loop": True,
 
     # Constants for PID control of the propulsion AND steering motors
     # (kP must be non-zero, or azimuth motors won't engage.)

@@ -156,11 +156,11 @@ import wpilib
 joystick = wpilib.XboxController(0)
 
 teleop_command = swerve.teleop_command(
-    translation=lambda: -joystick.getLeftY(),   # Invert input for positive forward
-    strafe=lambda: -joystick.getLeftX(),        # Invert input for positive left
-    rotation=lambda: -joystick.getRightX(),     # Invert input for CCW+
-    field_relative=True,                        # Forward is always facing the opposing driver station
-    open_loop=True,                             # Motors are not running feedback control
+    translation=lambda: -joystick.getLeftY(),  # Invert input for positive forward
+    strafe=lambda: -joystick.getLeftX(),  # Invert input for positive left
+    rotation=lambda: -joystick.getRightX(),  # Invert input for CCW+
+    field_relative=True,  # Forward is always facing the opposing driver station
+    drive_open_loop=True,  # Motors are not running feedback control
 )
 
 # The swerve subsystem will run the teleop command when no other commands are running (like during teleop)

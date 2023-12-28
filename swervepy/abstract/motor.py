@@ -5,7 +5,7 @@ from wpimath.geometry import Rotation2d
 
 
 class CoaxialDriveComponent(Protocol):
-    """Drive motor and encoder"""
+    """The component of a swerve module that drives the wheel (forward and backward)"""
 
     @abstractmethod
     def follow_velocity_open(self, velocity: float):
@@ -45,17 +45,22 @@ class CoaxialDriveComponent(Protocol):
 
 class CoaxialAzimuthComponent(Protocol):
     """
-    Azimuth (turning) motor and encoder.
-    Also includes a method for resetting to an absolute position (often provided by an absolute encoder)
+    The component of a swerve module that turns the wheel. This component also initializes the wheel to its absolute
+    position (usually via an absolute encoder).
     """
 
     @abstractmethod
     def follow_angle(self, angle: Rotation2d):
+        """
+        Move the wheel to an angle
+
+        :param angle: The desired wheel angle
+        """
         raise NotImplementedError
 
     @abstractmethod
     def reset(self):
-        """Reset module angle to absolute position"""
+        """Reset the wheel's angle to its absolute position"""
         raise NotImplementedError
 
     @property
@@ -67,4 +72,5 @@ class CoaxialAzimuthComponent(Protocol):
     @property
     @abstractmethod
     def angle(self) -> Rotation2d:
+        """The wheel angle"""
         raise NotImplementedError
