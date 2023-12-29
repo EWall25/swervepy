@@ -204,7 +204,7 @@ class SwerveDrive(commands2.Subsystem):
         rotation: Callable[[], float],
         field_relative: bool,
         drive_open_loop: bool,
-    ):
+    ) -> commands2.Command:
         """
         Construct a command that drives the robot using joystick (or other) inputs
 
@@ -224,7 +224,7 @@ class SwerveDrive(commands2.Subsystem):
         parameters: "TrajectoryFollowerParameters",
         first_path: bool = False,
         drive_open_loop: bool = False,
-    ):
+    ) -> commands2.Command:
         """
         Construct a command that follows a trajectory
 

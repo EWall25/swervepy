@@ -169,5 +169,8 @@ cython_debug/
 
 # End of https://www.toptal.com/developers/gitignore/api/python
 
-### RobotPy ###
+# RobotPy
 simgui*.json
+
+# MkDocs
+site/
