@@ -1,0 +1,4638 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="..">
+      
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.3">
+    
+    
+      
+        <title>API Reference - SwervePy</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.50c56a3b.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#api-reference" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="SwervePy" class="md-header__button md-logo" aria-label="SwervePy" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            SwervePy
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              API Reference
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="SwervePy" class="md-nav__button md-logo" aria-label="SwervePy" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    SwervePy
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    SwervePy Docs
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    API Reference
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    API Reference
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#swervepy.subsystem.SwerveDrive" class="md-nav__link">
+    <span class="md-ellipsis">
+      SwerveDrive
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="SwerveDrive">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.subsystem.SwerveDrive.heading" class="md-nav__link">
+    <span class="md-ellipsis">
+      heading
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.subsystem.SwerveDrive.module_positions" class="md-nav__link">
+    <span class="md-ellipsis">
+      module_positions
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.subsystem.SwerveDrive.pose" class="md-nav__link">
+    <span class="md-ellipsis">
+      pose
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.subsystem.SwerveDrive.robot_relative_speeds" class="md-nav__link">
+    <span class="md-ellipsis">
+      robot_relative_speeds
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.subsystem.SwerveDrive._" class="md-nav__link">
+    <span class="md-ellipsis">
+      _()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.subsystem.SwerveDrive.desire_module_states" class="md-nav__link">
+    <span class="md-ellipsis">
+      desire_module_states()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.subsystem.SwerveDrive.drive" class="md-nav__link">
+    <span class="md-ellipsis">
+      drive()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.subsystem.SwerveDrive.follow_trajectory_command" class="md-nav__link">
+    <span class="md-ellipsis">
+      follow_trajectory_command()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.subsystem.SwerveDrive.reset_odometry" class="md-nav__link">
+    <span class="md-ellipsis">
+      reset_odometry()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.subsystem.SwerveDrive.teleop_command" class="md-nav__link">
+    <span class="md-ellipsis">
+      teleop_command()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.subsystem.SwerveDrive.zero_heading" class="md-nav__link">
+    <span class="md-ellipsis">
+      zero_heading()
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#swervepy.abstract" class="md-nav__link">
+    <span class="md-ellipsis">
+      abstract
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="abstract">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.AbsoluteEncoder" class="md-nav__link">
+    <span class="md-ellipsis">
+      AbsoluteEncoder
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="AbsoluteEncoder">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.AbsoluteEncoder.absolute_position" class="md-nav__link">
+    <span class="md-ellipsis">
+      absolute_position
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.CoaxialAzimuthComponent" class="md-nav__link">
+    <span class="md-ellipsis">
+      CoaxialAzimuthComponent
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="CoaxialAzimuthComponent">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.CoaxialAzimuthComponent.angle" class="md-nav__link">
+    <span class="md-ellipsis">
+      angle
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.CoaxialAzimuthComponent.rotational_velocity" class="md-nav__link">
+    <span class="md-ellipsis">
+      rotational_velocity
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.CoaxialAzimuthComponent.follow_angle" class="md-nav__link">
+    <span class="md-ellipsis">
+      follow_angle()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.CoaxialAzimuthComponent.reset" class="md-nav__link">
+    <span class="md-ellipsis">
+      reset()
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.CoaxialDriveComponent" class="md-nav__link">
+    <span class="md-ellipsis">
+      CoaxialDriveComponent
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="CoaxialDriveComponent">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.CoaxialDriveComponent.distance" class="md-nav__link">
+    <span class="md-ellipsis">
+      distance
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.CoaxialDriveComponent.velocity" class="md-nav__link">
+    <span class="md-ellipsis">
+      velocity
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.CoaxialDriveComponent.follow_velocity_closed" class="md-nav__link">
+    <span class="md-ellipsis">
+      follow_velocity_closed()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.CoaxialDriveComponent.follow_velocity_open" class="md-nav__link">
+    <span class="md-ellipsis">
+      follow_velocity_open()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.CoaxialDriveComponent.reset" class="md-nav__link">
+    <span class="md-ellipsis">
+      reset()
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.Gyro" class="md-nav__link">
+    <span class="md-ellipsis">
+      Gyro
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Gyro">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.Gyro.heading" class="md-nav__link">
+    <span class="md-ellipsis">
+      heading
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.Gyro.zero_heading" class="md-nav__link">
+    <span class="md-ellipsis">
+      zero_heading()
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.SwerveModule" class="md-nav__link">
+    <span class="md-ellipsis">
+      SwerveModule
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="SwerveModule">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.SwerveModule.azimuth_angle" class="md-nav__link">
+    <span class="md-ellipsis">
+      azimuth_angle
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.SwerveModule.azimuth_velocity" class="md-nav__link">
+    <span class="md-ellipsis">
+      azimuth_velocity
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.SwerveModule.drive_distance" class="md-nav__link">
+    <span class="md-ellipsis">
+      drive_distance
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.SwerveModule.drive_velocity" class="md-nav__link">
+    <span class="md-ellipsis">
+      drive_velocity
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.SwerveModule.module_position" class="md-nav__link">
+    <span class="md-ellipsis">
+      module_position
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.SwerveModule.module_state" class="md-nav__link">
+    <span class="md-ellipsis">
+      module_state
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.SwerveModule.desire_azimuth_angle" class="md-nav__link">
+    <span class="md-ellipsis">
+      desire_azimuth_angle()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.SwerveModule.desire_drive_velocity" class="md-nav__link">
+    <span class="md-ellipsis">
+      desire_drive_velocity()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.SwerveModule.desire_state" class="md-nav__link">
+    <span class="md-ellipsis">
+      desire_state()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.SwerveModule.reset" class="md-nav__link">
+    <span class="md-ellipsis">
+      reset()
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#swervepy.impl" class="md-nav__link">
+    <span class="md-ellipsis">
+      impl
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="impl">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.impl.AbsoluteCANCoder" class="md-nav__link">
+    <span class="md-ellipsis">
+      AbsoluteCANCoder
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.impl.AbsoluteDutyCycleEncoder" class="md-nav__link">
+    <span class="md-ellipsis">
+      AbsoluteDutyCycleEncoder
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.impl.CoaxialSwerveModule" class="md-nav__link">
+    <span class="md-ellipsis">
+      CoaxialSwerveModule
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.impl.DummyCoaxialComponent" class="md-nav__link">
+    <span class="md-ellipsis">
+      DummyCoaxialComponent
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.impl.DummyGyro" class="md-nav__link">
+    <span class="md-ellipsis">
+      DummyGyro
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.impl.Falcon500CoaxialAzimuthComponent" class="md-nav__link">
+    <span class="md-ellipsis">
+      Falcon500CoaxialAzimuthComponent
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.impl.Falcon500CoaxialDriveComponent" class="md-nav__link">
+    <span class="md-ellipsis">
+      Falcon500CoaxialDriveComponent
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.impl.NEOCoaxialAzimuthComponent" class="md-nav__link">
+    <span class="md-ellipsis">
+      NEOCoaxialAzimuthComponent
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.impl.NEOCoaxialDriveComponent" class="md-nav__link">
+    <span class="md-ellipsis">
+      NEOCoaxialDriveComponent
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.impl.PigeonGyro" class="md-nav__link">
+    <span class="md-ellipsis">
+      PigeonGyro
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.impl.SparkMaxAbsoluteEncoder" class="md-nav__link">
+    <span class="md-ellipsis">
+      SparkMaxAbsoluteEncoder
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.impl.SparkMaxEncoderType" class="md-nav__link">
+    <span class="md-ellipsis">
+      SparkMaxEncoderType
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="SparkMaxEncoderType">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.impl.SparkMaxEncoderType.ANALOG" class="md-nav__link">
+    <span class="md-ellipsis">
+      ANALOG
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.impl.SparkMaxEncoderType.PWM" class="md-nav__link">
+    <span class="md-ellipsis">
+      PWM
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#swervepy.subsystem.SwerveDrive" class="md-nav__link">
+    <span class="md-ellipsis">
+      SwerveDrive
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="SwerveDrive">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.subsystem.SwerveDrive.heading" class="md-nav__link">
+    <span class="md-ellipsis">
+      heading
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.subsystem.SwerveDrive.module_positions" class="md-nav__link">
+    <span class="md-ellipsis">
+      module_positions
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.subsystem.SwerveDrive.pose" class="md-nav__link">
+    <span class="md-ellipsis">
+      pose
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.subsystem.SwerveDrive.robot_relative_speeds" class="md-nav__link">
+    <span class="md-ellipsis">
+      robot_relative_speeds
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.subsystem.SwerveDrive._" class="md-nav__link">
+    <span class="md-ellipsis">
+      _()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.subsystem.SwerveDrive.desire_module_states" class="md-nav__link">
+    <span class="md-ellipsis">
+      desire_module_states()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.subsystem.SwerveDrive.drive" class="md-nav__link">
+    <span class="md-ellipsis">
+      drive()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.subsystem.SwerveDrive.follow_trajectory_command" class="md-nav__link">
+    <span class="md-ellipsis">
+      follow_trajectory_command()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.subsystem.SwerveDrive.reset_odometry" class="md-nav__link">
+    <span class="md-ellipsis">
+      reset_odometry()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.subsystem.SwerveDrive.teleop_command" class="md-nav__link">
+    <span class="md-ellipsis">
+      teleop_command()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.subsystem.SwerveDrive.zero_heading" class="md-nav__link">
+    <span class="md-ellipsis">
+      zero_heading()
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#swervepy.abstract" class="md-nav__link">
+    <span class="md-ellipsis">
+      abstract
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="abstract">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.AbsoluteEncoder" class="md-nav__link">
+    <span class="md-ellipsis">
+      AbsoluteEncoder
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="AbsoluteEncoder">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.AbsoluteEncoder.absolute_position" class="md-nav__link">
+    <span class="md-ellipsis">
+      absolute_position
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.CoaxialAzimuthComponent" class="md-nav__link">
+    <span class="md-ellipsis">
+      CoaxialAzimuthComponent
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="CoaxialAzimuthComponent">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.CoaxialAzimuthComponent.angle" class="md-nav__link">
+    <span class="md-ellipsis">
+      angle
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.CoaxialAzimuthComponent.rotational_velocity" class="md-nav__link">
+    <span class="md-ellipsis">
+      rotational_velocity
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.CoaxialAzimuthComponent.follow_angle" class="md-nav__link">
+    <span class="md-ellipsis">
+      follow_angle()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.CoaxialAzimuthComponent.reset" class="md-nav__link">
+    <span class="md-ellipsis">
+      reset()
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.CoaxialDriveComponent" class="md-nav__link">
+    <span class="md-ellipsis">
+      CoaxialDriveComponent
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="CoaxialDriveComponent">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.CoaxialDriveComponent.distance" class="md-nav__link">
+    <span class="md-ellipsis">
+      distance
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.CoaxialDriveComponent.velocity" class="md-nav__link">
+    <span class="md-ellipsis">
+      velocity
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.CoaxialDriveComponent.follow_velocity_closed" class="md-nav__link">
+    <span class="md-ellipsis">
+      follow_velocity_closed()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.CoaxialDriveComponent.follow_velocity_open" class="md-nav__link">
+    <span class="md-ellipsis">
+      follow_velocity_open()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.CoaxialDriveComponent.reset" class="md-nav__link">
+    <span class="md-ellipsis">
+      reset()
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.Gyro" class="md-nav__link">
+    <span class="md-ellipsis">
+      Gyro
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Gyro">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.Gyro.heading" class="md-nav__link">
+    <span class="md-ellipsis">
+      heading
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.Gyro.zero_heading" class="md-nav__link">
+    <span class="md-ellipsis">
+      zero_heading()
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.SwerveModule" class="md-nav__link">
+    <span class="md-ellipsis">
+      SwerveModule
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="SwerveModule">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.SwerveModule.azimuth_angle" class="md-nav__link">
+    <span class="md-ellipsis">
+      azimuth_angle
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.SwerveModule.azimuth_velocity" class="md-nav__link">
+    <span class="md-ellipsis">
+      azimuth_velocity
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.SwerveModule.drive_distance" class="md-nav__link">
+    <span class="md-ellipsis">
+      drive_distance
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.SwerveModule.drive_velocity" class="md-nav__link">
+    <span class="md-ellipsis">
+      drive_velocity
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.SwerveModule.module_position" class="md-nav__link">
+    <span class="md-ellipsis">
+      module_position
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.SwerveModule.module_state" class="md-nav__link">
+    <span class="md-ellipsis">
+      module_state
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.SwerveModule.desire_azimuth_angle" class="md-nav__link">
+    <span class="md-ellipsis">
+      desire_azimuth_angle()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.SwerveModule.desire_drive_velocity" class="md-nav__link">
+    <span class="md-ellipsis">
+      desire_drive_velocity()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.SwerveModule.desire_state" class="md-nav__link">
+    <span class="md-ellipsis">
+      desire_state()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.abstract.SwerveModule.reset" class="md-nav__link">
+    <span class="md-ellipsis">
+      reset()
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#swervepy.impl" class="md-nav__link">
+    <span class="md-ellipsis">
+      impl
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="impl">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.impl.AbsoluteCANCoder" class="md-nav__link">
+    <span class="md-ellipsis">
+      AbsoluteCANCoder
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.impl.AbsoluteDutyCycleEncoder" class="md-nav__link">
+    <span class="md-ellipsis">
+      AbsoluteDutyCycleEncoder
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.impl.CoaxialSwerveModule" class="md-nav__link">
+    <span class="md-ellipsis">
+      CoaxialSwerveModule
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.impl.DummyCoaxialComponent" class="md-nav__link">
+    <span class="md-ellipsis">
+      DummyCoaxialComponent
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.impl.DummyGyro" class="md-nav__link">
+    <span class="md-ellipsis">
+      DummyGyro
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.impl.Falcon500CoaxialAzimuthComponent" class="md-nav__link">
+    <span class="md-ellipsis">
+      Falcon500CoaxialAzimuthComponent
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.impl.Falcon500CoaxialDriveComponent" class="md-nav__link">
+    <span class="md-ellipsis">
+      Falcon500CoaxialDriveComponent
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.impl.NEOCoaxialAzimuthComponent" class="md-nav__link">
+    <span class="md-ellipsis">
+      NEOCoaxialAzimuthComponent
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.impl.NEOCoaxialDriveComponent" class="md-nav__link">
+    <span class="md-ellipsis">
+      NEOCoaxialDriveComponent
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.impl.PigeonGyro" class="md-nav__link">
+    <span class="md-ellipsis">
+      PigeonGyro
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.impl.SparkMaxAbsoluteEncoder" class="md-nav__link">
+    <span class="md-ellipsis">
+      SparkMaxAbsoluteEncoder
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.impl.SparkMaxEncoderType" class="md-nav__link">
+    <span class="md-ellipsis">
+      SparkMaxEncoderType
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="SparkMaxEncoderType">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.impl.SparkMaxEncoderType.ANALOG" class="md-nav__link">
+    <span class="md-ellipsis">
+      ANALOG
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swervepy.impl.SparkMaxEncoderType.PWM" class="md-nav__link">
+    <span class="md-ellipsis">
+      PWM
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="api-reference">API Reference</h1>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+
+<h2 id="swervepy.subsystem.SwerveDrive" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">swervepy</span><span class="o">.</span><span class="n">subsystem</span><span class="o">.</span><span class="n">SwerveDrive</span><span class="p">(</span><span class="n">modules</span><span class="p">,</span> <span class="n">gyro</span><span class="p">,</span> <span class="n">max_velocity</span><span class="p">,</span> <span class="n">max_angular_velocity</span><span class="p">,</span> <span class="n">vision_pose_callback</span><span class="o">=</span><span class="k">lambda</span> <span class="p">:</span> <span class="kc">None</span><span class="p">)</span></code>
+
+</h2>
+
+
+  <div class="doc doc-contents first">
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="commands2.Subsystem">Subsystem</span></code></p>
+
+  
+      <p>A Subsystem representing the serve drivetrain.</p>
+<p>Use the drive() method to drive the swerve base at a set of desired velocities. The method handles
+moving the individual swerve modules, so the user only needs to consider the movement of the chassis itself.</p>
+<p>Field relative control is an option available for controlling movement. Field relative uses a gyro sensor
+to lock the robot's translational movement to the field's x- and y-axis. Practically, when a driver pushes "forward"
+on the stick, the robot will always move forward relative to the field rather than relative to the chassis heading.</p>
+  
+      <p>Construct a swerve drivetrain as a Subsystem.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>modules</code></td>
+          <td>
+                <code>tuple[<a class="autorefs autorefs-internal" title="swervepy.abstract.SwerveModule" href="#swervepy.abstract.SwerveModule">SwerveModule</a>, ...]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>List of swerve modules</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>gyro</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="swervepy.abstract.Gyro" href="#swervepy.abstract.Gyro">Gyro</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>A gyro sensor that provides a CCW+ heading reading of the chassis</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>max_velocity</code></td>
+          <td>
+                <code><a class="autorefs autorefs-external" title="pint.Quantity" href="https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity">Quantity</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The actual maximum velocity of the robot</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>max_angular_velocity</code></td>
+          <td>
+                <code><a class="autorefs autorefs-external" title="pint.Quantity" href="https://pint.readthedocs.io/en/stable/api/base.html#pint.Quantity">Quantity</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The actual maximum angular (turning) velocity of the robot</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>vision_pose_callback</code></td>
+          <td>
+                <code><span title="typing.Callable">Callable</span>[[<a class="autorefs autorefs-external" title="wpimath.geometry.Pose2d" href="https://robotpy.readthedocs.io/projects/wpimath/en/latest/wpimath.geometry/Pose2d.html#wpimath.geometry.Pose2d">Pose2d</a>], <span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-external" title="wpimath.geometry.Pose2d" href="https://robotpy.readthedocs.io/projects/wpimath/en/latest/wpimath.geometry/Pose2d.html#wpimath.geometry.Pose2d">Pose2d</a>]]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>An optional method that returns the robot's pose derived from vision and takes the robot's current pose as its sole argument. This pose from this method is integrated into the robot's odometry.</p>
+            </div>
+          </td>
+          <td>
+                <code>lambda : None</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+                <details class="quote">
+                  <summary>Source code in <code>swervepy\subsystem.py</code></summary>
+                  <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span>
+<span class="normal">75</span>
+<span class="normal">76</span>
+<span class="normal">77</span>
+<span class="normal">78</span>
+<span class="normal">79</span>
+<span class="normal">80</span>
+<span class="normal">81</span>
+<span class="normal">82</span>
+<span class="normal">83</span>
+<span class="normal">84</span>
+<span class="normal">85</span>
+<span class="normal">86</span>
+<span class="normal">87</span>
+<span class="normal">88</span>
+<span class="normal">89</span>
+<span class="normal">90</span>
+<span class="normal">91</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">modules</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">SwerveModule</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
+    <span class="n">gyro</span><span class="p">:</span> <span class="n">Gyro</span><span class="p">,</span>
+    <span class="n">max_velocity</span><span class="p">:</span> <span class="n">Quantity</span><span class="p">,</span>
+    <span class="n">max_angular_velocity</span><span class="p">:</span> <span class="n">Quantity</span><span class="p">,</span>
+    <span class="n">vision_pose_callback</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Pose2d</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Pose2d</span><span class="p">]]</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">_</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Construct a swerve drivetrain as a Subsystem.</span>
+
+<span class="sd">    :param modules: List of swerve modules</span>
+<span class="sd">    :param gyro: A gyro sensor that provides a CCW+ heading reading of the chassis</span>
+<span class="sd">    :param max_velocity: The actual maximum velocity of the robot</span>
+<span class="sd">    :param max_angular_velocity: The actual maximum angular (turning) velocity of the robot</span>
+<span class="sd">    :param vision_pose_callback: An optional method that returns the robot&#39;s pose derived from vision and takes the</span>
+<span class="sd">    robot&#39;s current pose as its sole argument. This pose from this method is integrated into the robot&#39;s odometry.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">_modules</span> <span class="o">=</span> <span class="n">modules</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_gyro</span> <span class="o">=</span> <span class="n">gyro</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_vision_pose_callback</span> <span class="o">=</span> <span class="n">vision_pose_callback</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">max_velocity</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">max_velocity</span><span class="o">.</span><span class="n">m_as</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">m</span> <span class="o">/</span> <span class="n">u</span><span class="o">.</span><span class="n">s</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">max_angular_velocity</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">max_angular_velocity</span><span class="o">.</span><span class="n">m_as</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">rad</span> <span class="o">/</span> <span class="n">u</span><span class="o">.</span><span class="n">s</span><span class="p">)</span>
+
+    <span class="c1"># Pause init for a second before setting module offsets to avoid a bug related to inverting motors.</span>
+    <span class="c1"># Fixes https://github.com/Team364/BaseFalconSwerve/issues/8.</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">reset_modules</span><span class="p">()</span>
+
+    <span class="c1"># Zero heading at startup to set &quot;forward&quot; direction</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">zero_heading</span><span class="p">()</span>
+
+    <span class="c1"># There are different classes for each number of swerve modules in a drive base,</span>
+    <span class="c1"># so construct the class name from number of modules.</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_kinematics</span><span class="p">:</span> <span class="s2">&quot;SwerveDrive4Kinematics&quot;</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span>
+        <span class="n">wpimath</span><span class="o">.</span><span class="n">kinematics</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;SwerveDrive</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">modules</span><span class="p">)</span><span class="si">}</span><span class="s2">Kinematics&quot;</span>
+    <span class="p">)(</span><span class="o">*</span><span class="p">[</span><span class="n">module</span><span class="o">.</span><span class="n">placement</span> <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_modules</span><span class="p">])</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_odometry</span><span class="p">:</span> <span class="s2">&quot;SwerveDrive4PoseEstimator&quot;</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span>
+        <span class="n">wpimath</span><span class="o">.</span><span class="n">estimator</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;SwerveDrive</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">modules</span><span class="p">)</span><span class="si">}</span><span class="s2">PoseEstimator&quot;</span>
+    <span class="p">)(</span><span class="bp">self</span><span class="o">.</span><span class="n">_kinematics</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gyro</span><span class="o">.</span><span class="n">heading</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">module_positions</span><span class="p">,</span> <span class="n">Pose2d</span><span class="p">())</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">module</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">modules</span><span class="p">):</span>
+        <span class="n">wpilib</span><span class="o">.</span><span class="n">SmartDashboard</span><span class="o">.</span><span class="n">putData</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Module </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">module</span><span class="p">)</span>
+
+    <span class="c1"># Field to plot auto trajectories and robot pose</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="n">wpilib</span><span class="o">.</span><span class="n">Field2d</span><span class="p">()</span>
+    <span class="n">wpilib</span><span class="o">.</span><span class="n">SmartDashboard</span><span class="o">.</span><span class="n">putData</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">field</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+                </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+
+<h3 id="swervepy.subsystem.SwerveDrive.heading" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">heading</span><span class="p">:</span> <span class="n">Rotation2d</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>The robot's facing direction</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+
+<h3 id="swervepy.subsystem.SwerveDrive.module_positions" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">module_positions</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">SwerveModulePosition</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>A tuple of the swerve modules' positions (driven distance and facing rotation)</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+
+<h3 id="swervepy.subsystem.SwerveDrive.pose" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">pose</span><span class="p">:</span> <span class="n">Pose2d</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>The robot's pose on the field (position and heading)</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+
+<h3 id="swervepy.subsystem.SwerveDrive.robot_relative_speeds" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">robot_relative_speeds</span><span class="p">:</span> <span class="n">ChassisSpeeds</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>The robot's translational and rotational speeds</p>
+  </div>
+
+</div>
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h3 id="swervepy.subsystem.SwerveDrive._" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">_</span><span class="p">(</span><span class="n">chassis_speeds</span><span class="p">,</span> <span class="n">drive_open_loop</span><span class="p">)</span></code>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Alternative method to drive the robot at a set of chassis speeds (exclusively robot-relative)</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>chassis_speeds</code></td>
+          <td>
+                <code><a class="autorefs autorefs-external" title="wpimath.kinematics.ChassisSpeeds" href="https://robotpy.readthedocs.io/projects/wpimath/en/latest/wpimath.kinematics/ChassisSpeeds.html#wpimath.kinematics.ChassisSpeeds">ChassisSpeeds</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Robot-relative speeds on the XY-plane in m/s where +X is forward and +Y is left</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>drive_open_loop</code></td>
+          <td>
+                <code>bool</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Use open loop (True) or closed loop (False) velocity control for driving the wheel</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+          <details class="quote">
+            <summary>Source code in <code>swervepy\subsystem.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@drive</span><span class="o">.</span><span class="n">register</span>
+<span class="k">def</span> <span class="nf">_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chassis_speeds</span><span class="p">:</span> <span class="n">ChassisSpeeds</span><span class="p">,</span> <span class="n">drive_open_loop</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Alternative method to drive the robot at a set of chassis speeds (exclusively robot-relative)</span>
+
+<span class="sd">    :param chassis_speeds: Robot-relative speeds on the XY-plane in m/s where +X is forward and +Y is left</span>
+<span class="sd">    :param drive_open_loop: Use open loop (True) or closed loop (False) velocity control for driving the wheel</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">translation</span> <span class="o">=</span> <span class="n">Translation2d</span><span class="p">(</span><span class="n">chassis_speeds</span><span class="o">.</span><span class="n">vx</span><span class="p">,</span> <span class="n">chassis_speeds</span><span class="o">.</span><span class="n">vy</span><span class="p">)</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">drive</span><span class="p">(</span><span class="n">translation</span><span class="p">,</span> <span class="n">chassis_speeds</span><span class="o">.</span><span class="n">omega</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">drive_open_loop</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h3 id="swervepy.subsystem.SwerveDrive.desire_module_states" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">desire_module_states</span><span class="p">(</span><span class="n">states</span><span class="p">,</span> <span class="n">drive_open_loop</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">rotate_in_place</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Command each individual module to a state (consisting of velocity and rotation)</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>states</code></td>
+          <td>
+                <code>tuple[<a class="autorefs autorefs-external" title="wpimath.kinematics.SwerveModuleState" href="https://robotpy.readthedocs.io/projects/wpimath/en/latest/wpimath.kinematics/SwerveModuleState.html#wpimath.kinematics.SwerveModuleState">SwerveModuleState</a>, ...]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>List of module states in the order of the swerve module list SwerveDrive was created with</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>drive_open_loop</code></td>
+          <td>
+                <code>bool</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Use open loop (True) or closed loop (False) velocity control for driving the wheel</p>
+            </div>
+          </td>
+          <td>
+                <code>False</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>rotate_in_place</code></td>
+          <td>
+                <code>bool</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Should the modules rotate while not driving</p>
+            </div>
+          </td>
+          <td>
+                <code>True</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+          <details class="quote">
+            <summary>Source code in <code>swervepy\subsystem.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">desire_module_states</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">states</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">SwerveModuleState</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
+    <span class="n">drive_open_loop</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">rotate_in_place</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Command each individual module to a state (consisting of velocity and rotation)</span>
+
+<span class="sd">    :param states: List of module states in the order of the swerve module list SwerveDrive was created with</span>
+<span class="sd">    :param drive_open_loop: Use open loop (True) or closed loop (False) velocity control for driving the wheel</span>
+<span class="sd">    :param rotate_in_place: Should the modules rotate while not driving</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">swerve_module_states</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kinematics</span><span class="o">.</span><span class="n">desaturateWheelSpeeds</span><span class="p">(</span><span class="n">states</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_velocity</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_modules</span><span class="p">)):</span>
+        <span class="n">module</span><span class="p">:</span> <span class="n">SwerveModule</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_modules</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">module</span><span class="o">.</span><span class="n">desire_state</span><span class="p">(</span><span class="n">swerve_module_states</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">drive_open_loop</span><span class="p">,</span> <span class="n">rotate_in_place</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h3 id="swervepy.subsystem.SwerveDrive.drive" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">drive</span><span class="p">(</span><span class="n">translation</span><span class="p">,</span> <span class="n">rotation</span><span class="p">,</span> <span class="n">field_relative</span><span class="p">,</span> <span class="n">drive_open_loop</span><span class="p">)</span></code>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Drive the robot at the provided speeds (translation and rotation)</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>translation</code></td>
+          <td>
+                <code><a class="autorefs autorefs-external" title="wpimath.geometry.Translation2d" href="https://robotpy.readthedocs.io/projects/wpimath/en/latest/wpimath.geometry/Translation2d.html#wpimath.geometry.Translation2d">Translation2d</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Translation speed on the XY-plane in m/s where +X is forward and +Y is left</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>rotation</code></td>
+          <td>
+                <code>float</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Rotation speed around the Z-axis in rad/s where CCW+</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>field_relative</code></td>
+          <td>
+                <code>bool</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>If True, gyroscopic zero is used as the forward direction. Else, forward faces the front of the robot.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>drive_open_loop</code></td>
+          <td>
+                <code>bool</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Use open loop (True) or closed loop (False) velocity control for driving the wheel</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+          <details class="quote">
+            <summary>Source code in <code>swervepy\subsystem.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@singledispatchmethod</span>
+<span class="k">def</span> <span class="nf">drive</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">translation</span><span class="p">:</span> <span class="n">Translation2d</span><span class="p">,</span>
+    <span class="n">rotation</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">field_relative</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">drive_open_loop</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Drive the robot at the provided speeds (translation and rotation)</span>
+
+<span class="sd">    :param translation: Translation speed on the XY-plane in m/s where +X is forward and +Y is left</span>
+<span class="sd">    :param rotation: Rotation speed around the Z-axis in rad/s where CCW+</span>
+<span class="sd">    :param field_relative: If True, gyroscopic zero is used as the forward direction.</span>
+<span class="sd">    Else, forward faces the front of the robot.</span>
+<span class="sd">    :param drive_open_loop: Use open loop (True) or closed loop (False) velocity control for driving the wheel</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">speeds</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">ChassisSpeeds</span><span class="o">.</span><span class="n">fromFieldRelativeSpeeds</span><span class="p">(</span><span class="n">translation</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">translation</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">rotation</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gyro</span><span class="o">.</span><span class="n">heading</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">field_relative</span>
+        <span class="k">else</span> <span class="n">ChassisSpeeds</span><span class="p">(</span><span class="n">translation</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">translation</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">rotation</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">swerve_module_states</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kinematics</span><span class="o">.</span><span class="n">toSwerveModuleStates</span><span class="p">(</span><span class="n">speeds</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">desire_module_states</span><span class="p">(</span><span class="n">swerve_module_states</span><span class="p">,</span> <span class="n">drive_open_loop</span><span class="p">,</span> <span class="n">rotate_in_place</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h3 id="swervepy.subsystem.SwerveDrive.follow_trajectory_command" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">follow_trajectory_command</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">first_path</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">drive_open_loop</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Construct a command that follows a trajectory</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>path</code></td>
+          <td>
+                <code><span title="pathplannerlib.path.PathPlannerPath">PathPlannerPath</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The path to follow</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>parameters</code></td>
+          <td>
+                <code><span title="swervepy.subsystem.TrajectoryFollowerParameters">TrajectoryFollowerParameters</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Options that determine how the robot will follow the trajectory</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>first_path</code></td>
+          <td>
+                <code>bool</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>If True, the robot's pose will be reset to the trajectory's initial pose</p>
+            </div>
+          </td>
+          <td>
+                <code>False</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>drive_open_loop</code></td>
+          <td>
+                <code>bool</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Use open loop control (True) or closed loop (False) to swerve module speeds. Closed-loop positional control will always be used for trajectory following</p>
+            </div>
+          </td>
+          <td>
+                <code>False</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code><span title="commands2.Command">Command</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Trajectory-follower command</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+          <details class="quote">
+            <summary>Source code in <code>swervepy\subsystem.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span>
+<span class="normal">268</span>
+<span class="normal">269</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">follow_trajectory_command</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">path</span><span class="p">:</span> <span class="n">PathPlannerPath</span><span class="p">,</span>
+    <span class="n">parameters</span><span class="p">:</span> <span class="s2">&quot;TrajectoryFollowerParameters&quot;</span><span class="p">,</span>
+    <span class="n">first_path</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">drive_open_loop</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">commands2</span><span class="o">.</span><span class="n">Command</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Construct a command that follows a trajectory</span>
+
+<span class="sd">    :param path: The path to follow</span>
+<span class="sd">    :param parameters: Options that determine how the robot will follow the trajectory</span>
+<span class="sd">    :param first_path: If True, the robot&#39;s pose will be reset to the trajectory&#39;s initial pose</span>
+<span class="sd">    :param drive_open_loop: Use open loop control (True) or closed loop (False) to swerve module speeds. Closed-loop</span>
+<span class="sd">    positional control will always be used for trajectory following</span>
+<span class="sd">    :return: Trajectory-follower command</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># TODO: Re-impl trajectory visualisation on Field2d</span>
+
+    <span class="c1"># Find the drive base radius (the distance from the center of the robot to the furthest module)</span>
+    <span class="n">radius</span> <span class="o">=</span> <span class="n">greatest_distance_from_translations</span><span class="p">([</span><span class="n">module</span><span class="o">.</span><span class="n">placement</span> <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_modules</span><span class="p">])</span>
+
+    <span class="c1"># Position feedback controller for following waypoints</span>
+    <span class="n">controller</span> <span class="o">=</span> <span class="n">PPHolonomicDriveController</span><span class="p">(</span>
+        <span class="n">PIDConstants</span><span class="p">(</span><span class="n">parameters</span><span class="o">.</span><span class="n">xy_kP</span><span class="p">),</span>
+        <span class="n">PIDConstants</span><span class="p">(</span><span class="n">parameters</span><span class="o">.</span><span class="n">theta_kP</span><span class="p">),</span>
+        <span class="n">parameters</span><span class="o">.</span><span class="n">max_drive_velocity</span><span class="o">.</span><span class="n">m_as</span><span class="p">(</span><span class="n">u</span><span class="o">.</span><span class="n">m</span> <span class="o">/</span> <span class="n">u</span><span class="o">.</span><span class="n">s</span><span class="p">),</span>
+        <span class="n">radius</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Trajectory follower command</span>
+    <span class="n">command</span> <span class="o">=</span> <span class="n">FollowPathWithEvents</span><span class="p">(</span>
+        <span class="n">FollowPathCommand</span><span class="p">(</span>
+            <span class="n">path</span><span class="p">,</span>
+            <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">pose</span><span class="p">,</span>
+            <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">robot_relative_speeds</span><span class="p">,</span>
+            <span class="k">lambda</span> <span class="n">speeds</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">drive</span><span class="p">(</span><span class="n">speeds</span><span class="p">,</span> <span class="n">drive_open_loop</span><span class="o">=</span><span class="n">drive_open_loop</span><span class="p">),</span>
+            <span class="n">controller</span><span class="p">,</span>
+            <span class="n">ReplanningConfig</span><span class="p">(),</span>
+            <span class="bp">self</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="n">path</span><span class="p">,</span>
+        <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">pose</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># If this is the first path in a sequence, reset the robot&#39;s pose so that it aligns with the start of the path</span>
+    <span class="k">if</span> <span class="n">first_path</span><span class="p">:</span>
+        <span class="n">initial_pose</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">getPreviewStartingHolonomicPose</span><span class="p">()</span>
+        <span class="n">command</span> <span class="o">=</span> <span class="n">command</span><span class="o">.</span><span class="n">beforeStarting</span><span class="p">(</span><span class="n">commands2</span><span class="o">.</span><span class="n">InstantCommand</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">reset_odometry</span><span class="p">(</span><span class="n">initial_pose</span><span class="p">)))</span>
+
+    <span class="k">return</span> <span class="n">command</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h3 id="swervepy.subsystem.SwerveDrive.reset_odometry" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">reset_odometry</span><span class="p">(</span><span class="n">pose</span><span class="p">)</span></code>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Reset the drive base's pose to a new one</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>pose</code></td>
+          <td>
+                <code><a class="autorefs autorefs-external" title="wpimath.geometry.Pose2d" href="https://robotpy.readthedocs.io/projects/wpimath/en/latest/wpimath.geometry/Pose2d.html#wpimath.geometry.Pose2d">Pose2d</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The new pose</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+          <details class="quote">
+            <summary>Source code in <code>swervepy\subsystem.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">reset_odometry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pose</span><span class="p">:</span> <span class="n">Pose2d</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reset the drive base&#39;s pose to a new one</span>
+
+<span class="sd">    :param pose: The new pose</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">_odometry</span><span class="o">.</span><span class="n">resetPosition</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_gyro</span><span class="o">.</span><span class="n">heading</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">module_positions</span><span class="p">,</span> <span class="n">pose</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h3 id="swervepy.subsystem.SwerveDrive.teleop_command" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">teleop_command</span><span class="p">(</span><span class="n">translation</span><span class="p">,</span> <span class="n">strafe</span><span class="p">,</span> <span class="n">rotation</span><span class="p">,</span> <span class="n">field_relative</span><span class="p">,</span> <span class="n">drive_open_loop</span><span class="p">)</span></code>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Construct a command that drives the robot using joystick (or other) inputs</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>translation</code></td>
+          <td>
+                <code><span title="typing.Callable">Callable</span>[[], float]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>A method that returns the desired +X (forward/backward) velocity in m/s</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>strafe</code></td>
+          <td>
+                <code><span title="typing.Callable">Callable</span>[[], float]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>A method that returns the desired +Y (left/right) velocity in m/s</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>rotation</code></td>
+          <td>
+                <code><span title="typing.Callable">Callable</span>[[], float]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>A method that returns the desired CCW+ rotational velocity in rad/s</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>field_relative</code></td>
+          <td>
+                <code>bool</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>If True, gyroscopic zero is used as the forward direction. Else, forward faces the front of the robot.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>drive_open_loop</code></td>
+          <td>
+                <code>bool</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Use open loop (True) or closed loop (False) velocity control for driving the wheel</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code><span title="commands2.Command">Command</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The command</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+          <details class="quote">
+            <summary>Source code in <code>swervepy\subsystem.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">teleop_command</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">translation</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="nb">float</span><span class="p">],</span>
+    <span class="n">strafe</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="nb">float</span><span class="p">],</span>
+    <span class="n">rotation</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="nb">float</span><span class="p">],</span>
+    <span class="n">field_relative</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">drive_open_loop</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">commands2</span><span class="o">.</span><span class="n">Command</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Construct a command that drives the robot using joystick (or other) inputs</span>
+
+<span class="sd">    :param translation: A method that returns the desired +X (forward/backward) velocity in m/s</span>
+<span class="sd">    :param strafe: A method that returns the desired +Y (left/right) velocity in m/s</span>
+<span class="sd">    :param rotation: A method that returns the desired CCW+ rotational velocity in rad/s</span>
+<span class="sd">    :param field_relative: If True, gyroscopic zero is used as the forward direction.</span>
+<span class="sd">    Else, forward faces the front of the robot.</span>
+<span class="sd">    :param drive_open_loop: Use open loop (True) or closed loop (False) velocity control for driving the wheel</span>
+<span class="sd">    :return: The command</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_TeleOpCommand</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">translation</span><span class="p">,</span> <span class="n">strafe</span><span class="p">,</span> <span class="n">rotation</span><span class="p">,</span> <span class="n">field_relative</span><span class="p">,</span> <span class="n">drive_open_loop</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h3 id="swervepy.subsystem.SwerveDrive.zero_heading" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">zero_heading</span><span class="p">()</span></code>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Set the chassis' current heading as "zero" or straight forward</p>
+
+          <details class="quote">
+            <summary>Source code in <code>swervepy\subsystem.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">zero_heading</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the chassis&#39; current heading as &quot;zero&quot; or straight forward&quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_gyro</span><span class="o">.</span><span class="n">zero_heading</span><span class="p">()</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-module">
+
+
+
+
+<h2 id="swervepy.abstract" class="doc doc-heading">
+          <code>swervepy.abstract</code>
+
+
+</h2>
+
+  <div class="doc doc-contents first">
+  
+      <p>Contains interfaces for components used in a swerve drive base. These are sensors, motors, and the swerve module itself.
+Implementations can be found in the impl module, or the user may define their own.</p>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+
+<h3 id="swervepy.abstract.AbsoluteEncoder" class="doc doc-heading">
+          <code>AbsoluteEncoder</code>
+
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="wpiutil.Sendable">Sendable</span></code></p>
+
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+
+<h4 id="swervepy.abstract.AbsoluteEncoder.absolute_position" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">absolute_position</span><span class="p">:</span> <span class="n">Rotation2d</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Absolute rotation</p>
+  </div>
+
+</div>
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+
+<h3 id="swervepy.abstract.CoaxialAzimuthComponent" class="doc doc-heading">
+          <code>CoaxialAzimuthComponent</code>
+
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="typing.Protocol">Protocol</span></code></p>
+
+  
+      <p>The component of a swerve module that turns the wheel. This component also initializes the wheel to its absolute
+position (usually via an absolute encoder).</p>
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+
+<h4 id="swervepy.abstract.CoaxialAzimuthComponent.angle" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">angle</span><span class="p">:</span> <span class="n">Rotation2d</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>The wheel angle</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+
+<h4 id="swervepy.abstract.CoaxialAzimuthComponent.rotational_velocity" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">rotational_velocity</span><span class="p">:</span> <span class="nb">float</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Rotational velocity in rad/s</p>
+  </div>
+
+</div>
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h4 id="swervepy.abstract.CoaxialAzimuthComponent.follow_angle" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">follow_angle</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Move the wheel to an angle</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>angle</code></td>
+          <td>
+                <code><a class="autorefs autorefs-external" title="wpimath.geometry.Rotation2d" href="https://robotpy.readthedocs.io/projects/wpimath/en/latest/wpimath.geometry/Rotation2d.html#wpimath.geometry.Rotation2d">Rotation2d</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The desired wheel angle</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+          <details class="quote">
+            <summary>Source code in <code>swervepy\abstract\motor.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@abstractmethod</span>
+<span class="k">def</span> <span class="nf">follow_angle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">angle</span><span class="p">:</span> <span class="n">Rotation2d</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Move the wheel to an angle</span>
+
+<span class="sd">    :param angle: The desired wheel angle</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h4 id="swervepy.abstract.CoaxialAzimuthComponent.reset" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">reset</span><span class="p">()</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Reset the wheel's angle to its absolute position</p>
+
+          <details class="quote">
+            <summary>Source code in <code>swervepy\abstract\motor.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@abstractmethod</span>
+<span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Reset the wheel&#39;s angle to its absolute position&quot;&quot;&quot;</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+
+<h3 id="swervepy.abstract.CoaxialDriveComponent" class="doc doc-heading">
+          <code>CoaxialDriveComponent</code>
+
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="typing.Protocol">Protocol</span></code></p>
+
+  
+      <p>The component of a swerve module that drives the wheel (forward and backward)</p>
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+
+<h4 id="swervepy.abstract.CoaxialDriveComponent.distance" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">distance</span><span class="p">:</span> <span class="nb">float</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Driven distance in metres</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+
+<h4 id="swervepy.abstract.CoaxialDriveComponent.velocity" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">velocity</span><span class="p">:</span> <span class="nb">float</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Drive velocity in m/s</p>
+  </div>
+
+</div>
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h4 id="swervepy.abstract.CoaxialDriveComponent.follow_velocity_closed" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">follow_velocity_closed</span><span class="p">(</span><span class="n">velocity</span><span class="p">)</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Follow a velocity using closed loop control (i.e., PID)</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>velocity</code></td>
+          <td>
+                <code>float</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Desired velocity in m/s</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+          <details class="quote">
+            <summary>Source code in <code>swervepy\abstract\motor.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@abstractmethod</span>
+<span class="k">def</span> <span class="nf">follow_velocity_closed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">velocity</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Follow a velocity using closed loop control (i.e., PID)</span>
+
+<span class="sd">    :param velocity: Desired velocity in m/s</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h4 id="swervepy.abstract.CoaxialDriveComponent.follow_velocity_open" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">follow_velocity_open</span><span class="p">(</span><span class="n">velocity</span><span class="p">)</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Follow a velocity using open loop control</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>velocity</code></td>
+          <td>
+                <code>float</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Desired velocity in m/s</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+          <details class="quote">
+            <summary>Source code in <code>swervepy\abstract\motor.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@abstractmethod</span>
+<span class="k">def</span> <span class="nf">follow_velocity_open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">velocity</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Follow a velocity using open loop control</span>
+
+<span class="sd">    :param velocity: Desired velocity in m/s</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h4 id="swervepy.abstract.CoaxialDriveComponent.reset" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">reset</span><span class="p">()</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Reset driven distance to zero or otherwise reinitialize the motor</p>
+
+          <details class="quote">
+            <summary>Source code in <code>swervepy\abstract\motor.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@abstractmethod</span>
+<span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Reset driven distance to zero or otherwise reinitialize the motor&quot;&quot;&quot;</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+
+<h3 id="swervepy.abstract.Gyro" class="doc doc-heading">
+          <code>Gyro</code>
+
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="wpiutil.Sendable">Sendable</span></code></p>
+
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+
+<h4 id="swervepy.abstract.Gyro.heading" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">heading</span><span class="p">:</span> <span class="n">Rotation2d</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>CCW+ chassis yaw angle</p>
+  </div>
+
+</div>
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h4 id="swervepy.abstract.Gyro.zero_heading" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">zero_heading</span><span class="p">()</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Set the gyro sensor's current heading as zero</p>
+
+          <details class="quote">
+            <summary>Source code in <code>swervepy\abstract\sensor.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@abstractmethod</span>
+<span class="k">def</span> <span class="nf">zero_heading</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the gyro sensor&#39;s current heading as zero&quot;&quot;&quot;</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+
+<h3 id="swervepy.abstract.SwerveModule" class="doc doc-heading">
+          <code>SwerveModule</code>
+
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="wpiutil.Sendable">Sendable</span></code></p>
+
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+
+<h4 id="swervepy.abstract.SwerveModule.azimuth_angle" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">azimuth_angle</span><span class="p">:</span> <span class="n">Rotation2d</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>CCW+ wheel angle</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+
+<h4 id="swervepy.abstract.SwerveModule.azimuth_velocity" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">azimuth_velocity</span><span class="p">:</span> <span class="nb">float</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>CCW+ wheel angular velocity in rad/s</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+
+<h4 id="swervepy.abstract.SwerveModule.drive_distance" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">drive_distance</span><span class="p">:</span> <span class="nb">float</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Driven distance in metres</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+
+<h4 id="swervepy.abstract.SwerveModule.drive_velocity" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">drive_velocity</span><span class="p">:</span> <span class="nb">float</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Drive wheel velocity in m/s</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+
+<h4 id="swervepy.abstract.SwerveModule.module_position" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">module_position</span><span class="p">:</span> <span class="n">SwerveModulePosition</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>The swerve module's driven distance (in metres) and facing angle</p>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+
+<h4 id="swervepy.abstract.SwerveModule.module_state" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">module_state</span><span class="p">:</span> <span class="n">SwerveModuleState</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>The swerve module's current velocity (in metres/sec) and facing angle</p>
+  </div>
+
+</div>
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h4 id="swervepy.abstract.SwerveModule.desire_azimuth_angle" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">desire_azimuth_angle</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Turn the wheel</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>angle</code></td>
+          <td>
+                <code><a class="autorefs autorefs-external" title="wpimath.geometry.Rotation2d" href="https://robotpy.readthedocs.io/projects/wpimath/en/latest/wpimath.geometry/Rotation2d.html#wpimath.geometry.Rotation2d">Rotation2d</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Desired facing angle of the wheel</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+          <details class="quote">
+            <summary>Source code in <code>swervepy\abstract\system.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@abstractmethod</span>
+<span class="k">def</span> <span class="nf">desire_azimuth_angle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">angle</span><span class="p">:</span> <span class="n">Rotation2d</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Turn the wheel</span>
+
+<span class="sd">    :param angle: Desired facing angle of the wheel</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h4 id="swervepy.abstract.SwerveModule.desire_drive_velocity" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">desire_drive_velocity</span><span class="p">(</span><span class="n">velocity</span><span class="p">,</span> <span class="n">open_loop</span><span class="p">)</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Drive the wheel</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>velocity</code></td>
+          <td>
+                <code>float</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Desired velocity in m/s</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>open_loop</code></td>
+          <td>
+                <code>bool</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Use open loop (True) or closed loop (False) velocity control</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+          <details class="quote">
+            <summary>Source code in <code>swervepy\abstract\system.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@abstractmethod</span>
+<span class="k">def</span> <span class="nf">desire_drive_velocity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">velocity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">open_loop</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Drive the wheel</span>
+
+<span class="sd">    :param velocity: Desired velocity in m/s</span>
+<span class="sd">    :param open_loop: Use open loop (True) or closed loop (False) velocity control</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h4 id="swervepy.abstract.SwerveModule.desire_state" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">desire_state</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">drive_open_loop</span><span class="p">,</span> <span class="n">rotate_in_place</span><span class="p">)</span></code>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Command the module to follow a speed and angle</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>state</code></td>
+          <td>
+                <code><a class="autorefs autorefs-external" title="wpimath.kinematics.SwerveModuleState" href="https://robotpy.readthedocs.io/projects/wpimath/en/latest/wpimath.kinematics/SwerveModuleState.html#wpimath.kinematics.SwerveModuleState">SwerveModuleState</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>SwerveModuleState representing the module's desired speed and angle</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>drive_open_loop</code></td>
+          <td>
+                <code>bool</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Use open loop (True) or closed loop (False) velocity control to drive the wheel</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>rotate_in_place</code></td>
+          <td>
+                <code>bool</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Whether the modules will rotate while not driving. Set False to prevent wheels from wearing down by spinning in place</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+          <details class="quote">
+            <summary>Source code in <code>swervepy\abstract\system.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">desire_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">SwerveModuleState</span><span class="p">,</span> <span class="n">drive_open_loop</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">rotate_in_place</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Command the module to follow a speed and angle</span>
+
+<span class="sd">    :param state: SwerveModuleState representing the module&#39;s desired speed and angle</span>
+<span class="sd">    :param drive_open_loop: Use open loop (True) or closed loop (False) velocity control to drive the wheel</span>
+<span class="sd">    :param rotate_in_place: Whether the modules will rotate while not driving. Set False to prevent wheels from</span>
+<span class="sd">    wearing down by spinning in place</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">state</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">azimuth_angle</span><span class="p">)</span>
+
+    <span class="c1"># Prevent rotating the module if drive speed is less than 2 cm/s to prevent feedback-loop jitter</span>
+    <span class="n">angle</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">angle</span> <span class="k">if</span> <span class="n">rotate_in_place</span> <span class="ow">or</span> <span class="nb">abs</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">speed</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.02</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">azimuth_angle</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">desire_drive_velocity</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">speed</span><span class="p">,</span> <span class="n">drive_open_loop</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">desire_azimuth_angle</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h4 id="swervepy.abstract.SwerveModule.reset" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">reset</span><span class="p">()</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Reset sensor readings. Should be called during initialization.</p>
+
+          <details class="quote">
+            <summary>Source code in <code>swervepy\abstract\system.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@abstractmethod</span>
+<span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Reset sensor readings. Should be called during initialization.&quot;&quot;&quot;</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+</code></pre></div></td></tr></table></div>
+          </details>
+  </div>
+
+</div>
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-module">
+
+
+
+
+<h2 id="swervepy.impl" class="doc doc-heading">
+          <code>swervepy.impl</code>
+
+
+</h2>
+
+  <div class="doc doc-contents first">
+  
+      <p>Contains default implementations of components (motors, sensors, modules). The user should instantiate these when
+creating their drive base.</p>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+
+<h3 id="swervepy.impl.AbsoluteCANCoder" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">AbsoluteCANCoder</span><span class="p">(</span><span class="n">id_</span><span class="p">)</span></code>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+          <p class="doc doc-class-bases">
+            Bases: <code><a class="autorefs autorefs-internal" title="swervepy.abstract.sensor.AbsoluteEncoder" href="#swervepy.abstract.AbsoluteEncoder">AbsoluteEncoder</a></code></p>
+
+
+                <details class="quote">
+                  <summary>Source code in <code>swervepy\impl\sensor.py</code></summary>
+                  <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">id_</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+    <span class="c1"># Construct the CANCoder from either a tuple of motor ID and CAN bus ID or just a motor ID</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_encoder</span> <span class="o">=</span> <span class="n">phoenix5</span><span class="o">.</span><span class="n">sensors</span><span class="o">.</span><span class="n">CANCoder</span><span class="p">(</span><span class="o">*</span><span class="n">id_</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_encoder</span> <span class="o">=</span> <span class="n">phoenix5</span><span class="o">.</span><span class="n">sensors</span><span class="o">.</span><span class="n">CANCoder</span><span class="p">(</span><span class="n">id_</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">_encoder</span><span class="o">.</span><span class="n">configAbsoluteSensorRange</span><span class="p">(</span><span class="n">phoenix5</span><span class="o">.</span><span class="n">sensors</span><span class="o">.</span><span class="n">AbsoluteSensorRange</span><span class="o">.</span><span class="n">Unsigned_0_to_360</span><span class="p">)</span>
+
+    <span class="n">wpilib</span><span class="o">.</span><span class="n">SmartDashboard</span><span class="o">.</span><span class="n">putData</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Absolute CANCoder </span><span class="si">{</span><span class="n">id_</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+                </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+
+<h3 id="swervepy.impl.AbsoluteDutyCycleEncoder" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">AbsoluteDutyCycleEncoder</span><span class="p">(</span><span class="n">dio_pin</span><span class="p">)</span></code>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+          <p class="doc doc-class-bases">
+            Bases: <code><a class="autorefs autorefs-internal" title="swervepy.abstract.sensor.AbsoluteEncoder" href="#swervepy.abstract.AbsoluteEncoder">AbsoluteEncoder</a></code></p>
+
+
+                <details class="quote">
+                  <summary>Source code in <code>swervepy\impl\sensor.py</code></summary>
+                  <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dio_pin</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">_encoder</span> <span class="o">=</span> <span class="n">wpilib</span><span class="o">.</span><span class="n">DutyCycleEncoder</span><span class="p">(</span><span class="n">dio_pin</span><span class="p">)</span>
+    <span class="n">wpilib</span><span class="o">.</span><span class="n">SmartDashboard</span><span class="o">.</span><span class="n">putData</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Absolute PWM Encoder </span><span class="si">{</span><span class="n">dio_pin</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+                </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+
+<h3 id="swervepy.impl.CoaxialSwerveModule" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">CoaxialSwerveModule</span><span class="p">(</span><span class="n">drive</span><span class="p">,</span> <span class="n">azimuth</span><span class="p">,</span> <span class="n">placement</span><span class="p">)</span></code>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+          <p class="doc doc-class-bases">
+            Bases: <code><a class="autorefs autorefs-internal" title="swervepy.abstract.system.SwerveModule" href="#swervepy.abstract.SwerveModule">SwerveModule</a></code></p>
+
+
+                <details class="quote">
+                  <summary>Source code in <code>swervepy\impl\system.py</code></summary>
+                  <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">drive</span><span class="p">:</span> <span class="n">CoaxialDriveComponent</span><span class="p">,</span> <span class="n">azimuth</span><span class="p">:</span> <span class="n">CoaxialAzimuthComponent</span><span class="p">,</span> <span class="n">placement</span><span class="p">:</span> <span class="n">Translation2d</span><span class="p">):</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">_drive</span> <span class="o">=</span> <span class="n">drive</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_azimuth</span> <span class="o">=</span> <span class="n">azimuth</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">placement</span> <span class="o">=</span> <span class="n">placement</span>
+</code></pre></div></td></tr></table></div>
+                </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+
+<h3 id="swervepy.impl.DummyCoaxialComponent" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">DummyCoaxialComponent</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span></code>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+          <p class="doc doc-class-bases">
+            Bases: <code><a class="autorefs autorefs-internal" title="swervepy.abstract.motor.CoaxialDriveComponent" href="#swervepy.abstract.CoaxialDriveComponent">CoaxialDriveComponent</a></code>, <code><a class="autorefs autorefs-internal" title="swervepy.abstract.motor.CoaxialAzimuthComponent" href="#swervepy.abstract.CoaxialAzimuthComponent">CoaxialAzimuthComponent</a></code></p>
+
+  
+      <p>Coaxial drive or azimuth component that does nothing</p>
+
+                <details class="quote">
+                  <summary>Source code in <code>swervepy\impl\motor.py</code></summary>
+                  <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">394</span>
+<span class="normal">395</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="k">pass</span>
+</code></pre></div></td></tr></table></div>
+                </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+
+<h3 id="swervepy.impl.DummyGyro" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">DummyGyro</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span></code>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+          <p class="doc doc-class-bases">
+            Bases: <code><a class="autorefs autorefs-internal" title="swervepy.abstract.sensor.Gyro" href="#swervepy.abstract.Gyro">Gyro</a></code></p>
+
+  
+      <p>Gyro that does nothing</p>
+
+                <details class="quote">
+                  <summary>Source code in <code>swervepy\impl\sensor.py</code></summary>
+                  <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 99</span>
+<span class="normal">100</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+</code></pre></div></td></tr></table></div>
+                </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+
+<h3 id="swervepy.impl.Falcon500CoaxialAzimuthComponent" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">Falcon500CoaxialAzimuthComponent</span><span class="p">(</span><span class="n">id_</span><span class="p">,</span> <span class="n">azimuth_offset</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">absolute_encoder</span><span class="p">)</span></code>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+          <p class="doc doc-class-bases">
+            Bases: <code><a class="autorefs autorefs-internal" title="swervepy.abstract.motor.CoaxialAzimuthComponent" href="#swervepy.abstract.CoaxialAzimuthComponent">CoaxialAzimuthComponent</a></code></p>
+
+
+                <details class="quote">
+                  <summary>Source code in <code>swervepy\impl\motor.py</code></summary>
+                  <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">id_</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
+    <span class="n">azimuth_offset</span><span class="p">:</span> <span class="n">Rotation2d</span><span class="p">,</span>
+    <span class="n">parameters</span><span class="p">:</span> <span class="n">Parameters</span><span class="p">,</span>
+    <span class="n">absolute_encoder</span><span class="p">:</span> <span class="n">AbsoluteEncoder</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_params</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">in_standard_units</span><span class="p">()</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Unpack tuple of motor id and CAN bus id into TalonFX constructor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_motor</span> <span class="o">=</span> <span class="n">phoenix5</span><span class="o">.</span><span class="n">TalonFX</span><span class="p">(</span><span class="o">*</span><span class="n">id_</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="c1"># Only an int was provided for id_</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_motor</span> <span class="o">=</span> <span class="n">phoenix5</span><span class="o">.</span><span class="n">TalonFX</span><span class="p">(</span><span class="n">id_</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">_absolute_encoder</span> <span class="o">=</span> <span class="n">absolute_encoder</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_offset</span> <span class="o">=</span> <span class="n">azimuth_offset</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+</code></pre></div></td></tr></table></div>
+                </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+
+<h3 id="swervepy.impl.Falcon500CoaxialDriveComponent" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">Falcon500CoaxialDriveComponent</span><span class="p">(</span><span class="n">id_</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span></code>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+          <p class="doc doc-class-bases">
+            Bases: <code><a class="autorefs autorefs-internal" title="swervepy.abstract.motor.CoaxialDriveComponent" href="#swervepy.abstract.CoaxialDriveComponent">CoaxialDriveComponent</a></code></p>
+
+
+                <details class="quote">
+                  <summary>Source code in <code>swervepy\impl\motor.py</code></summary>
+                  <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span>
+<span class="normal">75</span>
+<span class="normal">76</span>
+<span class="normal">77</span>
+<span class="normal">78</span>
+<span class="normal">79</span>
+<span class="normal">80</span>
+<span class="normal">81</span>
+<span class="normal">82</span>
+<span class="normal">83</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">id_</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">Parameters</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_params</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">in_standard_units</span><span class="p">()</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Unpack tuple of motor id and CAN bus id into TalonFX constructor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_motor</span> <span class="o">=</span> <span class="n">phoenix5</span><span class="o">.</span><span class="n">TalonFX</span><span class="p">(</span><span class="o">*</span><span class="n">id_</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="c1"># Only an int was provided for id_</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_motor</span> <span class="o">=</span> <span class="n">phoenix5</span><span class="o">.</span><span class="n">TalonFX</span><span class="p">(</span><span class="n">id_</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">_feedforward</span> <span class="o">=</span> <span class="n">SimpleMotorFeedforwardMeters</span><span class="p">(</span><span class="n">parameters</span><span class="o">.</span><span class="n">kS</span><span class="p">,</span> <span class="n">parameters</span><span class="o">.</span><span class="n">kV</span><span class="p">,</span> <span class="n">parameters</span><span class="o">.</span><span class="n">kA</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+                </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+
+<h3 id="swervepy.impl.NEOCoaxialAzimuthComponent" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">NEOCoaxialAzimuthComponent</span><span class="p">(</span><span class="n">id_</span><span class="p">,</span> <span class="n">azimuth_offset</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">absolute_encoder</span><span class="p">)</span></code>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+          <p class="doc doc-class-bases">
+            Bases: <code><a class="autorefs autorefs-internal" title="swervepy.abstract.motor.CoaxialAzimuthComponent" href="#swervepy.abstract.CoaxialAzimuthComponent">CoaxialAzimuthComponent</a></code></p>
+
+
+                <details class="quote">
+                  <summary>Source code in <code>swervepy\impl\motor.py</code></summary>
+                  <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">331</span>
+<span class="normal">332</span>
+<span class="normal">333</span>
+<span class="normal">334</span>
+<span class="normal">335</span>
+<span class="normal">336</span>
+<span class="normal">337</span>
+<span class="normal">338</span>
+<span class="normal">339</span>
+<span class="normal">340</span>
+<span class="normal">341</span>
+<span class="normal">342</span>
+<span class="normal">343</span>
+<span class="normal">344</span>
+<span class="normal">345</span>
+<span class="normal">346</span>
+<span class="normal">347</span>
+<span class="normal">348</span>
+<span class="normal">349</span>
+<span class="normal">350</span>
+<span class="normal">351</span>
+<span class="normal">352</span>
+<span class="normal">353</span>
+<span class="normal">354</span>
+<span class="normal">355</span>
+<span class="normal">356</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">id_</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">azimuth_offset</span><span class="p">:</span> <span class="n">Rotation2d</span><span class="p">,</span>
+    <span class="n">parameters</span><span class="p">:</span> <span class="n">Parameters</span><span class="p">,</span>
+    <span class="n">absolute_encoder</span><span class="p">:</span> <span class="n">AbsoluteEncoder</span> <span class="o">|</span> <span class="n">SparkMaxEncoderType</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_params</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">in_standard_units</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">_motor</span> <span class="o">=</span> <span class="n">rev</span><span class="o">.</span><span class="n">CANSparkMax</span><span class="p">(</span><span class="n">id_</span><span class="p">,</span> <span class="n">rev</span><span class="o">.</span><span class="n">CANSparkMax</span><span class="o">.</span><span class="n">MotorType</span><span class="o">.</span><span class="n">kBrushless</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_motor</span><span class="o">.</span><span class="n">getPIDController</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_encoder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_motor</span><span class="o">.</span><span class="n">getEncoder</span><span class="p">()</span>
+
+    <span class="c1"># Config must be called before the absolute encoder is set up because config method</span>
+    <span class="c1"># factory resets the SPARK MAX</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">absolute_encoder</span><span class="p">,</span> <span class="n">SparkMaxEncoderType</span><span class="p">):</span>
+        <span class="c1"># Construct an AbsoluteEncoder from sensor plugged into SPARK MAX</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_absolute_encoder</span> <span class="o">=</span> <span class="n">SparkMaxAbsoluteEncoder</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_motor</span><span class="p">,</span> <span class="n">absolute_encoder</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_absolute_encoder</span> <span class="o">=</span> <span class="n">absolute_encoder</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">_offset</span> <span class="o">=</span> <span class="n">azimuth_offset</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+</code></pre></div></td></tr></table></div>
+                </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+
+<h3 id="swervepy.impl.NEOCoaxialDriveComponent" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">NEOCoaxialDriveComponent</span><span class="p">(</span><span class="n">id_</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span></code>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+          <p class="doc doc-class-bases">
+            Bases: <code><a class="autorefs autorefs-internal" title="swervepy.abstract.motor.CoaxialDriveComponent" href="#swervepy.abstract.CoaxialDriveComponent">CoaxialDriveComponent</a></code></p>
+
+
+                <details class="quote">
+                  <summary>Source code in <code>swervepy\impl\motor.py</code></summary>
+                  <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">id_</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="n">Parameters</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_params</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">in_standard_units</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">_motor</span> <span class="o">=</span> <span class="n">rev</span><span class="o">.</span><span class="n">CANSparkMax</span><span class="p">(</span><span class="n">id_</span><span class="p">,</span> <span class="n">rev</span><span class="o">.</span><span class="n">CANSparkMax</span><span class="o">.</span><span class="n">MotorType</span><span class="o">.</span><span class="n">kBrushless</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_controller</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_motor</span><span class="o">.</span><span class="n">getPIDController</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_encoder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_motor</span><span class="o">.</span><span class="n">getEncoder</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">_feedforward</span> <span class="o">=</span> <span class="n">SimpleMotorFeedforwardMeters</span><span class="p">(</span><span class="n">parameters</span><span class="o">.</span><span class="n">kS</span><span class="p">,</span> <span class="n">parameters</span><span class="o">.</span><span class="n">kV</span><span class="p">,</span> <span class="n">parameters</span><span class="o">.</span><span class="n">kA</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+                </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+
+<h3 id="swervepy.impl.PigeonGyro" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">PigeonGyro</span><span class="p">(</span><span class="n">id_</span><span class="p">,</span> <span class="n">invert</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+          <p class="doc doc-class-bases">
+            Bases: <code><a class="autorefs autorefs-internal" title="swervepy.abstract.sensor.Gyro" href="#swervepy.abstract.Gyro">Gyro</a></code></p>
+
+
+                <details class="quote">
+                  <summary>Source code in <code>swervepy\impl\sensor.py</code></summary>
+                  <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">id_</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">invert</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">_gyro</span> <span class="o">=</span> <span class="n">phoenix5</span><span class="o">.</span><span class="n">sensors</span><span class="o">.</span><span class="n">PigeonIMU</span><span class="p">(</span><span class="n">id_</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">invert</span> <span class="o">=</span> <span class="n">invert</span>
+
+    <span class="n">wpilib</span><span class="o">.</span><span class="n">SmartDashboard</span><span class="o">.</span><span class="n">putData</span><span class="p">(</span><span class="s2">&quot;Pigeon IMU&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+                </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+
+<h3 id="swervepy.impl.SparkMaxAbsoluteEncoder" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">SparkMaxAbsoluteEncoder</span><span class="p">(</span><span class="n">controller</span><span class="p">,</span> <span class="n">encoder_type</span><span class="p">)</span></code>
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+          <p class="doc doc-class-bases">
+            Bases: <code><a class="autorefs autorefs-internal" title="swervepy.abstract.sensor.AbsoluteEncoder" href="#swervepy.abstract.AbsoluteEncoder">AbsoluteEncoder</a></code></p>
+
+  
+      <p>Absolute encoder plugged into the SPARK MAX's data port</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>controller</code></td>
+          <td>
+                <code><a class="autorefs autorefs-external" title="rev.CANSparkMax" href="https://robotpy.readthedocs.io/projects/rev/en/latest/rev/CANSparkMax.html#rev.CANSparkMax">CANSparkMax</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>SPARK MAX instance</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>encoder_type</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="swervepy.impl.sensor.SparkMaxEncoderType" href="#swervepy.impl.SparkMaxEncoderType">SparkMaxEncoderType</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Type of encoder plugged in. Based on how the encoder transmits data</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+                <details class="quote">
+                  <summary>Source code in <code>swervepy\impl\sensor.py</code></summary>
+                  <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">controller</span><span class="p">:</span> <span class="n">rev</span><span class="o">.</span><span class="n">CANSparkMax</span><span class="p">,</span> <span class="n">encoder_type</span><span class="p">:</span> <span class="n">SparkMaxEncoderType</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Absolute encoder plugged into the SPARK MAX&#39;s data port</span>
+
+<span class="sd">    :param controller: SPARK MAX instance</span>
+<span class="sd">    :param encoder_type: Type of encoder plugged in. Based on how the encoder transmits data</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+    <span class="c1"># Two types of absolute encoders can be plugged into the SPARK MAX data port: analog and duty cycle/PWM</span>
+    <span class="k">if</span> <span class="n">encoder_type</span> <span class="ow">is</span> <span class="n">SparkMaxEncoderType</span><span class="o">.</span><span class="n">ANALOG</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_encoder</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">getAnalog</span><span class="p">(</span><span class="n">rev</span><span class="o">.</span><span class="n">SparkMaxAnalogSensor</span><span class="o">.</span><span class="n">Mode</span><span class="o">.</span><span class="n">kAbsolute</span><span class="p">)</span>
+
+        <span class="c1"># Analog encoders output from 0V - 3.3V</span>
+        <span class="c1"># Change from voltage to degrees</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_encoder</span><span class="o">.</span><span class="n">setPositionConversionFactor</span><span class="p">(</span><span class="mi">360</span> <span class="o">/</span> <span class="mf">3.3</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">encoder_type</span> <span class="ow">is</span> <span class="n">SparkMaxEncoderType</span><span class="o">.</span><span class="n">PWM</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_encoder</span> <span class="o">=</span> <span class="n">controller</span><span class="o">.</span><span class="n">getAbsoluteEncoder</span><span class="p">(</span><span class="n">rev</span><span class="o">.</span><span class="n">SparkMaxAbsoluteEncoder</span><span class="o">.</span><span class="n">Type</span><span class="o">.</span><span class="n">kDutyCycle</span><span class="p">)</span>
+
+        <span class="c1"># Duty cycle encoders output from 0 to 1 by default</span>
+        <span class="c1"># Change into degrees</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_encoder</span><span class="o">.</span><span class="n">setPositionConversionFactor</span><span class="p">(</span><span class="mi">360</span><span class="p">)</span>
+
+    <span class="n">wpilib</span><span class="o">.</span><span class="n">SmartDashboard</span><span class="o">.</span><span class="n">putData</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Absolute Encoder </span><span class="si">{</span><span class="n">controller</span><span class="o">.</span><span class="n">getDeviceId</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+                </details>
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+
+<h3 id="swervepy.impl.SparkMaxEncoderType" class="doc doc-heading">
+          <code>SparkMaxEncoderType</code>
+
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="enum.Enum">Enum</span></code></p>
+
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+
+<h4 id="swervepy.impl.SparkMaxEncoderType.ANALOG" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">ANALOG</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+
+<h4 id="swervepy.impl.SparkMaxEncoderType.PWM" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">PWM</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.f886a092.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7c377c4.min.js"></script>
+      
+    
+  </body>
+</html>
