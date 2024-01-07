@@ -93,6 +93,21 @@ class RobotContainer:
 
         self.stick = wpilib.Joystick(0)
 
+        self.speed_limit_ratio = 1.0
+        if OP.speed_limit:
+            if OP.speed_limit > OP.max_speed:
+                wpilib.reportWarning("Speed limit is greater than max_speed and won't be used")
+            else:
+                self.speed_limit_ratio = OP.speed_limit / OP.max_speed
+
+        self.angular_velocity_limit_ratio = 1.0
+        if OP.angular_velocity_limit:
+            if OP.angular_velocity_limit > OP.max_angular_velocity:
+                wpilib.reportWarning("Angular velocity limit is greater than max_angular_velocity and won't be used")
+            else:
+                self.angular_velocity_limit_ratio = (
+                    OP.angular_velocity_limit / OP.max_angular_velocity)
+
         # Define a swerve drive subsystem by passing in a list of SwerveModules
         # and some options
         #
@@ -121,7 +136,7 @@ class RobotContainer:
     def deadband(value, band):
         return value if abs(value) > band else 0
 
-    def process_joystick_input(self, val, deadband=0.1, exponent=1, invert=False):
+    def process_joystick_input(self, val, deadband=0.1, exponent=1, limit_ratio=1.0, invert=False):
         """
         Given a raw joystick reading, return the processed value after adjusting
         for real-world UX considerations:
@@ -132,20 +147,23 @@ class RobotContainer:
         input_sign = +1 if val > 0 else -1  # this works for val=0 also
         invert_sign = -1 if invert else +1
         # abs required for fractional exponents
-        scaled_input = abs(deadbanded_input) ** exponent
+        scaled_input = limit_ratio * abs(deadbanded_input) ** exponent
         return invert_sign * input_sign * scaled_input
 
     def get_translation_input(self, invert=True):
         raw_stick_val = self.stick.getRawAxis(OP.translation_joystick_axis)
-        return self.process_joystick_input(raw_stick_val, invert=invert)
+        return self.process_joystick_input(raw_stick_val, invert=invert,
+                                           limit_ratio=self.speed_limit_ratio)
 
     def get_strafe_input(self, invert=True):
         raw_stick_val = self.stick.getRawAxis(OP.strafe_joystick_axis)
-        return self.process_joystick_input(raw_stick_val, invert=invert)
+        return self.process_joystick_input(raw_stick_val, invert=invert,
+                                           limit_ratio=self.speed_limit_ratio)
 
     def get_rotation_input(self, invert=True):
         raw_stick_val = self.stick.getRawAxis(OP.rotation_joystick_axis)
-        return self.process_joystick_input(raw_stick_val, invert=invert)
+        return self.process_joystick_input(
+            raw_stick_val, invert=invert, limit_ratio=self.angular_velocity_limit_ratio)
 
     def get_autonomous_command(self):
         follower_params = TrajectoryFollowerParameters(
