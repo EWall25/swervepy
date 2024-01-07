@@ -83,6 +83,13 @@ op_data = {
     "max_speed": 4.5 * (u.m / u.s),
     "max_angular_velocity": 11.5 * (u.rad / u.s),
 
+    # You can limit how fast your robot moves (e.g. during testing) using the
+    # following parameters.  Setting to None is the same as setting to
+    # max_speed/max_angular_velocity, and indicates no limit.
+    #
+    "speed_limit": 1.0 * (u.m / u.s),
+    "angular_velocity_limit": 2.5 * (u.rad / u.s),
+
     # For NEO / SparkMAX, use the following and comment out the Falcon500 values
     # "propulsion_neutral": rev.CANSparkMax.IdleMode.kCoast,
     # "steering_neutral": rev.CANSparkMax.IdleMode.kBrake,
