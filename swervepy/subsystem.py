@@ -7,7 +7,7 @@ from functools import singledispatchmethod
 from typing import Callable, Optional, TYPE_CHECKING, Iterable
 
 import commands2
-from pathplannerlib.commands import FollowPathCommand, FollowPathWithEvents
+from pathplannerlib.commands import FollowPathCommand
 from pathplannerlib.controller import PPHolonomicDriveController
 from pathplannerlib.config import ReplanningConfig, PIDConstants
 from pathplannerlib.path import PathPlannerPath
@@ -224,6 +224,7 @@ class SwerveDrive(commands2.Subsystem):
         parameters: "TrajectoryFollowerParameters",
         first_path: bool = False,
         drive_open_loop: bool = False,
+        flip_path: Callable[[], bool] = lambda: False,
     ) -> commands2.Command:
         """
         Construct a command that follows a trajectory
@@ -233,6 +234,8 @@ class SwerveDrive(commands2.Subsystem):
         :param first_path: If True, the robot's pose will be reset to the trajectory's initial pose
         :param drive_open_loop: Use open loop control (True) or closed loop (False) to swerve module speeds. Closed-loop
         positional control will always be used for trajectory following
+        :param flip_path: Method returning whether to flip the provided path.
+        This will maintain a global blue alliance origin.
         :return: Trajectory-follower command
         """
 
@@ -250,18 +253,15 @@ class SwerveDrive(commands2.Subsystem):
         )
 
         # Trajectory follower command
-        command = FollowPathWithEvents(
-            FollowPathCommand(
-                path,
-                lambda: self.pose,
-                lambda: self.robot_relative_speeds,
-                lambda speeds: self.drive(speeds, drive_open_loop=drive_open_loop),
-                controller,
-                ReplanningConfig(),
-                self,
-            ),
+        command = FollowPathCommand(
             path,
             lambda: self.pose,
+            lambda: self.robot_relative_speeds,
+            lambda speeds: self.drive(speeds, drive_open_loop=drive_open_loop),
+            controller,
+            ReplanningConfig(),
+            flip_path,
+            self,
         )
 
         # If this is the first path in a sequence, reset the robot's pose so that it aligns with the start of the path

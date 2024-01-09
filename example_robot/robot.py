@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import Optional
 
 import commands2
-import wpilib
 
 sys.path.append(str(Path(__file__).parent.parent.absolute()))
 
@@ -24,7 +23,3 @@ class Robot(commands2.TimedCommandRobot):
     def teleopInit(self) -> None:
         if self.autonomous_command:
             self.autonomous_command.cancel()
-
-
-if __name__ == "__main__":
-    wpilib.run(Robot)

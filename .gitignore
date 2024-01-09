@@ -171,6 +171,8 @@ cython_debug/
 
 # RobotPy
 simgui*.json
+.installer_config
+networktables.json
 
 # MkDocs
 site/
