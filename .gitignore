@@ -171,8 +171,11 @@ cython_debug/
 
 # RobotPy
 simgui*.json
+.wpilib
 .installer_config
 networktables.json
 
 # MkDocs
 site/
+
+example_robot/swervepy

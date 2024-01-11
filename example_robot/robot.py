@@ -1,10 +1,10 @@
-import sys
-from pathlib import Path
+# You must either:
+#   1) Hardlink swervepy into the example_robot directory OR
+#   2) Move the example code to a different project and copy swervepy into that project
+
 from typing import Optional
 
 import commands2
-
-sys.path.append(str(Path(__file__).parent.parent.absolute()))
 
 from container import RobotContainer
 
