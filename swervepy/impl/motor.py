@@ -1,7 +1,7 @@
 import copy
 from dataclasses import dataclass
 
-import ctre
+import phoenix5
 import rev
 from pint import Quantity
 from wpimath.controller import SimpleMotorFeedforwardMeters
@@ -28,7 +28,7 @@ class Falcon500CoaxialDriveComponent(CoaxialDriveComponent):
         peak_current_limit: int
         peak_current_duration: float
 
-        neutral_mode: ctre.NeutralMode
+        neutral_mode: phoenix5.NeutralMode
 
         kP: float
         kI: float
@@ -47,10 +47,10 @@ class Falcon500CoaxialDriveComponent(CoaxialDriveComponent):
             return data
 
         # noinspection PyPep8Naming
-        def create_TalonFX_config(self) -> ctre.TalonFXConfiguration:
-            motor_config = ctre.TalonFXConfiguration()
+        def create_TalonFX_config(self) -> phoenix5.TalonFXConfiguration:
+            motor_config = phoenix5.TalonFXConfiguration()
 
-            supply_limit = ctre.SupplyCurrentLimitConfiguration(
+            supply_limit = phoenix5.SupplyCurrentLimitConfiguration(
                 True,
                 self.continuous_current_limit,
                 self.peak_current_limit,
@@ -61,7 +61,7 @@ class Falcon500CoaxialDriveComponent(CoaxialDriveComponent):
             motor_config.slot0.kI = self.kI
             motor_config.slot0.kD = self.kD
             motor_config.supplyCurrLimit = supply_limit
-            motor_config.initializationStrategy = ctre.sensors.SensorInitializationStrategy.BootToZero
+            motor_config.initializationStrategy = phoenix5.sensors.SensorInitializationStrategy.BootToZero
             motor_config.openloopRamp = self.open_loop_ramp_rate
             motor_config.closedloopRamp = self.closed_loop_ramp_rate
 
@@ -72,10 +72,10 @@ class Falcon500CoaxialDriveComponent(CoaxialDriveComponent):
 
         try:
             # Unpack tuple of motor id and CAN bus id into TalonFX constructor
-            self._motor = ctre.TalonFX(*id_)
+            self._motor = phoenix5.TalonFX(*id_)
         except TypeError:
             # Only an int was provided for id_
-            self._motor = ctre.TalonFX(id_)
+            self._motor = phoenix5.TalonFX(id_)
 
         self._config()
         self.reset()
@@ -91,16 +91,16 @@ class Falcon500CoaxialDriveComponent(CoaxialDriveComponent):
 
     def follow_velocity_open(self, velocity: float):
         percent_out = velocity / self._params.max_speed
-        self._motor.set(ctre.ControlMode.PercentOutput, percent_out)
+        self._motor.set(phoenix5.ControlMode.PercentOutput, percent_out)
 
     def follow_velocity_closed(self, velocity: float):
         converted_velocity = conversions.mps_to_falcon(
             velocity, self._params.wheel_circumference, self._params.gear_ratio
         )
         self._motor.set(
-            ctre.ControlMode.Velocity,
+            phoenix5.ControlMode.Velocity,
             converted_velocity,
-            ctre.DemandType.ArbitraryFeedForward,
+            phoenix5.DemandType.ArbitraryFeedForward,
             self._feedforward.calculate(velocity),
         )
 
@@ -137,7 +137,7 @@ class Falcon500CoaxialAzimuthComponent(CoaxialAzimuthComponent):
         peak_current_limit: int
         peak_current_duration: float
 
-        neutral_mode: ctre.NeutralMode
+        neutral_mode: phoenix5.NeutralMode
 
         kP: float
         kI: float
@@ -151,10 +151,10 @@ class Falcon500CoaxialAzimuthComponent(CoaxialAzimuthComponent):
             return data
 
         # noinspection PyPep8Naming
-        def create_TalonFX_config(self) -> ctre.TalonFXConfiguration:
-            motor_config = ctre.TalonFXConfiguration()
+        def create_TalonFX_config(self) -> phoenix5.TalonFXConfiguration:
+            motor_config = phoenix5.TalonFXConfiguration()
 
-            supply_limit = ctre.SupplyCurrentLimitConfiguration(
+            supply_limit = phoenix5.SupplyCurrentLimitConfiguration(
                 True,
                 self.continuous_current_limit,
                 self.peak_current_limit,
@@ -165,7 +165,7 @@ class Falcon500CoaxialAzimuthComponent(CoaxialAzimuthComponent):
             motor_config.slot0.kI = self.kI
             motor_config.slot0.kD = self.kD
             motor_config.supplyCurrLimit = supply_limit
-            motor_config.initializationStrategy = ctre.sensors.SensorInitializationStrategy.BootToZero
+            motor_config.initializationStrategy = phoenix5.sensors.SensorInitializationStrategy.BootToZero
             motor_config.closedloopRamp = self.ramp_rate
 
             return motor_config
@@ -181,10 +181,10 @@ class Falcon500CoaxialAzimuthComponent(CoaxialAzimuthComponent):
 
         try:
             # Unpack tuple of motor id and CAN bus id into TalonFX constructor
-            self._motor = ctre.TalonFX(*id_)
+            self._motor = phoenix5.TalonFX(*id_)
         except TypeError:
             # Only an int was provided for id_
-            self._motor = ctre.TalonFX(id_)
+            self._motor = phoenix5.TalonFX(id_)
 
         self._absolute_encoder = absolute_encoder
         self._offset = azimuth_offset
@@ -201,7 +201,7 @@ class Falcon500CoaxialAzimuthComponent(CoaxialAzimuthComponent):
 
     def follow_angle(self, angle: Rotation2d):
         converted_angle = conversions.degrees_to_falcon(angle, self._params.gear_ratio)
-        self._motor.set(ctre.ControlMode.Position, converted_angle)
+        self._motor.set(phoenix5.ControlMode.Position, converted_angle)
 
     def reset(self):
         absolute_position = self._absolute_encoder.absolute_position - self._offset

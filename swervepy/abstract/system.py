@@ -12,12 +12,12 @@ class SwerveModule(Sendable, metaclass=SendableABCMeta):
 
     def desire_state(self, state: SwerveModuleState, drive_open_loop: bool, rotate_in_place: bool):
         """
-        Command the module to a speed and angle
+        Command the module to follow a speed and angle
 
         :param state: SwerveModuleState representing the module's desired speed and angle
-        :param drive_open_loop: Use open loop control (True) or closed loop (False) to drive the wheel
-        :param rotate_in_place: Should the modules rotate while not driving
-        :return:
+        :param drive_open_loop: Use open loop (True) or closed loop (False) velocity control to drive the wheel
+        :param rotate_in_place: Whether the modules will rotate while not driving. Set False to prevent wheels from
+        wearing down by spinning in place
         """
         state = optimize(state, self.azimuth_angle)
 
@@ -29,7 +29,13 @@ class SwerveModule(Sendable, metaclass=SendableABCMeta):
 
     @property
     def module_position(self) -> SwerveModulePosition:
+        """The swerve module's driven distance (in metres) and facing angle"""
         return SwerveModulePosition(self.drive_distance, self.azimuth_angle)
+
+    @property
+    def module_state(self) -> SwerveModuleState:
+        """The swerve module's current velocity (in metres/sec) and facing angle"""
+        return SwerveModuleState(self.drive_velocity, self.azimuth_angle)
 
     @abstractmethod
     def desire_drive_velocity(self, velocity: float, open_loop: bool):
@@ -37,16 +43,22 @@ class SwerveModule(Sendable, metaclass=SendableABCMeta):
         Drive the wheel
 
         :param velocity: Desired velocity in m/s
-        :param open_loop: Use open loop control (True) or closed loop (False)
+        :param open_loop: Use open loop (True) or closed loop (False) velocity control
         """
         raise NotImplementedError
 
     @abstractmethod
     def desire_azimuth_angle(self, angle: Rotation2d):
+        """
+        Turn the wheel
+
+        :param angle: Desired facing angle of the wheel
+        """
         raise NotImplementedError
 
     @abstractmethod
     def reset(self):
+        """Reset sensor readings. Should be called during initialization."""
         raise NotImplementedError
 
     @property
@@ -64,13 +76,13 @@ class SwerveModule(Sendable, metaclass=SendableABCMeta):
     @property
     @abstractmethod
     def azimuth_angle(self) -> Rotation2d:
-        """CCW+ module angle"""
+        """CCW+ wheel angle"""
         raise NotImplementedError
 
     @property
     @abstractmethod
     def azimuth_velocity(self) -> float:
-        """CCW+ module angular velocity in rad/s"""
+        """CCW+ wheel angular velocity in rad/s"""
         raise NotImplementedError
 
 

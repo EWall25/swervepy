@@ -3,17 +3,19 @@
 import math
 import time
 from dataclasses import dataclass
-from functools import cached_property
-from typing import Callable, Optional, TYPE_CHECKING
+from functools import singledispatchmethod
+from typing import Callable, Optional, TYPE_CHECKING, Iterable
 
 import commands2
+from pathplannerlib.commands import FollowPathCommand
+from pathplannerlib.controller import PPHolonomicDriveController
+from pathplannerlib.config import ReplanningConfig, PIDConstants
+from pathplannerlib.path import PathPlannerPath
 import wpilib
 import wpimath.estimator
 import wpimath.kinematics
 from pint import Quantity
-from wpimath.controller import ProfiledPIDControllerRadians, PIDController
-from wpimath.trajectory import Trajectory, TrapezoidProfileRadians
-from wpimath.geometry import Pose2d, Translation2d
+from wpimath.geometry import Pose2d, Translation2d, Rotation2d
 from wpimath.kinematics import ChassisSpeeds, SwerveModuleState, SwerveModulePosition
 from wpiutil import SendableBuilder
 
@@ -25,7 +27,18 @@ from swervepy import u
 from swervepy.abstract import SwerveModule, Gyro
 
 
-class SwerveDrive(commands2.SubsystemBase):
+class SwerveDrive(commands2.Subsystem):
+    """
+    A Subsystem representing the serve drivetrain.
+
+    Use the drive() method to drive the swerve base at a set of desired velocities. The method handles
+    moving the individual swerve modules, so the user only needs to consider the movement of the chassis itself.
+
+    Field relative control is an option available for controlling movement. Field relative uses a gyro sensor
+    to lock the robot's translational movement to the field's x- and y-axis. Practically, when a driver pushes "forward"
+    on the stick, the robot will always move forward relative to the field rather than relative to the chassis heading.
+    """
+
     def __init__(
         self,
         modules: tuple[SwerveModule, ...],
@@ -34,6 +47,17 @@ class SwerveDrive(commands2.SubsystemBase):
         max_angular_velocity: Quantity,
         vision_pose_callback: Callable[[Pose2d], Optional[Pose2d]] = lambda _: None,
     ):
+        """
+        Construct a swerve drivetrain as a Subsystem.
+
+        :param modules: List of swerve modules
+        :param gyro: A gyro sensor that provides a CCW+ heading reading of the chassis
+        :param max_velocity: The actual maximum velocity of the robot
+        :param max_angular_velocity: The actual maximum angular (turning) velocity of the robot
+        :param vision_pose_callback: An optional method that returns the robot's pose derived from vision and takes the
+        robot's current pose as its sole argument. This pose from this method is integrated into the robot's odometry.
+        """
+
         super().__init__()
 
         self._modules = modules
@@ -76,15 +100,22 @@ class SwerveDrive(commands2.SubsystemBase):
         # Visualize robot position on field
         self.field.setRobotPose(robot_pose)
 
-    def drive(self, translation: Translation2d, rotation: float, field_relative: bool, open_loop: bool):
+    @singledispatchmethod
+    def drive(
+        self,
+        translation: Translation2d,
+        rotation: float,
+        field_relative: bool,
+        drive_open_loop: bool,
+    ):
         """
-        Command the robot to provided chassis speeds (translation and rotation)
+        Drive the robot at the provided speeds (translation and rotation)
 
         :param translation: Translation speed on the XY-plane in m/s where +X is forward and +Y is left
         :param rotation: Rotation speed around the Z-axis in rad/s where CCW+
         :param field_relative: If True, gyroscopic zero is used as the forward direction.
         Else, forward faces the front of the robot.
-        :param open_loop: Use open loop control (True) or closed loop (False)
+        :param drive_open_loop: Use open loop (True) or closed loop (False) velocity control for driving the wheel
         """
 
         speeds = (
@@ -94,38 +125,67 @@ class SwerveDrive(commands2.SubsystemBase):
         )
         swerve_module_states = self._kinematics.toSwerveModuleStates(speeds)
 
-        self.desire_module_states(swerve_module_states, open_loop, rotate_in_place=False)
+        self.desire_module_states(swerve_module_states, drive_open_loop, rotate_in_place=False)
+
+    @drive.register
+    def _(self, chassis_speeds: ChassisSpeeds, drive_open_loop: bool):
+        """
+        Alternative method to drive the robot at a set of chassis speeds (exclusively robot-relative)
+
+        :param chassis_speeds: Robot-relative speeds on the XY-plane in m/s where +X is forward and +Y is left
+        :param drive_open_loop: Use open loop (True) or closed loop (False) velocity control for driving the wheel
+        """
+
+        translation = Translation2d(chassis_speeds.vx, chassis_speeds.vy)
+        return self.drive(translation, chassis_speeds.omega, False, drive_open_loop)
 
     def desire_module_states(
-        self, states: tuple[SwerveModuleState, ...], open_loop: bool = False, rotate_in_place: bool = True
+        self,
+        states: tuple[SwerveModuleState, ...],
+        drive_open_loop: bool = False,
+        rotate_in_place: bool = True,
     ):
         """
-        Command each individual module to a state
+        Command each individual module to a state (consisting of velocity and rotation)
 
         :param states: List of module states in the order of the swerve module list SwerveDrive was created with
-        :param open_loop: Use open loop control (True) or closed loop (False)
+        :param drive_open_loop: Use open loop (True) or closed loop (False) velocity control for driving the wheel
         :param rotate_in_place: Should the modules rotate while not driving
         """
 
         swerve_module_states = self._kinematics.desaturateWheelSpeeds(states, self.max_velocity)  # type: ignore
 
-        for i in range(4):
+        for i in range(len(self._modules)):
             module: SwerveModule = self._modules[i]
-            module.desire_state(swerve_module_states[i], open_loop, rotate_in_place)
+            module.desire_state(swerve_module_states[i], drive_open_loop, rotate_in_place)
 
     @property
     def module_positions(self) -> tuple[SwerveModulePosition, ...]:
+        """A tuple of the swerve modules' positions (driven distance and facing rotation)"""
         return tuple(module.module_position for module in self._modules)
 
     @property
     def pose(self) -> Pose2d:
+        """The robot's pose on the field (position and heading)"""
         return self._odometry.getEstimatedPosition()
+
+    @property
+    def heading(self) -> Rotation2d:
+        """The robot's facing direction"""
+        return self._gyro.heading
+
+    @property
+    def robot_relative_speeds(self) -> ChassisSpeeds:
+        """The robot's translational and rotational speeds"""
+        module_states = tuple(module.module_state for module in self._modules)
+        return self._kinematics.toChassisSpeeds(module_states)
 
     def reset_modules(self):
         for module in self._modules:
             module.reset()
 
     def zero_heading(self):
+        """Set the chassis' current heading as "zero" or straight forward"""
         self._gyro.zero_heading()
 
     def reset_odometry(self, pose: Pose2d):
@@ -143,47 +203,76 @@ class SwerveDrive(commands2.SubsystemBase):
         strafe: Callable[[], float],
         rotation: Callable[[], float],
         field_relative: bool,
-        open_loop: bool,
-    ):
-        return _TeleOpCommand(self, translation, strafe, rotation, field_relative, open_loop)
+        drive_open_loop: bool,
+    ) -> commands2.Command:
+        """
+        Construct a command that drives the robot using joystick (or other) inputs
+
+        :param translation: A method that returns the desired +X (forward/backward) velocity in m/s
+        :param strafe: A method that returns the desired +Y (left/right) velocity in m/s
+        :param rotation: A method that returns the desired CCW+ rotational velocity in rad/s
+        :param field_relative: If True, gyroscopic zero is used as the forward direction.
+        Else, forward faces the front of the robot.
+        :param drive_open_loop: Use open loop (True) or closed loop (False) velocity control for driving the wheel
+        :return: The command
+        """
+        return _TeleOpCommand(self, translation, strafe, rotation, field_relative, drive_open_loop)
 
     def follow_trajectory_command(
-        self, trajectory: Trajectory, parameters: "TrajectoryFollowerParameters", first_path: bool = False
-    ):
+        self,
+        path: PathPlannerPath,
+        parameters: "TrajectoryFollowerParameters",
+        first_path: bool = False,
+        drive_open_loop: bool = False,
+        flip_path: Callable[[], bool] = lambda: False,
+    ) -> commands2.Command:
         """
-        Build a command that follows a trajectory
+        Construct a command that follows a trajectory
 
-        :param trajectory: The path to follow
+        :param path: The path to follow
         :param parameters: Options that determine how the robot will follow the trajectory
         :param first_path: If True, the robot's pose will be reset to the trajectory's initial pose
+        :param drive_open_loop: Use open loop control (True) or closed loop (False) to swerve module speeds. Closed-loop
+        positional control will always be used for trajectory following
+        :param flip_path: Method returning whether to flip the provided path.
+        This will maintain a global blue alliance origin.
         :return: Trajectory-follower command
         """
 
-        theta_controller = ProfiledPIDControllerRadians(
-            parameters.theta_kP, 0, 0, parameters.theta_controller_constraints
-        )
-        theta_controller.enableContinuousInput(-math.pi, math.pi)
+        # TODO: Re-impl trajectory visualisation on Field2d
 
-        command = commands2.Swerve4ControllerCommand(
-            trajectory,
+        # Find the drive base radius (the distance from the center of the robot to the furthest module)
+        radius = greatest_distance_from_translations([module.placement for module in self._modules])
+
+        # Position feedback controller for following waypoints
+        controller = PPHolonomicDriveController(
+            PIDConstants(parameters.xy_kP),
+            PIDConstants(parameters.theta_kP),
+            parameters.max_drive_velocity.m_as(u.m / u.s),
+            radius,
+        )
+
+        # Trajectory follower command
+        command = FollowPathCommand(
+            path,
             lambda: self.pose,
-            self._kinematics,
-            PIDController(parameters.x_kP, 0, 0),
-            PIDController(parameters.y_kP, 0, 0),
-            theta_controller,
-            self.desire_module_states,
-            [self],
-        ).beforeStarting(lambda: self.field.getObject("traj").setTrajectory(trajectory))
+            lambda: self.robot_relative_speeds,
+            lambda speeds: self.drive(speeds, drive_open_loop=drive_open_loop),
+            controller,
+            ReplanningConfig(),
+            flip_path,
+            self,
+        )
 
         # If this is the first path in a sequence, reset the robot's pose so that it aligns with the start of the path
         if first_path:
-            initial_pose = trajectory.initialPose()
-            command = command.beforeStarting(lambda: self.reset_odometry(initial_pose))
+            initial_pose = path.getPreviewStartingHolonomicPose()
+            command = command.beforeStarting(commands2.InstantCommand(lambda: self.reset_odometry(initial_pose)))
 
         return command
 
 
-class _TeleOpCommand(commands2.CommandBase):
+class _TeleOpCommand(commands2.Command):
     def __init__(
         self,
         swerve: SwerveDrive,
@@ -191,7 +280,7 @@ class _TeleOpCommand(commands2.CommandBase):
         strafe: Callable[[], float],
         rotation: Callable[[], float],
         field_relative: bool,
-        open_loop: bool,
+        drive_open_loop: bool,
     ):
         super().__init__()
         self.addRequirements(swerve)
@@ -201,7 +290,7 @@ class _TeleOpCommand(commands2.CommandBase):
         self._strafe = strafe
         self._rotation = rotation
         self.field_relative = field_relative
-        self.open_loop = open_loop
+        self.open_loop = drive_open_loop
 
     def execute(self):
         self._swerve.drive(
@@ -215,7 +304,7 @@ class _TeleOpCommand(commands2.CommandBase):
         # fmt: off
         builder.addBooleanProperty("Field Relative", lambda: self.field_relative,
                                    lambda val: setattr(self, "field_relative", val))
-        builder.addBooleanProperty("Open Loop", lambda: self.open_loop, lambda val: setattr(self, "open_loop", val))
+        builder.addBooleanProperty("Open Loop", lambda: self.open_loop, lambda val: setattr(self, "drive_open_loop", val))
         # fmt: on
 
     def toggle_field_relative(self):
@@ -227,17 +316,18 @@ class _TeleOpCommand(commands2.CommandBase):
 
 @dataclass
 class TrajectoryFollowerParameters:
-    target_angular_velocity: Quantity
-    target_angular_acceleration: Quantity
+    max_drive_velocity: Quantity
 
     # Positional PID constants for X, Y, and theta (rotation) controllers
     theta_kP: float
-    x_kP: float
-    y_kP: float
+    xy_kP: float
 
-    @cached_property
-    def theta_controller_constraints(self):
-        return TrapezoidProfileRadians.Constraints(
-            self.target_angular_velocity.m_as(u.rad / u.s),
-            self.target_angular_acceleration.m_as(u.rad / (u.s * u.s)),
-        )
+
+def greatest_distance_from_translations(translations: Iterable[Translation2d]):
+    """
+    Calculates the magnitude of the longest translation from a list of translations.
+    :param translations: List of translations
+    :return: The magnitude
+    """
+    distances = tuple(math.sqrt(trans.x**2 + trans.y**2) for trans in translations)
+    return max(distances)

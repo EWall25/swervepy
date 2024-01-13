@@ -10,6 +10,7 @@ __all__ = [
     "NEOCoaxialDriveComponent",
     "NEOCoaxialAzimuthComponent",
     "AbsoluteCANCoder",
+    "AbsoluteDutyCycleEncoder",
     "PigeonGyro",
     "CoaxialSwerveModule",
     "SparkMaxEncoderType",
@@ -26,5 +27,12 @@ from .motor import (
     NEOCoaxialAzimuthComponent,
     DummyCoaxialComponent,
 )
-from .sensor import AbsoluteCANCoder, PigeonGyro, SparkMaxEncoderType, SparkMaxAbsoluteEncoder, DummyGyro
+from .sensor import (
+    AbsoluteCANCoder,
+    AbsoluteDutyCycleEncoder,
+    PigeonGyro,
+    SparkMaxEncoderType,
+    SparkMaxAbsoluteEncoder,
+    DummyGyro,
+)
 from .system import CoaxialSwerveModule

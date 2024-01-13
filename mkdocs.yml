@@ -1,0 +1,23 @@
+site_name: SwervePy
+theme:
+    name: "material"
+plugins:
+    - mkdocstrings:
+        default_handler: python
+        handlers:
+            python:
+                options:
+                    show_root_heading: true
+                    docstring_style: sphinx
+                    merge_init_into_class: true
+                    separate_signature: false
+                import:
+                    - https://robotpy.readthedocs.io/projects/wpilib/en/latest/objects.inv
+                    - https://robotpy.readthedocs.io/projects/wpimath/en/latest/objects.inv
+                    - https://pint.readthedocs.io/en/stable/objects.inv
+                    - https://robotpy.readthedocs.io/projects/ctre/en/latest/objects.inv
+                    - https://robotpy.readthedocs.io/projects/rev/en/latest/objects.inv
+    - search
+nav:
+    - SwervePy Docs: index.md
+    - reference.md

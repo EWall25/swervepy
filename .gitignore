@@ -36,6 +36,10 @@ MANIFEST
 *.manifest
 *.spec
 
+# Text editor auto-save files
+*~
+\#*
+
 # Installer logs
 pip-log.txt
 pip-delete-this-directory.txt
@@ -165,5 +169,13 @@ cython_debug/
 
 # End of https://www.toptal.com/developers/gitignore/api/python
 
-### RobotPy ###
+# RobotPy
 simgui*.json
+.wpilib
+.installer_config
+networktables.json
+
+# MkDocs
+site/
+
+example_robot/swervepy

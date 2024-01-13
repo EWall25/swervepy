@@ -9,6 +9,7 @@ from . import SendableABCMeta
 class Gyro(Sendable, metaclass=SendableABCMeta):
     @abstractmethod
     def zero_heading(self):
+        """Set the gyro sensor's current heading as zero"""
         raise NotImplementedError
 
     @property
@@ -27,6 +28,7 @@ class AbsoluteEncoder(Sendable, metaclass=SendableABCMeta):
     @property
     @abstractmethod
     def absolute_position(self) -> Rotation2d:
+        """Absolute rotation"""
         raise NotImplementedError
 
     def initSendable(self, builder: SendableBuilder):
