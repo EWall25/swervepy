@@ -7,10 +7,10 @@ from functools import singledispatchmethod
 from typing import Callable, Optional, TYPE_CHECKING, Iterable
 
 import commands2
+from pathplannerlib.path import PathPlannerPath
 from pathplannerlib.commands import FollowPathCommand
 from pathplannerlib.controller import PPHolonomicDriveController
 from pathplannerlib.config import ReplanningConfig, PIDConstants
-from pathplannerlib.path import PathPlannerPath
 import wpilib
 import wpimath.estimator
 import wpimath.kinematics
