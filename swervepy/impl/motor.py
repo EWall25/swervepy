@@ -2,6 +2,7 @@ import copy
 from dataclasses import dataclass
 
 import phoenix5
+import phoenix5.sensors
 import rev
 from pint import Quantity
 from wpimath.controller import SimpleMotorFeedforwardMeters
@@ -104,6 +105,10 @@ class Falcon500CoaxialDriveComponent(CoaxialDriveComponent):
             self._feedforward.calculate(velocity),
         )
 
+    def set_voltage(self, volts: float):
+        percent_output = volts / self._motor.getBusVoltage()
+        self._motor.set(phoenix5.ControlMode.PercentOutput, percent_output)
+
     def reset(self):
         self._motor.setSelectedSensorPosition(0)
 
@@ -122,6 +127,10 @@ class Falcon500CoaxialDriveComponent(CoaxialDriveComponent):
             self._params.wheel_circumference,
             self._params.gear_ratio,
         )
+
+    @property
+    def voltage(self) -> float:
+        return self._motor.getMotorOutputVoltage()
 
 
 class Falcon500CoaxialAzimuthComponent(CoaxialAzimuthComponent):
@@ -291,6 +300,9 @@ class NEOCoaxialDriveComponent(CoaxialDriveComponent):
             arbFeedforward=self._feedforward.calculate(velocity),
         )
 
+    def set_voltage(self, volts: float):
+        self._motor.setVoltage(volts)
+
     def reset(self):
         self._encoder.setPosition(0)
 
@@ -301,6 +313,10 @@ class NEOCoaxialDriveComponent(CoaxialDriveComponent):
     @property
     def distance(self) -> float:
         return self._encoder.getPosition()
+
+    @property
+    def voltage(self) -> float:
+        return self._motor.getBusVoltage() * self._motor.getAppliedOutput()
 
 
 class NEOCoaxialAzimuthComponent(CoaxialAzimuthComponent):
@@ -400,6 +416,9 @@ class DummyCoaxialComponent(CoaxialDriveComponent, CoaxialAzimuthComponent):
     def follow_velocity_closed(self, velocity: float):
         pass
 
+    def set_voltage(self, volts: float):
+        pass
+
     def reset(self):
         pass
 
@@ -409,6 +428,10 @@ class DummyCoaxialComponent(CoaxialDriveComponent, CoaxialAzimuthComponent):
 
     @property
     def distance(self) -> float:
+        return 0
+
+    @property
+    def voltage(self) -> float:
         return 0
 
     def follow_angle(self, angle: Rotation2d):

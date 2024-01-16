@@ -26,6 +26,15 @@ class CoaxialDriveComponent(Protocol):
         raise NotImplementedError
 
     @abstractmethod
+    def set_voltage(self, volts: float):
+        """
+        Power the underlying motor with the specified voltage
+
+        :param volts: Voltage in volts (between -12 and +12 for most FRC motors)
+        """
+        raise NotImplementedError
+
+    @abstractmethod
     def reset(self):
         """Reset driven distance to zero or otherwise reinitialize the motor"""
         raise NotImplementedError
@@ -40,6 +49,12 @@ class CoaxialDriveComponent(Protocol):
     @abstractmethod
     def distance(self) -> float:
         """Driven distance in metres"""
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def voltage(self) -> float:
+        """Applied motor voltage in volts, between -12 and +12 for most FRC motors"""
         raise NotImplementedError
 
 

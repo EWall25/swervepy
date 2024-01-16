@@ -48,6 +48,16 @@ class SwerveModule(Sendable, metaclass=SendableABCMeta):
         raise NotImplementedError
 
     @abstractmethod
+    def set_drive_voltage(self, volts: float):
+        """
+        Apply a voltage to the underlying drive motor. For use with SysID characterization
+
+        :param volts: Voltage in volts
+        """
+        # TODO: This method creates a compatibility concern for differential swerve drives
+        raise NotImplementedError
+
+    @abstractmethod
     def desire_azimuth_angle(self, angle: Rotation2d):
         """
         Turn the wheel
@@ -71,6 +81,12 @@ class SwerveModule(Sendable, metaclass=SendableABCMeta):
     @abstractmethod
     def drive_distance(self) -> float:
         """Driven distance in metres"""
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def drive_voltage(self) -> float:
+        """Applied output voltage of the drive motor"""
         raise NotImplementedError
 
     @property

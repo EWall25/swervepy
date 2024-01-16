@@ -12,6 +12,7 @@ from pathplannerlib.commands import FollowPathCommand
 from pathplannerlib.controller import PPHolonomicDriveController
 from pathplannerlib.config import ReplanningConfig, PIDConstants
 import wpilib
+import wpilib.sysid
 import wpimath.estimator
 import wpimath.kinematics
 from pint import Quantity
@@ -197,6 +198,41 @@ class SwerveDrive(commands2.Subsystem):
 
         self._odometry.resetPosition(self._gyro.heading, self.module_positions, pose)  # type: ignore
 
+    def _sysid_drive(self, volts: float):
+        """
+        Drive all wheels at the specified voltage and lock them forward
+
+        :param volts: Voltage in volts (between -12 and +12 for most FRC motors)
+        """
+        for module in self._modules:
+            # Lock modules facing forward so the swerve drive acts as a tank drive
+            module.desire_azimuth_angle(Rotation2d(0))
+
+            # Drive motors at desired voltage
+            module.set_drive_voltage(volts)
+
+    def _sysid_log(self, log: wpilib.sysid.SysIdRoutineLog, module_names: Optional[tuple[str, ...]] = None):
+        """
+        Log motor information for SysId
+
+        :param log: The SysId log
+        :param module_names: An optional ordered tuple of swerve module names to associate with recorded information
+        """
+        if module_names:
+            # Associate each swerve module with a name
+            modules = dict(zip(module_names, self._modules))
+        else:
+            # Associate each swerve module with a number if no names were provided
+            modules = dict(enumerate(self._modules))
+
+        for name, module in modules:  # type: str | int, SwerveModule
+            (
+                log.motor(str(name))
+                .voltage(module.drive_voltage)
+                .position(module.drive_distance)
+                .velocity(module.drive_velocity)
+            )
+
     def teleop_command(
         self,
         translation: Callable[[], float],
@@ -271,6 +307,8 @@ class SwerveDrive(commands2.Subsystem):
 
         return command
 
+    # TODO: Add SysId commands
+
 
 class _TeleOpCommand(commands2.Command):
     def __init__(
@@ -284,6 +322,7 @@ class _TeleOpCommand(commands2.Command):
     ):
         super().__init__()
         self.addRequirements(swerve)
+        self.setName("TeleOp Command")
 
         self._swerve = swerve
         self._translation = translation
@@ -301,11 +340,12 @@ class _TeleOpCommand(commands2.Command):
         )
 
     def initSendable(self, builder: SendableBuilder):
-        # fmt: off
-        builder.addBooleanProperty("Field Relative", lambda: self.field_relative,
-                                   lambda val: setattr(self, "field_relative", val))
-        builder.addBooleanProperty("Open Loop", lambda: self.open_loop, lambda val: setattr(self, "drive_open_loop", val))
-        # fmt: on
+        builder.addBooleanProperty(
+            "Field Relative", lambda: self.field_relative, lambda val: setattr(self, "field_relative", val)
+        )
+        builder.addBooleanProperty(
+            "Open Loop", lambda: self.open_loop, lambda val: setattr(self, "drive_open_loop", val)
+        )
 
     def toggle_field_relative(self):
         self.field_relative = not self.field_relative

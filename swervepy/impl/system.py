@@ -23,6 +23,9 @@ class CoaxialSwerveModule(SwerveModule):
         else:
             self._drive.follow_velocity_closed(velocity)
 
+    def set_drive_voltage(self, volts: float):
+        self._drive.set_voltage(volts)
+
     def desire_azimuth_angle(self, angle: Rotation2d):
         self.last_commanded_azimuth_angle = angle
         self._azimuth.follow_angle(angle)
@@ -40,6 +43,10 @@ class CoaxialSwerveModule(SwerveModule):
         return self._drive.distance
 
     @property
+    def drive_voltage(self) -> float:
+        return self._drive.voltage
+
+    @property
     def azimuth_angle(self) -> Rotation2d:
         return self._azimuth.angle
 
@@ -52,6 +59,7 @@ class CoaxialSwerveModule(SwerveModule):
         builder.setSmartDashboardType("CoaxialSwerveModule")
         builder.addDoubleProperty("Drive Velocity (mps)", lambda: self._drive.velocity, lambda _: None)
         builder.addDoubleProperty("Drive Distance (m)", lambda: self._drive.distance, lambda _: None)
+        builder.addDoubleProperty("Drive Voltage", lambda: self._drive.voltage, lambda _: None)
         builder.addDoubleProperty("Azimuth Velocity (radps)", lambda: self._azimuth.rotational_velocity, lambda _: None)
         builder.addDoubleProperty("Azimuth Position (rad)", lambda: self._azimuth.angle.radians(), lambda _: None)
         builder.addDoubleProperty("Azimuth Position (deg)", lambda: self._azimuth.angle.degrees(), lambda _: None)
