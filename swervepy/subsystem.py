@@ -19,6 +19,7 @@ from pint import Quantity
 from wpimath.geometry import Pose2d, Translation2d, Rotation2d
 from wpimath.kinematics import ChassisSpeeds, SwerveModuleState, SwerveModulePosition
 from wpiutil import SendableBuilder
+from commands2.sysid import SysIdRoutine
 
 if TYPE_CHECKING:
     from wpimath.estimator import SwerveDrive4PoseEstimator
@@ -90,6 +91,12 @@ class SwerveDrive(commands2.Subsystem):
         # Field to plot auto trajectories and robot pose
         self.field = wpilib.Field2d()
         wpilib.SmartDashboard.putData(self.field)
+
+        # Create a characterization routine to use with the SysId utility
+        self._sysid_routine = SysIdRoutine(
+            SysIdRoutine.Config(),
+            SysIdRoutine.Mechanism(self._sysid_drive, self._sysid_log, self, "drive"),
+        )
 
     def periodic(self):
         vision_pose = self._vision_pose_callback()
@@ -221,10 +228,10 @@ class SwerveDrive(commands2.Subsystem):
         """
         if module_names:
             # Associate each swerve module with a name
-            modules = dict(zip(module_names, self._modules))
+            modules = zip(module_names, self._modules)
         else:
             # Associate each swerve module with a number if no names were provided
-            modules = dict(enumerate(self._modules))
+            modules = enumerate(self._modules)
 
         for name, module in modules:  # type: str | int, SwerveModule
             (
@@ -308,7 +315,27 @@ class SwerveDrive(commands2.Subsystem):
 
         return command
 
-    # TODO: Add SysId commands
+    def sys_id_quasistatic(self, direction: SysIdRoutine.Direction) -> commands2.Command:
+        """
+        Run a quasistatic characterization test. The robot will move until this command is cancelled.
+
+        In this test, the mechanism is gradually sped-up such that the voltage corresponding to
+        acceleration is negligible (hence, “as if static”).
+
+        :param direction: The direction the robot will drive
+        """
+        return self._sysid_routine.quasistatic(direction)
+
+    def sys_id_dynamic(self, direction: SysIdRoutine.Direction) -> commands2.Command:
+        """
+        Run a dynamic characterization test. The robot will move until this command is cancelled.
+
+        In this test, a constant ‘step voltage’ is given to the mechanism, so that the
+        behavior while accelerating can be determined.
+
+        :param direction: The direction the robot will drive
+        """
+        return self._sysid_routine.dynamic(direction)
 
 
 class _TeleOpCommand(commands2.Command):
