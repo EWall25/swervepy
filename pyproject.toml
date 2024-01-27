@@ -10,8 +10,7 @@ keywords = ["frc", "swerve-drive"]
 
 [tool.poetry.dependencies]
 python = ">=3.11,<3.13"
-robotpy = {version = ">=2024.1.1.2,<2025.0.0", extras = ["rev", "phoenix5", "pathplannerlib"]}
-robotpy-commands-v2 = {git = "https://github.com/robotpy/robotpy-commands-v2.git", rev = "27a3071"}
+robotpy = {version = ">=2024.2.1,<2025", extras = ["rev", "phoenix5", "pathplannerlib", "commands2"]}
 Pint = "^0.20.1"
 
 [tool.poetry.group.dev.dependencies]
