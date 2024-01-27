@@ -248,7 +248,7 @@ class SwerveDrive(commands2.Subsystem):
         rotation: Callable[[], float],
         field_relative: bool,
         drive_open_loop: bool,
-    ) -> commands2.Command:
+    ) -> "_TeleOpCommand":
         """
         Construct a command that drives the robot using joystick (or other) inputs
 
@@ -353,16 +353,16 @@ class _TeleOpCommand(commands2.Command):
         self.setName("TeleOp Command")
 
         self._swerve = swerve
-        self._translation = translation
-        self._strafe = strafe
-        self._rotation = rotation
+        self.translation = translation
+        self.strafe = strafe
+        self.rotation = rotation
         self.field_relative = field_relative
         self.open_loop = drive_open_loop
 
     def execute(self):
         self._swerve.drive(
-            Translation2d(self._translation(), self._strafe()) * self._swerve.max_velocity,
-            self._rotation() * self._swerve.max_angular_velocity,
+            Translation2d(self.translation(), self.strafe()) * self._swerve.max_velocity,
+            self.rotation() * self._swerve.max_angular_velocity,
             self.field_relative,
             self.open_loop,
         )
