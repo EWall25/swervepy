@@ -57,7 +57,7 @@ class SwerveDrive(commands2.Subsystem):
         :param max_velocity: The actual maximum velocity of the robot
         :param max_angular_velocity: The actual maximum angular (turning) velocity of the robot
         :param vision_pose_callback: An optional method that returns the robot's pose derived from vision.
-        This pose from this method is integrated into the robot's odometry.
+               This pose from this method is integrated into the robot's odometry.
         """
 
         super().__init__()
@@ -67,6 +67,7 @@ class SwerveDrive(commands2.Subsystem):
         self._vision_pose_callback = vision_pose_callback
         self.max_velocity: float = max_velocity.m_as(u.m / u.s)
         self.max_angular_velocity: float = max_angular_velocity.m_as(u.rad / u.s)
+        self.period_seconds = 0.02
 
         # Pause init for a second before setting module offsets to avoid a bug related to inverting motors.
         # Fixes https://github.com/Team364/BaseFalconSwerve/issues/8.
@@ -118,12 +119,15 @@ class SwerveDrive(commands2.Subsystem):
         drive_open_loop: bool,
     ):
         """
-        Drive the robot at the provided speeds (translation and rotation)
+        Drive the robot at the provided speeds (translation and rotation).
+
+        By default, chassis speeds are discretized on an interval of 20ms.
+        If your robot loop has a non-default period, you **must** set this subsystem's ``period_seconds`` field!
 
         :param translation: Translation speed on the XY-plane in m/s where +X is forward and +Y is left
         :param rotation: Rotation speed around the Z-axis in rad/s where CCW+
         :param field_relative: If True, gyroscopic zero is used as the forward direction.
-        Else, forward faces the front of the robot.
+               Else, forward faces the front of the robot.
         :param drive_open_loop: Use open loop (True) or closed loop (False) velocity control for driving the wheel
         """
 
@@ -132,6 +136,7 @@ class SwerveDrive(commands2.Subsystem):
             if field_relative
             else ChassisSpeeds(translation.x, translation.y, rotation)
         )
+        speeds = ChassisSpeeds.discretize(speeds, self.period_seconds)
         swerve_module_states = self._kinematics.toSwerveModuleStates(speeds)
 
         self.desire_module_states(swerve_module_states, drive_open_loop, rotate_in_place=False)
@@ -139,7 +144,10 @@ class SwerveDrive(commands2.Subsystem):
     @drive.register
     def _(self, chassis_speeds: ChassisSpeeds, drive_open_loop: bool):
         """
-        Alternative method to drive the robot at a set of chassis speeds (exclusively robot-relative)
+        Alternative method to drive the robot at a set of chassis speeds (exclusively robot-relative).
+
+        By default, chassis speeds are discretized on an interval of 20ms.
+        If your robot loop has a non-default period, you **must** set this subsystem's ``period_seconds`` field!
 
         :param chassis_speeds: Robot-relative speeds on the XY-plane in m/s where +X is forward and +Y is left
         :param drive_open_loop: Use open loop (True) or closed loop (False) velocity control for driving the wheel
@@ -256,7 +264,7 @@ class SwerveDrive(commands2.Subsystem):
         :param strafe: A method that returns the desired +Y (left/right) velocity in m/s
         :param rotation: A method that returns the desired CCW+ rotational velocity in rad/s
         :param field_relative: If True, gyroscopic zero is used as the forward direction.
-        Else, forward faces the front of the robot.
+               Else, forward faces the front of the robot.
         :param drive_open_loop: Use open loop (True) or closed loop (False) velocity control for driving the wheel
         :return: The command
         """
@@ -277,9 +285,9 @@ class SwerveDrive(commands2.Subsystem):
         :param parameters: Options that determine how the robot will follow the trajectory
         :param first_path: If True, the robot's pose will be reset to the trajectory's initial pose
         :param drive_open_loop: Use open loop control (True) or closed loop (False) to swerve module speeds. Closed-loop
-        positional control will always be used for trajectory following
+               positional control will always be used for trajectory following
         :param flip_path: Method returning whether to flip the provided path.
-        This will maintain a global blue alliance origin.
+               This will maintain a global blue alliance origin.
         :return: Trajectory-follower command
         """
 
@@ -394,6 +402,7 @@ class TrajectoryFollowerParameters:
 def greatest_distance_from_translations(translations: Iterable[Translation2d]):
     """
     Calculates the magnitude of the longest translation from a list of translations.
+
     :param translations: List of translations
     :return: The magnitude
     """
