@@ -34,6 +34,10 @@ class CoaxialSwerveModule(SwerveModule):
         self._drive.reset()
         self._azimuth.reset()
 
+    def run_simulation(self, delta_time: float):
+        self._drive.run_simulation(delta_time)
+        self._azimuth.run_simulation(delta_time)
+
     @property
     def drive_velocity(self) -> float:
         return self._drive.velocity

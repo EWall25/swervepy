@@ -1,4 +1,5 @@
 import enum
+import math
 
 import phoenix5.sensors
 import rev
@@ -55,10 +56,15 @@ class PigeonGyro(Gyro):
         self._gyro = phoenix5.sensors.PigeonIMU(id_)
         self.invert = invert
 
+        self._sim_gyro = self._gyro.getSimCollection()
+
         wpilib.SmartDashboard.putData("Pigeon IMU", self)
 
     def zero_heading(self):
         self._gyro.setYaw(0)
+
+    def run_simulation(self, delta_position: float):
+        self._sim_gyro.addHeading(delta_position * 180 / math.pi)
 
     @property
     def heading(self) -> Rotation2d:
@@ -80,10 +86,15 @@ class Pigeon2Gyro(Gyro):
             # Only an int was provided for id_
             self._gyro = phoenix5.sensors.Pigeon2(id_)
 
+        self._sim_gyro = self._gyro.getSimCollection()
+
         wpilib.SmartDashboard.putData("Pigeon 2", self)
 
     def zero_heading(self):
         self._gyro.setYaw(0)
+
+    def run_simulation(self, delta_position: float):
+        self._sim_gyro.addHeading(delta_position * 180 / math.pi)
 
     @property
     def heading(self) -> Rotation2d:

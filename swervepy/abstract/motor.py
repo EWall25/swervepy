@@ -39,6 +39,13 @@ class CoaxialDriveComponent(Protocol):
         """Reset driven distance to zero or otherwise reinitialize the motor"""
         raise NotImplementedError
 
+    def run_simulation(self, delta_time: float):
+        """
+        Update simulated motors and sensors. Called periodically during simulation.
+
+        :param delta_time: Time in seconds since this method was last called
+        """
+
     @property
     @abstractmethod
     def velocity(self) -> float:
@@ -77,6 +84,13 @@ class CoaxialAzimuthComponent(Protocol):
     def reset(self):
         """Reset the wheel's angle to its absolute position"""
         raise NotImplementedError
+
+    def run_simulation(self, delta_time: float):
+        """
+        Update simulated motors and sensors. Called periodically during simulation.
+
+        :param delta_time: Time in seconds since this method was last called
+        """
 
     @property
     @abstractmethod

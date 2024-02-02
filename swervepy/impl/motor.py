@@ -5,6 +5,7 @@ import phoenix5
 import phoenix5.sensors
 import rev
 from pint import Quantity
+from wpilib.simulation import SimDeviceSim
 from wpimath.controller import SimpleMotorFeedforwardMeters
 from wpimath.geometry import Rotation2d
 
@@ -83,6 +84,8 @@ class Falcon500CoaxialDriveComponent(CoaxialDriveComponent):
 
         self._feedforward = SimpleMotorFeedforwardMeters(parameters.kS, parameters.kV, parameters.kA)
 
+        self._sim_motor = self._motor.getSimCollection()
+
     def _config(self):
         settings = self._params.create_TalonFX_config()
         self._motor.configFactoryDefault()
@@ -93,6 +96,11 @@ class Falcon500CoaxialDriveComponent(CoaxialDriveComponent):
     def follow_velocity_open(self, velocity: float):
         percent_out = velocity / self._params.max_speed
         self._motor.set(phoenix5.ControlMode.PercentOutput, percent_out)
+
+        converted_velocity = conversions.mps_to_falcon(
+            velocity, self._params.wheel_circumference, self._params.gear_ratio
+        )
+        self._sim_motor.setIntegratedSensorVelocity(int(converted_velocity))
 
     def follow_velocity_closed(self, velocity: float):
         converted_velocity = conversions.mps_to_falcon(
@@ -111,6 +119,10 @@ class Falcon500CoaxialDriveComponent(CoaxialDriveComponent):
 
     def reset(self):
         self._motor.setSelectedSensorPosition(0)
+
+    def run_simulation(self, delta_time: float):
+        delta_pos = conversions.units_per_100_ms_to_units_per_sec(self._motor.getSelectedSensorVelocity()) * delta_time
+        self._sim_motor.addIntegratedSensorPosition(int(delta_pos))
 
     @property
     def velocity(self) -> float:
@@ -201,6 +213,8 @@ class Falcon500CoaxialAzimuthComponent(CoaxialAzimuthComponent):
         self._config()
         self.reset()
 
+        self._sim_motor = self._motor.getSimCollection()
+
     def _config(self):
         settings = self._params.create_TalonFX_config()
         self._motor.configFactoryDefault()
@@ -211,6 +225,8 @@ class Falcon500CoaxialAzimuthComponent(CoaxialAzimuthComponent):
     def follow_angle(self, angle: Rotation2d):
         converted_angle = conversions.degrees_to_falcon(angle, self._params.gear_ratio)
         self._motor.set(phoenix5.ControlMode.Position, converted_angle)
+
+        self._sim_motor.setIntegratedSensorRawPosition(int(converted_angle))
 
     def reset(self):
         absolute_position = self._absolute_encoder.absolute_position - self._offset
@@ -269,6 +285,10 @@ class NEOCoaxialDriveComponent(CoaxialDriveComponent):
 
         self._feedforward = SimpleMotorFeedforwardMeters(parameters.kS, parameters.kV, parameters.kA)
 
+        sim_motor = SimDeviceSim(f"SPARK MAX [{id_}]")
+        self._sim_velocity = sim_motor.getDouble("Velocity")
+        self._sim_position = sim_motor.getDouble("Position")
+
     def _config(self):
         self._motor.restoreFactoryDefaults()
 
@@ -293,6 +313,8 @@ class NEOCoaxialDriveComponent(CoaxialDriveComponent):
         percent_out = velocity / self._params.max_speed
         self._motor.set(percent_out)
 
+        self._sim_velocity.set(velocity)
+
     def follow_velocity_closed(self, velocity: float):
         self._controller.setReference(
             velocity,
@@ -305,6 +327,10 @@ class NEOCoaxialDriveComponent(CoaxialDriveComponent):
 
     def reset(self):
         self._encoder.setPosition(0)
+
+    def run_simulation(self, delta_time: float):
+        new_position = self.distance + self.velocity * delta_time
+        self._sim_position.set(new_position)
 
     @property
     def velocity(self) -> float:
@@ -371,6 +397,9 @@ class NEOCoaxialAzimuthComponent(CoaxialAzimuthComponent):
 
         self.reset()
 
+        sim_motor = SimDeviceSim(f"SPARK MAX [{id_}]")
+        self._sim_position = sim_motor.getDouble("Position")
+
     def _config(self):
         self._motor.restoreFactoryDefaults()
 
@@ -389,7 +418,10 @@ class NEOCoaxialAzimuthComponent(CoaxialAzimuthComponent):
         self._encoder.setVelocityConversionFactor(position_conversion_factor / 60)
 
     def follow_angle(self, angle: Rotation2d):
-        self._controller.setReference(angle.degrees(), rev.CANSparkMax.ControlType.kPosition)
+        degrees = angle.degrees()
+        self._controller.setReference(degrees, rev.CANSparkMax.ControlType.kPosition)
+
+        self._sim_position.set(degrees)
 
     def reset(self):
         absolute_position = self._absolute_encoder.absolute_position - self._offset

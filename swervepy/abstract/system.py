@@ -71,6 +71,15 @@ class SwerveModule(Sendable, metaclass=SendableABCMeta):
         """Reset sensor readings. Should be called during initialization."""
         raise NotImplementedError
 
+    @abstractmethod
+    def run_simulation(self, delta_time: float):
+        """
+        Update simulated motors and sensors. Called periodically during simulation.
+
+        :param delta_time: Time in seconds since this method was last called
+        """
+        raise NotImplementedError
+
     @property
     @abstractmethod
     def drive_velocity(self) -> float:

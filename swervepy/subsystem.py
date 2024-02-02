@@ -110,6 +110,13 @@ class SwerveDrive(commands2.Subsystem):
         # Visualize robot position on field
         self.field.setRobotPose(robot_pose)
 
+    def simulationPeriodic(self):
+        for module in self._modules:
+            module.run_simulation(self.period_seconds)
+
+        angular_velocity = self._kinematics.toChassisSpeeds(self.module_states).omega
+        self._gyro.run_simulation(angular_velocity * self.period_seconds)
+
     @singledispatchmethod
     def drive(
         self,
