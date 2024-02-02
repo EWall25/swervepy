@@ -177,6 +177,11 @@ class SwerveDrive(commands2.Subsystem):
             module.desire_state(swerve_module_states[i], drive_open_loop, rotate_in_place)
 
     @property
+    def module_states(self) -> tuple[SwerveModuleState, ...]:
+        """A tuple of the swerve modules' states (wheel velocity and facing rotation)"""
+        return tuple(module.module_state for module in self._modules)
+
+    @property
     def module_positions(self) -> tuple[SwerveModulePosition, ...]:
         """A tuple of the swerve modules' positions (driven distance and facing rotation)"""
         return tuple(module.module_position for module in self._modules)
