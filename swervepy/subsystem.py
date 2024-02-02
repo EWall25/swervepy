@@ -265,9 +265,9 @@ class SwerveDrive(commands2.Subsystem):
         """
         Construct a command that drives the robot using joystick (or other) inputs
 
-        :param translation: A method that returns the desired +X (forward/backward) velocity in m/s
-        :param strafe: A method that returns the desired +Y (left/right) velocity in m/s
-        :param rotation: A method that returns the desired CCW+ rotational velocity in rad/s
+        :param translation: A method that returns the desired +X (forward/backward) velocity as a percentage in [-1, 1]
+        :param strafe: A method that returns the desired +Y (left/right) velocity as a percentage in [-1, 1]
+        :param rotation: A method that returns the desired CCW+ rotational velocity as a percentage in [-1, 1]
         :param field_relative: If True, gyroscopic zero is used as the forward direction.
                Else, forward faces the front of the robot.
         :param drive_open_loop: Use open loop (True) or closed loop (False) velocity control for driving the wheel
