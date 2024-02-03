@@ -105,17 +105,21 @@ class Pigeon2Gyro(Gyro):
 
 
 class DummyGyro(Gyro):
-    """Gyro that does nothing"""
+    """Gyro that does nothing on a real robot but functions normally in simulation"""
 
     def __init__(self, *args):
         super().__init__()
+        self._radians = 0
 
     def zero_heading(self):
-        pass
+        self._radians = 0
+
+    def simulation_periodic(self, delta_position: float):
+        self._radians += delta_position
 
     @property
     def heading(self) -> Rotation2d:
-        return Rotation2d.fromDegrees(0)
+        return Rotation2d(self._radians)
 
 
 class SparkMaxEncoderType(enum.Enum):
