@@ -72,10 +72,11 @@ class SwerveDrive(commands2.Subsystem):
         # Pause init for a second before setting module offsets to avoid a bug related to inverting motors.
         # Fixes https://github.com/Team364/BaseFalconSwerve/issues/8.
         time.sleep(1)
-        self.reset_modules()
+        for module in self._modules:
+            module.reset()
 
         # Zero heading at startup to set "forward" direction
-        self.zero_heading()
+        self._gyro.zero_heading()
 
         # There are different classes for each number of swerve modules in a drive base,
         # so construct the class name from number of modules.
@@ -213,9 +214,15 @@ class SwerveDrive(commands2.Subsystem):
         for module in self._modules:
             module.reset()
 
+        # Any time encoder distances are reset, odometry must also be reset
+        self.reset_odometry(self.pose)
+
     def zero_heading(self):
         """Set the chassis' current heading as "zero" or straight forward"""
         self._gyro.zero_heading()
+
+        # Any time gyro angle is reset, odometry must also be reset
+        self._odometry.resetPosition(Rotation2d(), self.module_positions, self.pose)
 
     def reset_odometry(self, pose: Pose2d):
         """
