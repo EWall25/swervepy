@@ -63,7 +63,7 @@ class PigeonGyro(Gyro):
     def zero_heading(self):
         self._gyro.setYaw(0)
 
-    def run_simulation(self, delta_position: float):
+    def simulation_periodic(self, delta_position: float):
         self._sim_gyro.addHeading(delta_position * 180 / math.pi)
 
     @property
@@ -93,7 +93,7 @@ class Pigeon2Gyro(Gyro):
     def zero_heading(self):
         self._gyro.setYaw(0)
 
-    def run_simulation(self, delta_position: float):
+    def simulation_periodic(self, delta_position: float):
         self._sim_gyro.addHeading(delta_position * 180 / math.pi)
 
     @property

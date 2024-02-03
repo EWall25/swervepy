@@ -12,7 +12,7 @@ class Gyro(Sendable, metaclass=SendableABCMeta):
         """Set the gyro sensor's current heading as zero"""
         raise NotImplementedError
 
-    def run_simulation(self, delta_position: float):
+    def simulation_periodic(self, delta_position: float):
         """
         Update gyro angular position and velocity. Called periodically during simulation.
 

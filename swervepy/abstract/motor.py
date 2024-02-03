@@ -39,7 +39,7 @@ class CoaxialDriveComponent(Protocol):
         """Reset driven distance to zero or otherwise reinitialize the motor"""
         raise NotImplementedError
 
-    def run_simulation(self, delta_time: float):
+    def simulation_periodic(self, delta_time: float):
         """
         Update simulated motors and sensors. Called periodically during simulation.
 
@@ -85,7 +85,7 @@ class CoaxialAzimuthComponent(Protocol):
         """Reset the wheel's angle to its absolute position"""
         raise NotImplementedError
 
-    def run_simulation(self, delta_time: float):
+    def simulation_periodic(self, delta_time: float):
         """
         Update simulated motors and sensors. Called periodically during simulation.
 

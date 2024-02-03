@@ -112,11 +112,14 @@ class SwerveDrive(commands2.Subsystem):
         self.field.setRobotPose(robot_pose)
 
     def simulationPeriodic(self):
+        # Run a periodic simulation method that updates sensor readings based on desired velocities and rotations
         for module in self._modules:
-            module.run_simulation(self.period_seconds)
+            module.simulation_periodic(self.period_seconds)
 
+        # Calculate the chassis angular velocity produced by the simulated swerve modules
         angular_velocity = self._kinematics.toChassisSpeeds(self.module_states).omega
-        self._gyro.run_simulation(angular_velocity * self.period_seconds)
+        # Update the gyro heading reading with the change in heading since the last timestep
+        self._gyro.simulation_periodic(angular_velocity * self.period_seconds)
 
     @singledispatchmethod
     def drive(
@@ -232,6 +235,12 @@ class SwerveDrive(commands2.Subsystem):
         """
 
         self._odometry.resetPosition(self._gyro.heading, self.module_positions, pose)  # type: ignore
+
+    def reset_odometry_to_vision(self):
+        """Reset the robot's pose to the vision pose estimation"""
+        estimated_pose = self._vision_pose_callback()
+        if estimated_pose:
+            self.reset_odometry(estimated_pose)
 
     def _sysid_drive(self, volts: float):
         """

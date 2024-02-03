@@ -72,7 +72,7 @@ class SwerveModule(Sendable, metaclass=SendableABCMeta):
         raise NotImplementedError
 
     @abstractmethod
-    def run_simulation(self, delta_time: float):
+    def simulation_periodic(self, delta_time: float):
         """
         Update simulated motors and sensors. Called periodically during simulation.
 

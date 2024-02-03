@@ -120,7 +120,7 @@ class Falcon500CoaxialDriveComponent(CoaxialDriveComponent):
     def reset(self):
         self._motor.setSelectedSensorPosition(0)
 
-    def run_simulation(self, delta_time: float):
+    def simulation_periodic(self, delta_time: float):
         delta_pos = conversions.units_per_100_ms_to_units_per_sec(self._motor.getSelectedSensorVelocity()) * delta_time
         self._sim_motor.addIntegratedSensorPosition(int(delta_pos))
 
@@ -328,7 +328,7 @@ class NEOCoaxialDriveComponent(CoaxialDriveComponent):
     def reset(self):
         self._encoder.setPosition(0)
 
-    def run_simulation(self, delta_time: float):
+    def simulation_periodic(self, delta_time: float):
         new_position = self.distance + self.velocity * delta_time
         self._sim_position.set(new_position)
 
