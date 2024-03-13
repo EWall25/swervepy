@@ -5,6 +5,8 @@ import phoenix5
 import phoenix5.sensors
 import rev
 from pint import Quantity
+from typing_extensions import deprecated
+from wpilib.simulation import SimDeviceSim
 from wpimath.controller import SimpleMotorFeedforwardMeters
 from wpimath.geometry import Rotation2d
 
@@ -73,15 +75,17 @@ class Falcon500CoaxialDriveComponent(CoaxialDriveComponent):
 
         try:
             # Unpack tuple of motor id and CAN bus id into TalonFX constructor
-            self._motor = phoenix5.TalonFX(*id_)
+            self._motor = phoenix5.WPI_TalonFX(*id_)
         except TypeError:
             # Only an int was provided for id_
-            self._motor = phoenix5.TalonFX(id_)
+            self._motor = phoenix5.WPI_TalonFX(id_)
 
         self._config()
         self.reset()
 
         self._feedforward = SimpleMotorFeedforwardMeters(parameters.kS, parameters.kV, parameters.kA)
+
+        self._sim_motor = self._motor.getSimCollection()
 
     def _config(self):
         settings = self._params.create_TalonFX_config()
@@ -94,6 +98,14 @@ class Falcon500CoaxialDriveComponent(CoaxialDriveComponent):
         percent_out = velocity / self._params.max_speed
         self._motor.set(phoenix5.ControlMode.PercentOutput, percent_out)
 
+        converted_velocity = conversions.mps_to_falcon(
+            velocity, self._params.wheel_circumference, self._params.gear_ratio
+        )
+        # CTRE sim requires us to invert sensor readings ourselves
+        self._sim_motor.setIntegratedSensorVelocity(int(
+            converted_velocity * -1 if self._params.invert_motor else 1
+        ))
+
     def follow_velocity_closed(self, velocity: float):
         converted_velocity = conversions.mps_to_falcon(
             velocity, self._params.wheel_circumference, self._params.gear_ratio
@@ -105,12 +117,21 @@ class Falcon500CoaxialDriveComponent(CoaxialDriveComponent):
             self._feedforward.calculate(velocity),
         )
 
+        # CTRE sim requires us to invert sensor readings ourselves
+        self._sim_motor.setIntegratedSensorVelocity(int(
+            converted_velocity * -1 if self._params.invert_motor else 1
+        ))
+
     def set_voltage(self, volts: float):
         percent_output = volts / self._motor.getBusVoltage()
         self._motor.set(phoenix5.ControlMode.PercentOutput, percent_output)
 
     def reset(self):
         self._motor.setSelectedSensorPosition(0)
+
+    def simulation_periodic(self, delta_time: float):
+        delta_pos = conversions.units_per_100_ms_to_units_per_sec(self._motor.getSelectedSensorVelocity()) * delta_time
+        self._sim_motor.addIntegratedSensorPosition(int(delta_pos))
 
     @property
     def velocity(self) -> float:
@@ -190,16 +211,18 @@ class Falcon500CoaxialAzimuthComponent(CoaxialAzimuthComponent):
 
         try:
             # Unpack tuple of motor id and CAN bus id into TalonFX constructor
-            self._motor = phoenix5.TalonFX(*id_)
+            self._motor = phoenix5.WPI_TalonFX(*id_)
         except TypeError:
             # Only an int was provided for id_
-            self._motor = phoenix5.TalonFX(id_)
+            self._motor = phoenix5.WPI_TalonFX(id_)
 
         self._absolute_encoder = absolute_encoder
         self._offset = azimuth_offset
 
         self._config()
         self.reset()
+
+        self._sim_motor = self._motor.getSimCollection()
 
     def _config(self):
         settings = self._params.create_TalonFX_config()
@@ -211,6 +234,11 @@ class Falcon500CoaxialAzimuthComponent(CoaxialAzimuthComponent):
     def follow_angle(self, angle: Rotation2d):
         converted_angle = conversions.degrees_to_falcon(angle, self._params.gear_ratio)
         self._motor.set(phoenix5.ControlMode.Position, converted_angle)
+
+        # CTRE sim requires us to invert sensor readings ourselves
+        self._sim_motor.setIntegratedSensorRawPosition(int(
+            converted_angle * -1 if self._params.invert_motor else 1
+        ))
 
     def reset(self):
         absolute_position = self._absolute_encoder.absolute_position - self._offset
@@ -269,6 +297,10 @@ class NEOCoaxialDriveComponent(CoaxialDriveComponent):
 
         self._feedforward = SimpleMotorFeedforwardMeters(parameters.kS, parameters.kV, parameters.kA)
 
+        sim_motor = SimDeviceSim(f"SPARK MAX [{id_}]")
+        self._sim_velocity = sim_motor.getDouble("Velocity")
+        self._sim_position = sim_motor.getDouble("Position")
+
     def _config(self):
         self._motor.restoreFactoryDefaults()
 
@@ -293,6 +325,8 @@ class NEOCoaxialDriveComponent(CoaxialDriveComponent):
         percent_out = velocity / self._params.max_speed
         self._motor.set(percent_out)
 
+        self._sim_velocity.set(velocity)
+
     def follow_velocity_closed(self, velocity: float):
         self._controller.setReference(
             velocity,
@@ -305,6 +339,10 @@ class NEOCoaxialDriveComponent(CoaxialDriveComponent):
 
     def reset(self):
         self._encoder.setPosition(0)
+
+    def simulation_periodic(self, delta_time: float):
+        new_position = self.distance + self.velocity * delta_time
+        self._sim_position.set(new_position)
 
     @property
     def velocity(self) -> float:
@@ -371,6 +409,9 @@ class NEOCoaxialAzimuthComponent(CoaxialAzimuthComponent):
 
         self.reset()
 
+        sim_motor = SimDeviceSim(f"SPARK MAX [{id_}]")
+        self._sim_position = sim_motor.getDouble("Position")
+
     def _config(self):
         self._motor.restoreFactoryDefaults()
 
@@ -389,7 +430,10 @@ class NEOCoaxialAzimuthComponent(CoaxialAzimuthComponent):
         self._encoder.setVelocityConversionFactor(position_conversion_factor / 60)
 
     def follow_angle(self, angle: Rotation2d):
-        self._controller.setReference(angle.degrees(), rev.CANSparkMax.ControlType.kPosition)
+        degrees = angle.degrees()
+        self._controller.setReference(degrees, rev.CANSparkMax.ControlType.kPosition)
+
+        self._sim_position.set(degrees)
 
     def reset(self):
         absolute_position = self._absolute_encoder.absolute_position - self._offset
@@ -404,6 +448,10 @@ class NEOCoaxialAzimuthComponent(CoaxialAzimuthComponent):
         return Rotation2d.fromDegrees(self._encoder.getPosition())
 
 
+@deprecated(
+    "This component has been replaced by DummyCoaxialDriveComponent and DummyCoaxialAzimuthComponent."
+    "Use those if you want simulation support."
+)
 class DummyCoaxialComponent(CoaxialDriveComponent, CoaxialAzimuthComponent):
     """Coaxial drive or azimuth component that does nothing"""
 
@@ -444,3 +492,59 @@ class DummyCoaxialComponent(CoaxialDriveComponent, CoaxialAzimuthComponent):
     @property
     def angle(self) -> Rotation2d:
         return Rotation2d.fromDegrees(0)
+
+
+class DummyCoaxialDriveComponent(CoaxialDriveComponent):
+    """Coaxial drive component that does nothing on a real robot, but functions normally in simulation"""
+
+    def __init__(self, *args):
+        self._velocity = 0
+        self._position = 0
+
+    def simulation_periodic(self, delta_time: float):
+        self._position += self._velocity * delta_time
+
+    def follow_velocity_open(self, velocity: float):
+        self._velocity = velocity
+
+    def follow_velocity_closed(self, velocity: float):
+        self._velocity = velocity
+
+    def set_voltage(self, volts: float):
+        pass
+
+    def reset(self):
+        self._position = 0
+
+    @property
+    def velocity(self) -> float:
+        return self._velocity
+
+    @property
+    def distance(self) -> float:
+        return self._position
+
+    @property
+    def voltage(self) -> float:
+        return 0
+
+
+class DummyCoaxialAzimuthComponent(CoaxialAzimuthComponent):
+    """Coaxial azimuth component that does nothing on a real robot, but functions normally in simulation"""
+
+    def __init__(self, *args):
+        self._angle = Rotation2d()
+
+    def follow_angle(self, angle: Rotation2d):
+        self._angle = angle
+
+    def reset(self):
+        pass
+
+    @property
+    def rotational_velocity(self) -> float:
+        return 0
+
+    @property
+    def angle(self) -> Rotation2d:
+        return self._angle

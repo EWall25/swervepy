@@ -76,3 +76,7 @@ def falcon_to_radps(velocity: float, gear_ratio: float) -> float:
 def radps_to_falcon(dps: float, gear_ratio: float) -> float:
     rpm = dps * 60 / RADS_PER_ROTATION
     return rpm_to_falcon(rpm, gear_ratio)
+
+
+def units_per_100_ms_to_units_per_sec(velocity: float) -> float:
+    return velocity * 10
