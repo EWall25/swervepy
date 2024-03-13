@@ -10,7 +10,7 @@ from ..abstract.sensor import AbsoluteEncoder, Gyro
 
 
 class AbsoluteCANCoder(AbsoluteEncoder):
-    def __init__(self, id_: int | tuple[int, str]):
+    def __init__(self, id_: int | tuple[int, str], invert: bool = False):
         super().__init__()
 
         # Construct the CANCoder from either a tuple of motor ID and CAN bus ID or just a motor ID
@@ -19,7 +19,14 @@ class AbsoluteCANCoder(AbsoluteEncoder):
         except TypeError:
             self._encoder = phoenix5.sensors.CANCoder(id_)
 
-        self._encoder.configAbsoluteSensorRange(phoenix5.sensors.AbsoluteSensorRange.Unsigned_0_to_360)
+        config = phoenix5.sensors.CANCoderConfiguration()
+        config.absoluteSensorRange = phoenix5.sensors.AbsoluteSensorRange.Unsigned_0_to_360
+        config.sensorDirection = invert
+        config.initializationStrategy = phoenix5.sensors.SensorInitializationStrategy.BootToAbsolutePosition
+        config.sensorTimeBase = phoenix5.sensors.SensorTimeBase.PerSecond
+
+        self._encoder.configFactoryDefault()
+        self._encoder.configAllSettings(config)
 
         wpilib.SmartDashboard.putData(f"Absolute CANCoder {id_}", self)
 
