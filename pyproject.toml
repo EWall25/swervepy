@@ -9,7 +9,7 @@ repository = "https://github.com/EWall25/swervepy"
 keywords = ["frc", "swerve-drive"]
 
 [tool.poetry.dependencies]
-python = ">=3.11,<3.13"
+python = ">=3.11"
 robotpy = {version = ">=2024.2.1,<2025", extras = ["rev", "phoenix5", "pathplannerlib", "commands2"]}
 Pint = "^0.20.1"
 
