@@ -51,7 +51,7 @@ swerve = swervepy.subsystem.SwerveDrive(modules, gyro, MAX_VELOCITY, MAX_ANGULAR
 But first, we need to define some parameters ubiquitous to all our modules.
 
 ```python
-drive_params = swervepy.impl.Falcon500CoaxialDriveComponent.Parameters(
+drive_params = swervepy.impl.TypicalDriveComponentParameters(
     wheel_circumference=4 * math.pi * u.inch,
     gear_ratio=6.75 / 1,  # SDS Mk4i L2
     max_speed=4.5 * (u.m / u.s),
@@ -60,7 +60,7 @@ drive_params = swervepy.impl.Falcon500CoaxialDriveComponent.Parameters(
     continuous_current_limit=40,
     peak_current_limit=60,
     peak_current_duration=0.01,
-    neutral_mode=ctre.NeutralMode.Coast,
+    neutral_mode=swervepy.impl.NeutralMode.COAST,
     kP=0,
     kI=0,
     kD=0,
@@ -69,15 +69,15 @@ drive_params = swervepy.impl.Falcon500CoaxialDriveComponent.Parameters(
     kA=0,
     invert_motor=False,
 )
-azimuth_params = swervepy.impl.Falcon500CoaxialAzimuthComponent.Parameters(
+azimuth_params = swervepy.impl.TypicalAzimuthComponentParameters(
     gear_ratio=150 / 7,  # SDS Mk4i
     max_angular_velocity=11.5 * (u.rad / u.s),
     ramp_rate=0,
     continuous_current_limit=40,
     peak_current_limit=60,
     peak_current_duration=0.01,
-    neutral_mode=ctre.NeutralMode.Brake,
-    kP=0,
+    neutral_mode=swervepy.impl.NeutralMode.BRAKE,
+    kP=0.3,
     kI=0,
     kD=0,
     invert_motor=False,
@@ -197,13 +197,13 @@ Forward faces the front of the robot, so "forward" changes as the chassis rotate
 **swervepy** uses [Pint](https://pint.readthedocs.io/en/stable/) to specify units whenever possible. Whenever a parameter
 requires units, it is denoted with a `Quantity` type hint.
 
-Take for example, a Falcon 500 drive motor's `Parameters`:
+Take for example, a drive motor's parameters:
 
 ```python
 from swervepy import u
 import swervepy.impl
 
-drive_params = swervepy.impl.Falcon500CoaxialDriveComponent.Parameters(
+drive_params = swervepy.impl.TypicalDriveComponentParameters(
     wheel_circumference=(4 * math.pi) * u.inch, # 4π in
     max_speed=4.5 * (u.m / u.s),                # 4.5 m/s
     ...
