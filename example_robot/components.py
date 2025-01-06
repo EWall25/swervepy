@@ -12,9 +12,10 @@ from swervepy.impl import (
     # Replace these classes with the ones that apply to your robot
     DummyGyro,
     AbsoluteDutyCycleEncoder,
-    CoaxialSwerveModule,
     Falcon500CoaxialDriveComponent,
     Falcon500CoaxialAzimuthComponent,
+    TypicalDriveComponentParameters,
+    TypicalAzimuthComponentParameters,
 )
 
 # Define which components you're using (e.g. which motors you're using)
@@ -41,8 +42,6 @@ drive_param_values = {
     "closed_loop_ramp_rate": ELEC.closed_loop_ramp_rate,
     "continuous_current_limit": ELEC.drive_continuous_current_limit,
     "peak_current_limit": ELEC.drive_peak_current_limit,
-
-    # remove the following line for NEOCoaxialDriveComponent
     "peak_current_duration": ELEC.drive_peak_current_duration,
 
     "neutral_mode": OP.propulsion_neutral,
@@ -64,8 +63,6 @@ azimuth_param_values = {
     "ramp_rate": 0,
     "continuous_current_limit": ELEC.azimuth_continuous_current_limit,
     "peak_current_limit": ELEC.azimuth_peak_current_limit,
-
-    # remove the following line for NEOCoaxialDriveComponent
     "peak_current_duration": ELEC.azimuth_peak_current_duration,
 
     "neutral_mode": OP.steering_neutral,
@@ -88,8 +85,8 @@ gyro_param_values = {
     # Add your gyro constructor params here.
 }
 
-drive_component_params_class = drive_component_class.Parameters
-azimuth_component_params_class = azimuth_component_class.Parameters
+drive_component_params_class = TypicalDriveComponentParameters
+azimuth_component_params_class = TypicalAzimuthComponentParameters
 
 drive_params = drive_component_params_class(**drive_param_values)
 azimuth_params = azimuth_component_params_class(**azimuth_param_values)
