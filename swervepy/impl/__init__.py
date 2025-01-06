@@ -4,6 +4,9 @@ creating their drive base.
 """
 
 __all__ = [
+    "NeutralMode",
+    "TypicalDriveComponentParameters",
+    "TypicalAzimuthComponentParameters",
     "Falcon500CoaxialAzimuthComponent",
     "Falcon500CoaxialDriveComponent",
     "NEOCoaxialAzimuthComponent",
@@ -21,6 +24,9 @@ __all__ = [
 ]
 
 from .motor import (
+    NeutralMode,
+    TypicalDriveComponentParameters,
+    TypicalAzimuthComponentParameters,
     Falcon500CoaxialAzimuthComponent,
     Falcon500CoaxialDriveComponent,
     NEOCoaxialDriveComponent,

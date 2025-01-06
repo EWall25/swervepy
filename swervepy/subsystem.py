@@ -72,10 +72,11 @@ class SwerveDrive(commands2.Subsystem):
         # Pause init for a second before setting module offsets to avoid a bug related to inverting motors.
         # Fixes https://github.com/Team364/BaseFalconSwerve/issues/8.
         time.sleep(1)
-        self.reset_modules()
+        for module in self._modules:
+            module.reset()
 
         # Zero heading at startup to set "forward" direction
-        self.zero_heading()
+        self._gyro.zero_heading()
 
         # There are different classes for each number of swerve modules in a drive base,
         # so construct the class name from number of modules.
@@ -109,6 +110,16 @@ class SwerveDrive(commands2.Subsystem):
 
         # Visualize robot position on field
         self.field.setRobotPose(robot_pose)
+
+    def simulationPeriodic(self):
+        # Run a periodic simulation method that updates sensor readings based on desired velocities and rotations
+        for module in self._modules:
+            module.simulation_periodic(self.period_seconds)
+
+        # Calculate the chassis angular velocity produced by the simulated swerve modules
+        angular_velocity = self._kinematics.toChassisSpeeds(self.module_states).omega
+        # Update the gyro heading reading with the change in heading since the last timestep
+        self._gyro.simulation_periodic(angular_velocity * self.period_seconds)
 
     @singledispatchmethod
     def drive(
@@ -206,9 +217,15 @@ class SwerveDrive(commands2.Subsystem):
         for module in self._modules:
             module.reset()
 
+        # Any time encoder distances are reset, odometry must also be reset
+        self.reset_odometry(self.pose)
+
     def zero_heading(self):
         """Set the chassis' current heading as "zero" or straight forward"""
         self._gyro.zero_heading()
+
+        # Any time gyro angle is reset, odometry must also be reset
+        self._odometry.resetPosition(Rotation2d(), self.module_positions, self.pose)
 
     def reset_odometry(self, pose: Pose2d):
         """
@@ -218,6 +235,12 @@ class SwerveDrive(commands2.Subsystem):
         """
 
         self._odometry.resetPosition(self._gyro.heading, self.module_positions, pose)  # type: ignore
+
+    def reset_odometry_to_vision(self):
+        """Reset the robot's pose to the vision pose estimation"""
+        estimated_pose = self._vision_pose_callback()
+        if estimated_pose:
+            self.reset_odometry(estimated_pose)
 
     def _sysid_drive(self, volts: float):
         """

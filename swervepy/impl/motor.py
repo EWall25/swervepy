@@ -1,10 +1,13 @@
 import copy
 from dataclasses import dataclass
+from enum import IntEnum
 
 import phoenix5
 import phoenix5.sensors
 import rev
 from pint import Quantity
+from typing_extensions import deprecated
+from wpilib.simulation import SimDeviceSim
 from wpimath.controller import SimpleMotorFeedforwardMeters
 from wpimath.geometry import Rotation2d
 
@@ -14,85 +17,122 @@ from .. import conversions, u
 from ..abstract.sensor import AbsoluteEncoder
 
 
+class NeutralMode(IntEnum):
+    COAST = 0
+    BRAKE = 1
+
+
+@dataclass
+class TypicalDriveComponentParameters:
+    wheel_circumference: Quantity
+    gear_ratio: float
+
+    max_speed: Quantity
+
+    open_loop_ramp_rate: float
+    closed_loop_ramp_rate: float
+
+    continuous_current_limit: int
+    peak_current_limit: int
+    peak_current_duration: float  # Unused for REV implementation, but makes interoperability easier
+
+    neutral_mode: NeutralMode
+
+    kP: float
+    kI: float
+    kD: float
+
+    kS: float
+    kV: float
+    kA: float
+
+    invert_motor: bool
+
+    def in_standard_units(self):
+        data = copy.deepcopy(self)
+        data.wheel_circumference = data.wheel_circumference.m_as(u.m)
+        data.max_speed = data.max_speed.m_as(u.m / u.s)
+        return data
+
+
+@dataclass
+class TypicalAzimuthComponentParameters:
+    gear_ratio: float
+
+    max_angular_velocity: Quantity
+
+    ramp_rate: float
+
+    continuous_current_limit: int
+    peak_current_limit: int
+    peak_current_duration: float  # Unused for REV implementation, but makes interoperability easier
+
+    neutral_mode: NeutralMode
+
+    kP: float
+    kI: float
+    kD: float
+
+    invert_motor: bool
+
+    def in_standard_units(self):
+        data = copy.deepcopy(self)
+        data.max_angular_velocity = data.max_angular_velocity.m_as(u.rad / u.s)
+        return data
+
+
 class Falcon500CoaxialDriveComponent(CoaxialDriveComponent):
-    @dataclass
-    class Parameters:
-        wheel_circumference: Quantity
-        gear_ratio: float
-
-        max_speed: Quantity
-
-        open_loop_ramp_rate: float
-        closed_loop_ramp_rate: float
-
-        continuous_current_limit: int
-        peak_current_limit: int
-        peak_current_duration: float
-
-        neutral_mode: phoenix5.NeutralMode
-
-        kP: float
-        kI: float
-        kD: float
-
-        kS: float
-        kV: float
-        kA: float
-
-        invert_motor: bool
-
-        def in_standard_units(self):
-            data = copy.deepcopy(self)
-            data.wheel_circumference = data.wheel_circumference.m_as(u.m)
-            data.max_speed = data.max_speed.m_as(u.m / u.s)
-            return data
-
-        # noinspection PyPep8Naming
-        def create_TalonFX_config(self) -> phoenix5.TalonFXConfiguration:
-            motor_config = phoenix5.TalonFXConfiguration()
-
-            supply_limit = phoenix5.SupplyCurrentLimitConfiguration(
-                True,
-                self.continuous_current_limit,
-                self.peak_current_limit,
-                self.peak_current_duration,
-            )
-
-            motor_config.slot0.kP = self.kP
-            motor_config.slot0.kI = self.kI
-            motor_config.slot0.kD = self.kD
-            motor_config.supplyCurrLimit = supply_limit
-            motor_config.initializationStrategy = phoenix5.sensors.SensorInitializationStrategy.BootToZero
-            motor_config.openloopRamp = self.open_loop_ramp_rate
-            motor_config.closedloopRamp = self.closed_loop_ramp_rate
-
-            return motor_config
-
-    def __init__(self, id_: int | tuple[int, str], parameters: Parameters):
+    def __init__(self, id_: int | tuple[int, str], parameters: TypicalDriveComponentParameters):
         self._params = parameters.in_standard_units()
 
         try:
             # Unpack tuple of motor id and CAN bus id into TalonFX constructor
-            self._motor = phoenix5.TalonFX(*id_)
+            self._motor = phoenix5.WPI_TalonFX(*id_)
         except TypeError:
             # Only an int was provided for id_
-            self._motor = phoenix5.TalonFX(id_)
+            self._motor = phoenix5.WPI_TalonFX(id_)
 
         self._config()
         self.reset()
 
         self._feedforward = SimpleMotorFeedforwardMeters(parameters.kS, parameters.kV, parameters.kA)
 
+        self._sim_motor = self._motor.getSimCollection()
+
     def _config(self):
-        settings = self._params.create_TalonFX_config()
+        settings = phoenix5.TalonFXConfiguration()
+
+        supply_limit = phoenix5.SupplyCurrentLimitConfiguration(
+            True,
+            self._params.continuous_current_limit,
+            self._params.peak_current_limit,
+            self._params.peak_current_duration,
+        )
+
+        settings.slot0.kP = self._params.kP
+        settings.slot0.kI = self._params.kI
+        settings.slot0.kD = self._params.kD
+        settings.supplyCurrLimit = supply_limit
+        settings.initializationStrategy = phoenix5.sensors.SensorInitializationStrategy.BootToZero
+        settings.openloopRamp = self._params.open_loop_ramp_rate
+        settings.closedloopRamp = self._params.closed_loop_ramp_rate
+
         self._motor.configFactoryDefault()
         self._motor.configAllSettings(settings)
         self._motor.setInverted(self._params.invert_motor)
-        self._motor.setNeutralMode(self._params.neutral_mode)
+
+        # Convert from generalized neutral mode to CTRE API NeutralMode
+        self._motor.setNeutralMode(phoenix5.NeutralMode.Brake if self._params.neutral_mode is NeutralMode.BRAKE else phoenix5.NeutralMode.Coast)
 
     def follow_velocity_open(self, velocity: float):
         percent_out = velocity / self._params.max_speed
         self._motor.set(phoenix5.ControlMode.PercentOutput, percent_out)
+
+        converted_velocity = conversions.mps_to_falcon(
+            velocity, self._params.wheel_circumference, self._params.gear_ratio
+        )
+        # CTRE sim requires us to invert sensor readings ourselves
+        self._sim_motor.setIntegratedSensorVelocity(int(converted_velocity * -1 if self._params.invert_motor else 1))
 
     def follow_velocity_closed(self, velocity: float):
         converted_velocity = conversions.mps_to_falcon(
@@ -105,12 +145,19 @@ class Falcon500CoaxialDriveComponent(CoaxialDriveComponent):
             self._feedforward.calculate(velocity),
         )
 
+        # CTRE sim requires us to invert sensor readings ourselves
+        self._sim_motor.setIntegratedSensorVelocity(int(converted_velocity * -1 if self._params.invert_motor else 1))
+
     def set_voltage(self, volts: float):
         percent_output = volts / self._motor.getBusVoltage()
         self._motor.set(phoenix5.ControlMode.PercentOutput, percent_output)
 
     def reset(self):
         self._motor.setSelectedSensorPosition(0)
+
+    def simulation_periodic(self, delta_time: float):
+        delta_pos = conversions.units_per_100_ms_to_units_per_sec(self._motor.getSelectedSensorVelocity()) * delta_time
+        self._sim_motor.addIntegratedSensorPosition(int(delta_pos))
 
     @property
     def velocity(self) -> float:
@@ -134,66 +181,21 @@ class Falcon500CoaxialDriveComponent(CoaxialDriveComponent):
 
 
 class Falcon500CoaxialAzimuthComponent(CoaxialAzimuthComponent):
-    @dataclass
-    class Parameters:
-        gear_ratio: float
-
-        max_angular_velocity: Quantity
-
-        ramp_rate: float
-
-        continuous_current_limit: int
-        peak_current_limit: int
-        peak_current_duration: float
-
-        neutral_mode: phoenix5.NeutralMode
-
-        kP: float
-        kI: float
-        kD: float
-
-        invert_motor: bool
-
-        def in_standard_units(self):
-            data = copy.deepcopy(self)
-            data.max_angular_velocity = data.max_angular_velocity.m_as(u.rad / u.s)
-            return data
-
-        # noinspection PyPep8Naming
-        def create_TalonFX_config(self) -> phoenix5.TalonFXConfiguration:
-            motor_config = phoenix5.TalonFXConfiguration()
-
-            supply_limit = phoenix5.SupplyCurrentLimitConfiguration(
-                True,
-                self.continuous_current_limit,
-                self.peak_current_limit,
-                self.peak_current_duration,
-            )
-
-            motor_config.slot0.kP = self.kP
-            motor_config.slot0.kI = self.kI
-            motor_config.slot0.kD = self.kD
-            motor_config.supplyCurrLimit = supply_limit
-            motor_config.initializationStrategy = phoenix5.sensors.SensorInitializationStrategy.BootToZero
-            motor_config.closedloopRamp = self.ramp_rate
-
-            return motor_config
-
     def __init__(
         self,
         id_: int | tuple[int, str],
         azimuth_offset: Rotation2d,
-        parameters: Parameters,
+        parameters: TypicalAzimuthComponentParameters,
         absolute_encoder: AbsoluteEncoder,
     ):
         self._params = parameters.in_standard_units()
 
         try:
             # Unpack tuple of motor id and CAN bus id into TalonFX constructor
-            self._motor = phoenix5.TalonFX(*id_)
+            self._motor = phoenix5.WPI_TalonFX(*id_)
         except TypeError:
             # Only an int was provided for id_
-            self._motor = phoenix5.TalonFX(id_)
+            self._motor = phoenix5.WPI_TalonFX(id_)
 
         self._absolute_encoder = absolute_encoder
         self._offset = azimuth_offset
@@ -201,16 +203,36 @@ class Falcon500CoaxialAzimuthComponent(CoaxialAzimuthComponent):
         self._config()
         self.reset()
 
+        self._sim_motor = self._motor.getSimCollection()
+
     def _config(self):
-        settings = self._params.create_TalonFX_config()
+        settings = phoenix5.TalonFXConfiguration()
+
+        supply_limit = phoenix5.SupplyCurrentLimitConfiguration(
+            True,
+            self._params.continuous_current_limit,
+            self._params.peak_current_limit,
+            self._params.peak_current_duration,
+        )
+
+        settings.slot0.kP = self._params.kP
+        settings.slot0.kI = self._params.kI
+        settings.slot0.kD = self._params.kD
+        settings.supplyCurrLimit = supply_limit
+        settings.initializationStrategy = phoenix5.sensors.SensorInitializationStrategy.BootToZero
+        settings.closedloopRamp = self._params.ramp_rate
+
         self._motor.configFactoryDefault()
         self._motor.configAllSettings(settings)
         self._motor.setInverted(self._params.invert_motor)
-        self._motor.setNeutralMode(self._params.neutral_mode)
+        self._motor.setNeutralMode(phoenix5.NeutralMode.Brake if self._params.neutral_mode is NeutralMode.BRAKE else phoenix5.NeutralMode.Coast)
 
     def follow_angle(self, angle: Rotation2d):
         converted_angle = conversions.degrees_to_falcon(angle, self._params.gear_ratio)
         self._motor.set(phoenix5.ControlMode.Position, converted_angle)
+
+        # CTRE sim requires us to invert sensor readings ourselves
+        self._sim_motor.setIntegratedSensorRawPosition(int(converted_angle * -1 if self._params.invert_motor else 1))
 
     def reset(self):
         absolute_position = self._absolute_encoder.absolute_position - self._offset
@@ -227,38 +249,7 @@ class Falcon500CoaxialAzimuthComponent(CoaxialAzimuthComponent):
 
 
 class NEOCoaxialDriveComponent(CoaxialDriveComponent):
-    @dataclass
-    class Parameters:
-        wheel_circumference: Quantity
-        gear_ratio: float
-
-        max_speed: Quantity
-
-        open_loop_ramp_rate: float
-        closed_loop_ramp_rate: float
-
-        continuous_current_limit: int
-        peak_current_limit: int
-
-        neutral_mode: rev.CANSparkMax.IdleMode
-
-        kP: float
-        kI: float
-        kD: float
-
-        kS: float
-        kV: float
-        kA: float
-
-        invert_motor: bool
-
-        def in_standard_units(self):
-            data = copy.deepcopy(self)
-            data.wheel_circumference = data.wheel_circumference.m_as(u.m)
-            data.max_speed = data.max_speed.m_as(u.m / u.s)
-            return data
-
-    def __init__(self, id_: int, parameters: Parameters):
+    def __init__(self, id_: int, parameters: TypicalDriveComponentParameters):
         self._params = parameters.in_standard_units()
 
         self._motor = rev.CANSparkMax(id_, rev.CANSparkMax.MotorType.kBrushless)
@@ -268,6 +259,10 @@ class NEOCoaxialDriveComponent(CoaxialDriveComponent):
         self.reset()
 
         self._feedforward = SimpleMotorFeedforwardMeters(parameters.kS, parameters.kV, parameters.kA)
+
+        sim_motor = SimDeviceSim(f"SPARK MAX [{id_}]")
+        self._sim_velocity = sim_motor.getDouble("Velocity")
+        self._sim_position = sim_motor.getDouble("Position")
 
     def _config(self):
         self._motor.restoreFactoryDefaults()
@@ -283,7 +278,9 @@ class NEOCoaxialDriveComponent(CoaxialDriveComponent):
         self._motor.setClosedLoopRampRate(self._params.closed_loop_ramp_rate)
 
         self._motor.setInverted(self._params.invert_motor)
-        self._motor.setIdleMode(self._params.neutral_mode)
+
+        # Convert generic neutral mode to REV IdleMode
+        self._motor.setIdleMode(rev.CANSparkMax.IdleMode(self._params.neutral_mode))
 
         position_conversion_factor = self._params.wheel_circumference / self._params.gear_ratio
         self._encoder.setPositionConversionFactor(position_conversion_factor)
@@ -292,6 +289,8 @@ class NEOCoaxialDriveComponent(CoaxialDriveComponent):
     def follow_velocity_open(self, velocity: float):
         percent_out = velocity / self._params.max_speed
         self._motor.set(percent_out)
+
+        self._sim_velocity.set(velocity)
 
     def follow_velocity_closed(self, velocity: float):
         self._controller.setReference(
@@ -305,6 +304,10 @@ class NEOCoaxialDriveComponent(CoaxialDriveComponent):
 
     def reset(self):
         self._encoder.setPosition(0)
+
+    def simulation_periodic(self, delta_time: float):
+        new_position = self.distance + self.velocity * delta_time
+        self._sim_position.set(new_position)
 
     @property
     def velocity(self) -> float:
@@ -320,35 +323,11 @@ class NEOCoaxialDriveComponent(CoaxialDriveComponent):
 
 
 class NEOCoaxialAzimuthComponent(CoaxialAzimuthComponent):
-    @dataclass
-    class Parameters:
-        gear_ratio: float
-
-        max_angular_velocity: Quantity
-
-        ramp_rate: float
-
-        continuous_current_limit: int
-        peak_current_limit: int
-
-        neutral_mode: rev.CANSparkMax.IdleMode
-
-        kP: float
-        kI: float
-        kD: float
-
-        invert_motor: bool
-
-        def in_standard_units(self):
-            data = copy.deepcopy(self)
-            data.max_angular_velocity = data.max_angular_velocity.m_as(u.rad / u.s)
-            return data
-
     def __init__(
         self,
         id_: int,
         azimuth_offset: Rotation2d,
-        parameters: Parameters,
+        parameters: TypicalAzimuthComponentParameters,
         absolute_encoder: AbsoluteEncoder | SparkMaxEncoderType,
     ):
         self._params = parameters.in_standard_units()
@@ -371,6 +350,9 @@ class NEOCoaxialAzimuthComponent(CoaxialAzimuthComponent):
 
         self.reset()
 
+        sim_motor = SimDeviceSim(f"SPARK MAX [{id_}]")
+        self._sim_position = sim_motor.getDouble("Position")
+
     def _config(self):
         self._motor.restoreFactoryDefaults()
 
@@ -382,14 +364,19 @@ class NEOCoaxialAzimuthComponent(CoaxialAzimuthComponent):
         self._motor.setSecondaryCurrentLimit(self._params.peak_current_limit)
 
         self._motor.setInverted(self._params.invert_motor)
-        self._motor.setIdleMode(self._params.neutral_mode)
+
+        # Convert generic neutral mode to REV IdleMode
+        self._motor.setIdleMode(rev.CANSparkMax.IdleMode(self._params.neutral_mode))
 
         position_conversion_factor = 360 / self._params.gear_ratio
         self._encoder.setPositionConversionFactor(position_conversion_factor)
         self._encoder.setVelocityConversionFactor(position_conversion_factor / 60)
 
     def follow_angle(self, angle: Rotation2d):
-        self._controller.setReference(angle.degrees(), rev.CANSparkMax.ControlType.kPosition)
+        degrees = angle.degrees()
+        self._controller.setReference(degrees, rev.CANSparkMax.ControlType.kPosition)
+
+        self._sim_position.set(degrees)
 
     def reset(self):
         absolute_position = self._absolute_encoder.absolute_position - self._offset
@@ -404,6 +391,10 @@ class NEOCoaxialAzimuthComponent(CoaxialAzimuthComponent):
         return Rotation2d.fromDegrees(self._encoder.getPosition())
 
 
+@deprecated(
+    "This component has been replaced by DummyCoaxialDriveComponent and DummyCoaxialAzimuthComponent."
+    "Use those if you want simulation support."
+)
 class DummyCoaxialComponent(CoaxialDriveComponent, CoaxialAzimuthComponent):
     """Coaxial drive or azimuth component that does nothing"""
 
@@ -444,3 +435,59 @@ class DummyCoaxialComponent(CoaxialDriveComponent, CoaxialAzimuthComponent):
     @property
     def angle(self) -> Rotation2d:
         return Rotation2d.fromDegrees(0)
+
+
+class DummyCoaxialDriveComponent(CoaxialDriveComponent):
+    """Coaxial drive component that does nothing on a real robot, but functions normally in simulation"""
+
+    def __init__(self, *args):
+        self._velocity = 0
+        self._position = 0
+
+    def simulation_periodic(self, delta_time: float):
+        self._position += self._velocity * delta_time
+
+    def follow_velocity_open(self, velocity: float):
+        self._velocity = velocity
+
+    def follow_velocity_closed(self, velocity: float):
+        self._velocity = velocity
+
+    def set_voltage(self, volts: float):
+        pass
+
+    def reset(self):
+        self._position = 0
+
+    @property
+    def velocity(self) -> float:
+        return self._velocity
+
+    @property
+    def distance(self) -> float:
+        return self._position
+
+    @property
+    def voltage(self) -> float:
+        return 0
+
+
+class DummyCoaxialAzimuthComponent(CoaxialAzimuthComponent):
+    """Coaxial azimuth component that does nothing on a real robot, but functions normally in simulation"""
+
+    def __init__(self, *args):
+        self._angle = Rotation2d()
+
+    def follow_angle(self, angle: Rotation2d):
+        self._angle = angle
+
+    def reset(self):
+        pass
+
+    @property
+    def rotational_velocity(self) -> float:
+        return 0
+
+    @property
+    def angle(self) -> Rotation2d:
+        return self._angle
