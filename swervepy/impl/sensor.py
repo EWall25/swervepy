@@ -44,7 +44,7 @@ class AbsoluteDutyCycleEncoder(AbsoluteEncoder):
 
     @property
     def absolute_position_degrees(self) -> float:
-        pos = self._encoder.getAbsolutePosition()  # 0.0 <= pos < 1.0 (rotations)
+        pos = self._encoder.get()  # 0.0 <= pos < 1.0 (rotations)
         degrees = 360 * pos
         return degrees
 
@@ -135,7 +135,7 @@ class SparkMaxEncoderType(enum.Enum):
 
 
 class SparkMaxAbsoluteEncoder(AbsoluteEncoder):
-    def __init__(self, controller: rev.CANSparkMax, encoder_type: SparkMaxEncoderType):
+    def __init__(self, controller: rev.SparkMax, encoder_type: SparkMaxEncoderType):
         """
         Absolute encoder plugged into the SPARK MAX's data port
 
@@ -147,17 +147,22 @@ class SparkMaxAbsoluteEncoder(AbsoluteEncoder):
 
         # Two types of absolute encoders can be plugged into the SPARK MAX data port: analog and duty cycle/PWM
         if encoder_type is SparkMaxEncoderType.ANALOG:
-            self._encoder = controller.getAnalog(rev.SparkMaxAnalogSensor.Mode.kAbsolute)
-
-            # Analog encoders output from 0V - 3.3V
-            # Change from voltage to degrees
-            self._encoder.setPositionConversionFactor(360 / 3.3)
+            self._encoder = controller.getAnalog()
         elif encoder_type is SparkMaxEncoderType.PWM:
-            self._encoder = controller.getAbsoluteEncoder(rev.SparkMaxAbsoluteEncoder.Type.kDutyCycle)
+            self._encoder = controller.getAbsoluteEncoder()
 
-            # Duty cycle encoders output from 0 to 1 by default
-            # Change into degrees
-            self._encoder.setPositionConversionFactor(360)
+        settings = rev.SparkBaseConfig()
+        # Analog encoders output from 0V - 3.3V
+        # Change from voltage to degrees
+        settings.analogSensor.positionConversionFactor(360 / 3.3)
+        # Duty cycle encoders output from 0 to 1 by default
+        # Change into degrees
+        settings.absoluteEncoder.positionConversionFactor(360)
+        controller.configure(
+            settings,
+            rev.SparkMax.ResetMode.kNoResetSafeParameters,
+            rev.SparkMax.PersistMode.kPersistParameters,
+        )
 
         wpilib.SmartDashboard.putData(f"Absolute Encoder {controller.getDeviceId()}", self)
 

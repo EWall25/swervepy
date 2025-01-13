@@ -7,10 +7,11 @@ from functools import singledispatchmethod
 from typing import Callable, Optional, TYPE_CHECKING, Iterable
 
 import commands2
+from pathplannerlib.auto import AutoBuilder
 from pathplannerlib.path import PathPlannerPath
 from pathplannerlib.commands import FollowPathCommand
 from pathplannerlib.controller import PPHolonomicDriveController
-from pathplannerlib.config import ReplanningConfig, PIDConstants
+from pathplannerlib.config import PIDConstants, RobotConfig
 import wpilib
 import wpilib.sysid
 import wpimath.estimator
@@ -47,6 +48,7 @@ class SwerveDrive(commands2.Subsystem):
         gyro: Gyro,
         max_velocity: Quantity,
         max_angular_velocity: Quantity,
+        path_following_params: Optional["TrajectoryFollowerParameters"] = None,
         vision_pose_callback: Callable[[], Optional[Pose2d]] = lambda: None,
     ):
         """
@@ -93,6 +95,27 @@ class SwerveDrive(commands2.Subsystem):
         # Field to plot auto trajectories and robot pose
         self.field = wpilib.Field2d()
         wpilib.SmartDashboard.putData(self.field)
+
+        # AutoBuilder for users to create PathPlanner paths
+        if path_following_params is not None:
+            AutoBuilder.configure(
+                lambda: self.pose,
+                self.reset_odometry,
+                lambda: self.robot_relative_speeds,
+                lambda speeds, feedforwards: self.drive(speeds),
+                PPHolonomicDriveController(
+                    PIDConstants(path_following_params.xy_kP),
+                    PIDConstants(path_following_params.theta_kP),
+                    self.period_seconds,
+                ),
+                RobotConfig.fromGUISettings(),  # Make this configurable in code
+                should_flip_path,
+                self,
+            )
+        else:
+            wpilib.reportWarning(
+                "Path following parameters not supplied, AutoBuilder will not be configured for swerve drivetrain!"
+            )
 
         # Create a characterization routine to use with the SysId utility
         self._sysid_routine = SysIdRoutine(
@@ -328,8 +351,6 @@ class SwerveDrive(commands2.Subsystem):
         controller = PPHolonomicDriveController(
             PIDConstants(parameters.xy_kP),
             PIDConstants(parameters.theta_kP),
-            parameters.max_drive_velocity.m_as(u.m / u.s),
-            radius,
         )
 
         # Trajectory follower command
@@ -337,17 +358,18 @@ class SwerveDrive(commands2.Subsystem):
             path,
             lambda: self.pose,
             lambda: self.robot_relative_speeds,
-            lambda speeds: self.drive(speeds, drive_open_loop=drive_open_loop),
+            lambda speeds, feedforwards: self.drive(speeds, drive_open_loop=drive_open_loop),
             controller,
-            ReplanningConfig(),
+            RobotConfig.fromGUISettings(),
             flip_path,
             self,
         )
 
         # If this is the first path in a sequence, reset the robot's pose so that it aligns with the start of the path
         if first_path:
-            initial_pose = path.getPreviewStartingHolonomicPose()
-            command = command.beforeStarting(commands2.InstantCommand(lambda: self.reset_odometry(initial_pose)))
+            initial_pose = path.getStartingHolonomicPose()
+            if initial_pose is not None:
+                command = command.beforeStarting(commands2.InstantCommand(lambda: self.reset_odometry(initial_pose)))
 
         return command
 
@@ -436,3 +458,10 @@ def greatest_distance_from_translations(translations: Iterable[Translation2d]):
     """
     distances = tuple(math.sqrt(trans.x**2 + trans.y**2) for trans in translations)
     return max(distances)
+
+
+def should_flip_path() -> bool:
+    # Boolean supplier that controls when the path will be mirrored for the red alliance
+    # This will flip the path being followed to the red side of the field.
+    # THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+    return wpilib.DriverStation.getAlliance() is wpilib.DriverStation.Alliance.kRed
