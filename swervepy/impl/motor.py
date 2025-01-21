@@ -1,4 +1,5 @@
 import copy
+import math
 from dataclasses import dataclass
 from enum import IntEnum
 
@@ -9,9 +10,9 @@ import phoenix6.signals
 import rev
 from pint import Quantity
 from typing_extensions import deprecated
-from wpilib.simulation import SimDeviceSim
 from wpimath.controller import SimpleMotorFeedforwardMeters
 from wpimath.geometry import Rotation2d
+from wpimath.system.plant import DCMotor
 
 from .sensor import SparkMaxEncoderType, SparkMaxAbsoluteEncoder
 from .. import conversions, u
@@ -99,88 +100,93 @@ class Falcon500CoaxialDriveComponent(CoaxialDriveComponent):
 
         self._feedforward = SimpleMotorFeedforwardMeters(parameters.kS, parameters.kV, parameters.kA)
 
+        self._motor_sim = self._motor.sim_state
+        self._duty_cycle_request = phoenix6.controls.DutyCycleOut(0)
+        self._velocity_request = phoenix6.controls.VelocityDutyCycle(0)
+        self._voltage_request = phoenix6.controls.VoltageOut(0)
+
+        self._velocity_signal = self._motor.get_velocity()
+        self._position_signal = self._motor.get_position()
+        self._voltage_output_signal = self._motor.get_motor_voltage()
+
     def _config(self):
         configs = phoenix6.configs.TalonFXConfiguration()
 
-        supply_limit = phoenix5.SupplyCurrentLimitConfiguration(
-            True,
-            self._params.continuous_current_limit,
-            self._params.peak_current_limit,
-            self._params.peak_current_duration,
-        )
+        configs.current_limits.supply_current_limit_enable = True
+        configs.current_limits.supply_current_limit = self._params.peak_current_limit
+        configs.current_limits.supply_current_lower_time = self._params.peak_current_duration
+        configs.current_limits.supply_current_lower_limit = self._params.continuous_current_limit
 
         configs.slot0.kP = self._params.kP
         configs.slot0.kI = self._params.kI
         configs.slot0.kD = self._params.kD
 
-        configs.current_limits.supply_current_limit = supply_limit
-        configs.initializationStrategy = phoenix5.sensors.SensorInitializationStrategy.BootToZero
-        configs.openloopRamp = self._params.open_loop_ramp_rate
-        configs.closedloopRamp = self._params.closed_loop_ramp_rate
+        configs.open_loop_ramps.duty_cycle_open_loop_ramp_period = self._params.open_loop_ramp_rate
+        configs.closed_loop_ramps.duty_cycle_closed_loop_ramp_period = self._params.closed_loop_ramp_rate
 
-        self._motor.configFactoryDefault()
-        self._motor.configAllSettings(configs)
-        self._motor.setInverted(self._params.invert_motor)
+        # Convert from generalized neutral mode and invert value to CTRE API enums
+        configs.motor_output.neutral_mode = phoenix6.signals.NeutralModeValue(self._params.neutral_mode)
+        configs.motor_output.inverted = phoenix6.signals.InvertedValue(self._params.invert_motor)
 
-        # Convert from generalized neutral mode to CTRE API NeutralMode
-        self._motor.setNeutralMode(
-            phoenix5.NeutralMode.Brake if self._params.neutral_mode is NeutralMode.BRAKE else phoenix5.NeutralMode.Coast
-        )
+        configs.feedback.sensor_to_mechanism_ratio = self._params.gear_ratio
+
+        # Configs are automatically factory-defaulted
+        self._motor.configurator.apply(configs)
 
     def follow_velocity_open(self, velocity: float):
         percent_out = velocity / self._params.max_speed
-        self._motor.set(phoenix5.ControlMode.PercentOutput, percent_out)
+        self._motor.set_control(self._duty_cycle_request.with_output(percent_out))
 
+        # TODO Improve motor simulation to use DCMotorSim and physics
+        """
         converted_velocity = conversions.mps_to_falcon(
             velocity, self._params.wheel_circumference, self._params.gear_ratio
         )
         # CTRE sim requires us to invert sensor readings ourselves
         self._sim_motor.setIntegratedSensorVelocity(int(converted_velocity * -1 if self._params.invert_motor else 1))
+        """
+        converted_velocity = conversions.metres_to_rotations(velocity, self._params.wheel_circumference)
+        self._motor_sim.set_rotor_velocity(self._params.gear_ratio * converted_velocity)
 
     def follow_velocity_closed(self, velocity: float):
-        converted_velocity = conversions.mps_to_falcon(
-            velocity, self._params.wheel_circumference, self._params.gear_ratio
-        )
-        self._motor.set(
-            phoenix5.ControlMode.Velocity,
-            converted_velocity,
-            phoenix5.DemandType.ArbitraryFeedForward,
-            self._feedforward.calculate(velocity),
-        )
+        converted_velocity = conversions.metres_to_rotations(velocity, self._params.wheel_circumference)
+        ff = self._feedforward.calculate(velocity)
+        self._motor.set_control(self._velocity_request.with_velocity(converted_velocity).with_feed_forward(ff))
 
+        # TODO
+        # TODO What to do about motor inversions?
+        """
         # CTRE sim requires us to invert sensor readings ourselves
         self._sim_motor.setIntegratedSensorVelocity(int(converted_velocity * -1 if self._params.invert_motor else 1))
+        """
+        self._motor_sim.set_rotor_velocity(self._params.gear_ratio * converted_velocity)
 
     def set_voltage(self, volts: float):
-        percent_output = volts / self._motor.getBusVoltage()
-        self._motor.set(phoenix5.ControlMode.PercentOutput, percent_output)
+        self._motor.set_control(self._voltage_request.with_output(volts))
 
     def reset(self):
-        self._motor.setSelectedSensorPosition(0)
+        self._motor.set_position(0)
 
     def simulation_periodic(self, delta_time: float):
+        # TODO
+        """
         delta_pos = conversions.units_per_100_ms_to_units_per_sec(self._motor.getSelectedSensorVelocity()) * delta_time
         self._sim_motor.addIntegratedSensorPosition(int(delta_pos))
+        """
+        delta_pos = self._velocity_signal.refresh().value * delta_time
+        self._motor_sim.add_rotor_position(delta_pos)
 
     @property
     def velocity(self) -> float:
-        return conversions.falcon_to_mps(
-            self._motor.getSelectedSensorVelocity(),
-            self._params.wheel_circumference,
-            self._params.gear_ratio,
-        )
+        return conversions.rotations_to_metres(self._velocity_signal.refresh().value, self._params.wheel_circumference)
 
     @property
     def distance(self) -> float:
-        return conversions.falcon_to_metres(
-            self._motor.getSelectedSensorPosition(),
-            self._params.wheel_circumference,
-            self._params.gear_ratio,
-        )
+        return conversions.rotations_to_metres(self._position_signal.refresh().value, self._params.wheel_circumference)
 
     @property
     def voltage(self) -> float:
-        return self._motor.getMotorOutputVoltage()
+        return self._voltage_output_signal.refresh().value
 
 
 class Falcon500CoaxialAzimuthComponent(CoaxialAzimuthComponent):
@@ -195,10 +201,10 @@ class Falcon500CoaxialAzimuthComponent(CoaxialAzimuthComponent):
 
         try:
             # Unpack tuple of motor id and CAN bus id into TalonFX constructor
-            self._motor = phoenix5.WPI_TalonFX(*id_)
+            self._motor = phoenix6.hardware.TalonFX(*id_)
         except TypeError:
             # Only an int was provided for id_
-            self._motor = phoenix5.WPI_TalonFX(id_)
+            self._motor = phoenix6.hardware.TalonFX(id_)
 
         self._absolute_encoder = absolute_encoder
         self._offset = azimuth_offset
@@ -206,51 +212,59 @@ class Falcon500CoaxialAzimuthComponent(CoaxialAzimuthComponent):
         self._config()
         self.reset()
 
-        self._sim_motor = self._motor.getSimCollection()
+        self._motor_sim = self._motor.sim_state
+        self._position_request = phoenix6.controls.PositionDutyCycle(0)
+
+        self._velocity_signal = self._motor.get_velocity()
+        self._position_signal = self._motor.get_position()
 
     def _config(self):
-        settings = phoenix5.TalonFXConfiguration()
+        configs = phoenix6.configs.TalonFXConfiguration()
 
-        supply_limit = phoenix5.SupplyCurrentLimitConfiguration(
-            True,
-            self._params.continuous_current_limit,
-            self._params.peak_current_limit,
-            self._params.peak_current_duration,
-        )
+        configs.current_limits.supply_current_limit_enable = True
+        configs.current_limits.supply_current_limit = self._params.peak_current_limit
+        configs.current_limits.supply_current_lower_time = self._params.peak_current_duration
+        configs.current_limits.supply_current_lower_limit = self._params.continuous_current_limit
 
-        settings.slot0.kP = self._params.kP
-        settings.slot0.kI = self._params.kI
-        settings.slot0.kD = self._params.kD
-        settings.supplyCurrLimit = supply_limit
-        settings.initializationStrategy = phoenix5.sensors.SensorInitializationStrategy.BootToZero
-        settings.closedloopRamp = self._params.ramp_rate
+        configs.slot0.kP = self._params.kP
+        configs.slot0.kI = self._params.kI
+        configs.slot0.kD = self._params.kD
 
-        self._motor.configFactoryDefault()
-        self._motor.configAllSettings(settings)
-        self._motor.setInverted(self._params.invert_motor)
-        self._motor.setNeutralMode(
-            phoenix5.NeutralMode.Brake if self._params.neutral_mode is NeutralMode.BRAKE else phoenix5.NeutralMode.Coast
-        )
+        configs.closed_loop_ramps.duty_cycle_closed_loop_ramp_period = self._params.ramp_rate
+
+        # Convert from generalized neutral mode and invert value to CTRE API enums
+        configs.motor_output.neutral_mode = phoenix6.signals.NeutralModeValue(self._params.neutral_mode)
+        configs.motor_output.inverted = phoenix6.signals.InvertedValue(self._params.invert_motor)
+
+        configs.feedback.sensor_to_mechanism_ratio = self._params.gear_ratio
+
+        # Configs are automatically factory-defaulted
+        self._motor.configurator.apply(configs)
 
     def follow_angle(self, angle: Rotation2d):
-        converted_angle = conversions.degrees_to_falcon(angle, self._params.gear_ratio)
-        self._motor.set(phoenix5.ControlMode.Position, converted_angle)
+        converted_angle = angle.radians() / (2 * math.pi)
+        self._motor.set_control(self._position_request.with_position(converted_angle))
 
+        # TODO
+        """
         # CTRE sim requires us to invert sensor readings ourselves
         self._sim_motor.setIntegratedSensorRawPosition(int(converted_angle * -1 if self._params.invert_motor else 1))
+        """
+        self._motor_sim.set_raw_rotor_position(self._params.gear_ratio * converted_angle)
 
     def reset(self):
         absolute_position = self._absolute_encoder.absolute_position - self._offset
-        converted_position = conversions.degrees_to_falcon(absolute_position, self._params.gear_ratio)
-        self._motor.setSelectedSensorPosition(converted_position)
+        converted_position = absolute_position.radians() / (2 * math.pi)
+        self._motor.set_position(converted_position)
 
     @property
     def rotational_velocity(self) -> float:
-        return conversions.falcon_to_radps(self._motor.getSelectedSensorVelocity(), self._params.gear_ratio)
+        """Rotational velocity in radians/sec"""
+        return self._velocity_signal.refresh().value * (2 * math.pi)
 
     @property
     def angle(self) -> Rotation2d:
-        return conversions.falcon_to_degrees(self._motor.getSelectedSensorPosition(), self._params.gear_ratio)
+        return Rotation2d(self._position_signal.refresh().value * (2 * math.pi))
 
 
 class NEOCoaxialDriveComponent(CoaxialDriveComponent):
@@ -265,9 +279,8 @@ class NEOCoaxialDriveComponent(CoaxialDriveComponent):
 
         self._feedforward = SimpleMotorFeedforwardMeters(parameters.kS, parameters.kV, parameters.kA)
 
-        sim_motor = SimDeviceSim(f"SPARK MAX [{id_}]")
-        self._sim_velocity = sim_motor.getDouble("Velocity")
-        self._sim_position = sim_motor.getDouble("Position")
+        gearbox = DCMotor.NEO(1)
+        self._sim_motor = rev.SparkMaxSim(self._motor, gearbox)
 
     def _config(self):
         settings = rev.SparkBaseConfig()
@@ -283,7 +296,7 @@ class NEOCoaxialDriveComponent(CoaxialDriveComponent):
         settings.inverted(self._params.invert_motor)
 
         # Convert generic neutral mode to REV IdleMode
-        settings.setIdleMode(rev.SparkMax.IdleMode(self._params.neutral_mode))
+        settings.setIdleMode(rev.SparkBaseConfig.IdleMode(self._params.neutral_mode))
 
         position_conversion_factor = self._params.wheel_circumference / self._params.gear_ratio
         settings.encoder.positionConversionFactor(position_conversion_factor)
@@ -299,7 +312,7 @@ class NEOCoaxialDriveComponent(CoaxialDriveComponent):
         percent_out = velocity / self._params.max_speed
         self._motor.set(percent_out)
 
-        self._sim_velocity.set(velocity)
+        self._sim_motor.setVelocity(velocity)
 
     def follow_velocity_closed(self, velocity: float):
         self._controller.setReference(
@@ -307,6 +320,8 @@ class NEOCoaxialDriveComponent(CoaxialDriveComponent):
             rev.SparkMax.ControlType.kVelocity,
             arbFeedforward=self._feedforward.calculate(velocity),
         )
+
+        self._sim_motor.setVelocity(velocity)
 
     def set_voltage(self, volts: float):
         self._motor.setVoltage(volts)
@@ -316,7 +331,7 @@ class NEOCoaxialDriveComponent(CoaxialDriveComponent):
 
     def simulation_periodic(self, delta_time: float):
         new_position = self.distance + self.velocity * delta_time
-        self._sim_position.set(new_position)
+        self._sim_motor.setPosition(new_position)
 
     @property
     def velocity(self) -> float:
@@ -359,8 +374,8 @@ class NEOCoaxialAzimuthComponent(CoaxialAzimuthComponent):
 
         self.reset()
 
-        sim_motor = SimDeviceSim(f"SPARK MAX [{id_}]")
-        self._sim_position = sim_motor.getDouble("Position")
+        gearbox = DCMotor.NEO(1)
+        self._sim_motor = rev.SparkMaxSim(self._motor, gearbox)
 
     def _config(self):
         settings = rev.SparkBaseConfig()
@@ -375,7 +390,7 @@ class NEOCoaxialAzimuthComponent(CoaxialAzimuthComponent):
         settings.inverted(self._params.invert_motor)
 
         # Convert generic neutral mode to REV IdleMode
-        settings.setIdleMode(rev.SparkMax.IdleMode(self._params.neutral_mode))
+        settings.setIdleMode(rev.SparkBaseConfig.IdleMode(self._params.neutral_mode))
 
         position_conversion_factor = 360 / self._params.gear_ratio
         settings.encoder.positionConversionFactor(position_conversion_factor)
@@ -391,7 +406,7 @@ class NEOCoaxialAzimuthComponent(CoaxialAzimuthComponent):
         degrees = angle.degrees()
         self._controller.setReference(degrees, rev.SparkMax.ControlType.kPosition)
 
-        self._sim_position.set(degrees)
+        self._sim_motor.setPosition(degrees)
 
     def reset(self):
         absolute_position = self._absolute_encoder.absolute_position - self._offset

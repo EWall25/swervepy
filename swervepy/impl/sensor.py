@@ -2,6 +2,7 @@ import enum
 import math
 
 import phoenix5.sensors
+import phoenix6.hardware
 import rev
 import wpilib
 from wpimath.geometry import Rotation2d
@@ -15,24 +16,24 @@ class AbsoluteCANCoder(AbsoluteEncoder):
 
         # Construct the CANCoder from either a tuple of motor ID and CAN bus ID or just a motor ID
         try:
-            self._encoder = phoenix5.sensors.CANCoder(*id_)
+            self._encoder = phoenix6.hardware.CANcoder(*id_)
         except TypeError:
-            self._encoder = phoenix5.sensors.CANCoder(id_)
+            self._encoder = phoenix6.hardware.CANcoder(id_)
 
-        config = phoenix5.sensors.CANCoderConfiguration()
-        config.absoluteSensorRange = phoenix5.sensors.AbsoluteSensorRange.Unsigned_0_to_360
-        config.sensorDirection = invert
-        config.initializationStrategy = phoenix5.sensors.SensorInitializationStrategy.BootToAbsolutePosition
-        config.sensorTimeBase = phoenix5.sensors.SensorTimeBase.PerSecond
+        configs = phoenix6.configs.CANcoderConfiguration()
+        configs.magnet_sensor.absolute_sensor_discontinuity_point = 1  # Set sensor range between 0 and 360 degrees
+        configs.magnet_sensor.sensor_direction = phoenix6.signals.SensorDirectionValue(invert)
 
-        self._encoder.configFactoryDefault()
-        self._encoder.configAllSettings(config)
+        # Configs are automatically factory-defaulted
+        self._encoder.configurator.apply(configs)
+
+        self._position_signal = self._encoder.get_absolute_position()
 
         wpilib.SmartDashboard.putData(f"Absolute CANCoder {id_}", self)
 
     @property
     def absolute_position(self) -> Rotation2d:
-        return Rotation2d.fromDegrees(self._encoder.getAbsolutePosition())
+        return Rotation2d.fromDegrees(self._position_signal.refresh().value)
 
 
 class AbsoluteDutyCycleEncoder(AbsoluteEncoder):
@@ -88,24 +89,26 @@ class Pigeon2Gyro(Gyro):
 
         try:
             # Unpack tuple of sensor id and CAN bus id into Pigeon2 constructor
-            self._gyro = phoenix5.sensors.Pigeon2(*id_)
+            self._gyro = phoenix6.hardware.Pigeon2(*id_)
         except TypeError:
             # Only an int was provided for id_
-            self._gyro = phoenix5.sensors.Pigeon2(id_)
+            self._gyro = phoenix6.hardware.Pigeon2(id_)
 
-        self._sim_gyro = self._gyro.getSimCollection()
+        self._gyro_sim = self._gyro.sim_state
+        self._yaw_signal = self._gyro.get_yaw()
 
         wpilib.SmartDashboard.putData("Pigeon 2", self)
 
     def zero_heading(self):
-        self._gyro.setYaw(0)
+        self._gyro.reset()
 
     def simulation_periodic(self, delta_position: float):
-        self._sim_gyro.addHeading(delta_position * 180 / math.pi)
+        # Convert delta_position from radians to degrees and add it into the simulation
+        self._gyro_sim.add_yaw(delta_position * 180 / math.pi)
 
     @property
     def heading(self) -> Rotation2d:
-        yaw = self._gyro.getYaw()
+        yaw = self._yaw_signal.refresh().value
         if self.invert:
             yaw = 360 - yaw
         return Rotation2d.fromDegrees(yaw)
