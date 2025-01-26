@@ -17,6 +17,7 @@ import wpilib.sysid
 import wpimath.estimator
 import wpimath.kinematics
 from pint import Quantity
+from typing_extensions import deprecated
 from wpimath.geometry import Pose2d, Translation2d, Rotation2d
 from wpimath.kinematics import ChassisSpeeds, SwerveModuleState, SwerveModulePosition
 from wpiutil import SendableBuilder
@@ -102,13 +103,13 @@ class SwerveDrive(commands2.Subsystem):
                 lambda: self.pose,
                 self.reset_odometry,
                 lambda: self.robot_relative_speeds,
-                lambda speeds, feedforwards: self.drive(speeds),
+                lambda speeds, feedforwards: self.drive(speeds, path_following_params.drive_open_loop),
                 PPHolonomicDriveController(
                     PIDConstants(path_following_params.xy_kP),
                     PIDConstants(path_following_params.theta_kP),
                     self.period_seconds,
                 ),
-                RobotConfig.fromGUISettings(),  # Make this configurable in code
+                RobotConfig.fromGUISettings(),  # TODO: Make this configurable in code
                 should_flip_path,
                 self,
             )
@@ -321,12 +322,12 @@ class SwerveDrive(commands2.Subsystem):
         """
         return _TeleOpCommand(self, translation, strafe, rotation, field_relative, drive_open_loop)
 
+    @deprecated("SwervePy automatically configures PathPlanner AutoBuilder. Use native PathPlanner functions instead.")
     def follow_trajectory_command(
         self,
         path: PathPlannerPath,
         parameters: "TrajectoryFollowerParameters",
         first_path: bool = False,
-        drive_open_loop: bool = False,
         flip_path: Callable[[], bool] = lambda: False,
     ) -> commands2.Command:
         """
@@ -335,8 +336,6 @@ class SwerveDrive(commands2.Subsystem):
         :param path: The path to follow
         :param parameters: Options that determine how the robot will follow the trajectory
         :param first_path: If True, the robot's pose will be reset to the trajectory's initial pose
-        :param drive_open_loop: Use open loop control (True) or closed loop (False) to swerve module speeds. Closed-loop
-               positional control will always be used for trajectory following
         :param flip_path: Method returning whether to flip the provided path.
                This will maintain a global blue alliance origin.
         :return: Trajectory-follower command
@@ -358,7 +357,7 @@ class SwerveDrive(commands2.Subsystem):
             path,
             lambda: self.pose,
             lambda: self.robot_relative_speeds,
-            lambda speeds, feedforwards: self.drive(speeds, drive_open_loop=drive_open_loop),
+            lambda speeds, feedforwards: self.drive(speeds, drive_open_loop=parameters.drive_open_loop),
             controller,
             RobotConfig.fromGUISettings(),
             flip_path,
@@ -442,11 +441,13 @@ class _TeleOpCommand(commands2.Command):
 
 @dataclass
 class TrajectoryFollowerParameters:
-    max_drive_velocity: Quantity
-
     # Positional PID constants for X, Y, and theta (rotation) controllers
     theta_kP: float
     xy_kP: float
+
+    # Use open loop control (True) or closed loop (False) to swerve module speeds.
+    # Closed-loop positional control will always be used for trajectory following
+    drive_open_loop: bool
 
 
 def greatest_distance_from_translations(translations: Iterable[Translation2d]):
