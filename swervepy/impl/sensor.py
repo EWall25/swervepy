@@ -33,7 +33,8 @@ class AbsoluteCANCoder(AbsoluteEncoder):
 
     @property
     def absolute_position(self) -> Rotation2d:
-        return Rotation2d.fromDegrees(self._position_signal.refresh().value)
+        # Convert rotations to degrees
+        return Rotation2d.fromDegrees(self._position_signal.refresh().value * 360)
 
 
 class AbsoluteDutyCycleEncoder(AbsoluteEncoder):
