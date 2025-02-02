@@ -123,9 +123,9 @@ class Falcon500CoaxialDriveComponent(CoaxialDriveComponent):
         configs.current_limits.supply_current_lower_time = self._params.peak_current_duration
         configs.current_limits.supply_current_lower_limit = self._params.continuous_current_limit
 
-        configs.slot0.kP = self._params.kP
-        configs.slot0.kI = self._params.kI
-        configs.slot0.kD = self._params.kD
+        configs.slot0.k_p = self._params.kP
+        configs.slot0.k_i = self._params.kI
+        configs.slot0.k_d = self._params.kD
 
         configs.open_loop_ramps.duty_cycle_open_loop_ramp_period = self._params.open_loop_ramp_rate
         configs.closed_loop_ramps.duty_cycle_closed_loop_ramp_period = self._params.closed_loop_ramp_rate
@@ -222,9 +222,9 @@ class Falcon500CoaxialAzimuthComponent(CoaxialAzimuthComponent):
         configs.current_limits.supply_current_lower_time = self._params.peak_current_duration
         configs.current_limits.supply_current_lower_limit = self._params.continuous_current_limit
 
-        configs.slot0.kP = self._params.kP
-        configs.slot0.kI = self._params.kI
-        configs.slot0.kD = self._params.kD
+        configs.slot0.k_p = self._params.kP
+        configs.slot0.k_i = self._params.kI
+        configs.slot0.k_d = self._params.kD
 
         configs.closed_loop_ramps.duty_cycle_closed_loop_ramp_period = self._params.ramp_rate
 
