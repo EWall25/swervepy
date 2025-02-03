@@ -108,7 +108,7 @@ class Falcon500CoaxialDriveComponent(CoaxialDriveComponent):
         )
 
         self._duty_cycle_request = phoenix6.controls.DutyCycleOut(0)
-        self._velocity_request = phoenix6.controls.VelocityDutyCycle(0)
+        self._velocity_request = phoenix6.controls.VelocityVoltage(0)
         self._voltage_request = phoenix6.controls.VoltageOut(0)
 
         self._velocity_signal = self._motor.get_velocity()
@@ -209,7 +209,7 @@ class Falcon500CoaxialAzimuthComponent(CoaxialAzimuthComponent):
             else phoenix6.sim.ChassisReference.CounterClockwise_Positive
         )
 
-        self._position_request = phoenix6.controls.PositionDutyCycle(0)
+        self._position_request = phoenix6.controls.PositionVoltage(0)
 
         self._velocity_signal = self._motor.get_velocity()
         self._position_signal = self._motor.get_position()
@@ -309,6 +309,7 @@ class NEOCoaxialDriveComponent(CoaxialDriveComponent):
             velocity,
             rev.SparkMax.ControlType.kVelocity,
             arbFeedforward=self._feedforward.calculate(velocity),
+            arbFFUnits=rev.SparkClosedLoopController.ArbFFUnits.kVoltage,
         )
 
         self._sim_encoder.setVelocity(velocity)
