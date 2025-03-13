@@ -50,7 +50,7 @@ class SwerveDrive(commands2.Subsystem):
         max_velocity: Quantity,
         max_angular_velocity: Quantity,
         path_following_params: Optional["TrajectoryFollowerParameters"] = None,
-        vision_pose_callback: Callable[[], Optional[Pose2d]] = lambda: None,
+        vision_pose_callback: Callable[[Pose2d], Optional[Pose2d]] = lambda _: None,
     ):
         """
         Construct a swerve drivetrain as a Subsystem.
@@ -59,8 +59,9 @@ class SwerveDrive(commands2.Subsystem):
         :param gyro: A gyro sensor that provides a CCW+ heading reading of the chassis
         :param max_velocity: The actual maximum velocity of the robot
         :param max_angular_velocity: The actual maximum angular (turning) velocity of the robot
-        :param vision_pose_callback: An optional method that returns the robot's pose derived from vision.
-               This pose from this method is integrated into the robot's odometry.
+        :param vision_pose_callback: An optional method that returns an estimation of the robot's pose derived from vision.
+               This pose from this method is integrated into the robot's odometry. The robot's current pose is passed
+               into the method as an argument.
         """
 
         super().__init__()
@@ -125,7 +126,7 @@ class SwerveDrive(commands2.Subsystem):
         )
 
     def periodic(self):
-        vision_pose = self._vision_pose_callback()
+        vision_pose = self._vision_pose_callback(self.pose)
         # TODO: Add ability to specify custom timestamp
         if vision_pose:
             self._odometry.addVisionMeasurement(vision_pose, wpilib.Timer.getFPGATimestamp())
@@ -262,7 +263,7 @@ class SwerveDrive(commands2.Subsystem):
 
     def reset_odometry_to_vision(self):
         """Reset the robot's pose to the vision pose estimation"""
-        estimated_pose = self._vision_pose_callback()
+        estimated_pose = self._vision_pose_callback(self.pose)
         if estimated_pose:
             self.reset_odometry(estimated_pose)
 
