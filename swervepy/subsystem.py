@@ -50,7 +50,7 @@ class SwerveDrive(commands2.Subsystem):
         max_velocity: Quantity,
         max_angular_velocity: Quantity,
         path_following_params: Optional["TrajectoryFollowerParameters"] = None,
-        vision_pose_callback: Callable[[Pose2d], Optional[Pose2d]] = lambda _: None,
+        vision_pose_callback: Callable[[Pose2d], Optional[tuple[Pose2d, float]]] = lambda _: None,
     ):
         """
         Construct a swerve drivetrain as a Subsystem.
@@ -59,9 +59,11 @@ class SwerveDrive(commands2.Subsystem):
         :param gyro: A gyro sensor that provides a CCW+ heading reading of the chassis
         :param max_velocity: The actual maximum velocity of the robot
         :param max_angular_velocity: The actual maximum angular (turning) velocity of the robot
-        :param vision_pose_callback: An optional method that returns an estimation of the robot's pose derived from vision.
-               This pose from this method is integrated into the robot's odometry. The robot's current pose is passed
-               into the method as an argument.
+        :param vision_pose_callback: An optional method that returns an estimation of the robot's pose derived from vision and the timestamp
+               of when that pose measurement was taken (in seconds). The timestamp needs to be synchronized with the RoboRIO's
+               FPGA clock. ``Timer.getFPGATimestamp()`` may be used to acquire the timestamp.
+               The robot's current pose is passed into the method as an argument.
+               This pose from this method is integrated into the robot's odometry.
         """
 
         super().__init__()
@@ -126,10 +128,10 @@ class SwerveDrive(commands2.Subsystem):
         )
 
     def periodic(self):
-        vision_pose = self._vision_pose_callback(self.pose)
-        # TODO: Add ability to specify custom timestamp
-        if vision_pose:
-            self._odometry.addVisionMeasurement(vision_pose, wpilib.Timer.getFPGATimestamp())
+        vision_result = self._vision_pose_callback(self.pose)
+        if vision_result:
+            vision_pose, timestamp = vision_result
+            self._odometry.addVisionMeasurement(vision_pose, timestamp)
 
         robot_pose = self._odometry.update(self._gyro.heading, self.module_positions)
 
@@ -263,7 +265,7 @@ class SwerveDrive(commands2.Subsystem):
 
     def reset_odometry_to_vision(self):
         """Reset the robot's pose to the vision pose estimation"""
-        estimated_pose = self._vision_pose_callback(self.pose)
+        estimated_pose, _timestamp = self._vision_pose_callback(self.pose)
         if estimated_pose:
             self.reset_odometry(estimated_pose)
 
@@ -466,4 +468,4 @@ def should_flip_path() -> bool:
     # Boolean supplier that controls when the path will be mirrored for the red alliance
     # This will flip the path being followed to the red side of the field.
     # THE ORIGIN WILL REMAIN ON THE BLUE SIDE
-    return wpilib.DriverStation.getAlliance() is wpilib.DriverStation.Alliance.kRed
+    return wpilib.DriverStation.getAlliance() == wpilib.DriverStation.Alliance.kRed
