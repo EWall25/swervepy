@@ -8,7 +8,7 @@ from . import SendableABCMeta
 
 class Gyro(Sendable, metaclass=SendableABCMeta):
     @abstractmethod
-    def zero_heading(self):
+    def zero_heading(self, offset: float = 0):
         """Set the gyro sensor's current heading as zero"""
         raise NotImplementedError
 

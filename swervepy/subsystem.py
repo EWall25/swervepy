@@ -18,6 +18,7 @@ import wpimath.estimator
 import wpimath.kinematics
 from pint import Quantity
 from typing_extensions import deprecated
+from wpilib import SmartDashboard
 from wpimath.geometry import Pose2d, Translation2d, Rotation2d
 from wpimath.kinematics import ChassisSpeeds, SwerveModuleState, SwerveModulePosition
 from wpiutil import SendableBuilder
@@ -137,6 +138,9 @@ class SwerveDrive(commands2.Subsystem):
 
         # Visualize robot position on field
         self.field.setRobotPose(robot_pose)
+        SmartDashboard.putNumber("Robot X", robot_pose.x)
+        SmartDashboard.putNumber("Robot Y", robot_pose.y)
+        SmartDashboard.putString("Swerve Command", self.getCurrentCommand().getName() if self.getCurrentCommand() is not None else "None")
 
     def simulationPeriodic(self):
         # Run a periodic simulation method that updates sensor readings based on desired velocities and rotations
@@ -247,12 +251,12 @@ class SwerveDrive(commands2.Subsystem):
         # Any time encoder distances are reset, odometry must also be reset
         self.reset_odometry(self.pose)
 
-    def zero_heading(self):
+    def zero_heading(self, offset: float = 0):
         """Set the chassis' current heading as "zero" or straight forward"""
-        self._gyro.zero_heading()
+        self._gyro.zero_heading(offset)
 
         # Any time gyro angle is reset, odometry must also be reset
-        self._odometry.resetPosition(Rotation2d(), self.module_positions, self.pose)
+        self._odometry.resetPosition(Rotation2d.fromDegrees(offset), self.module_positions, self.pose)
 
     def reset_odometry(self, pose: Pose2d):
         """

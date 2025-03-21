@@ -100,8 +100,8 @@ class Pigeon2Gyro(Gyro):
 
         wpilib.SmartDashboard.putData("Pigeon 2", self)
 
-    def zero_heading(self):
-        self._gyro.reset()
+    def zero_heading(self, offset: float = 0):
+        self._gyro.set_yaw(offset)
 
     def simulation_periodic(self, delta_position: float):
         # Convert delta_position from radians to degrees and add it into the simulation
